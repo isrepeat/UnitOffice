@@ -22,6 +22,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{91E8
 		Projects\Components\Library\PersonalEventsBuilder.WinRt.xml = Projects\Components\Library\PersonalEventsBuilder.WinRt.xml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sources", "Sources", "{E649F354-5C30-4526-BC56-F418929E3826}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Windows", "Windows", "{A939F85B-C90B-448B-A58A-4153EBDE77B5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PersonalEventsBuilder.WinRt", "PersonalEventsBuilder.WinRt", "{9DD1DA9C-BF2F-49AA-AD64-1D2E062B904E}"
+	ProjectSection(SolutionItems) = preProject
+		Sources\Windows\PersonalEventsBuilder.WinRt\EventBuilder.idl = Sources\Windows\PersonalEventsBuilder.WinRt\EventBuilder.idl
+		Sources\Windows\PersonalEventsBuilder.WinRt\EventBuilder.h = Sources\Windows\PersonalEventsBuilder.WinRt\EventBuilder.h
+		Sources\Windows\PersonalEventsBuilder.WinRt\EventBuilder.cpp = Sources\Windows\PersonalEventsBuilder.WinRt\EventBuilder.cpp
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -35,6 +46,8 @@ Global
 		{1C1FC4AA-6F1D-4FFA-B464-439FC8990901} = {6DB38FB4-DBFA-4A89-A802-E221B5D5C077}
 		{A08695BC-E4C7-4E9B-8D7B-DF86C239446F} = {1C1FC4AA-6F1D-4FFA-B464-439FC8990901}
 		{91E8FC89-0783-4702-9058-05EB01D2CC3E} = {1C1FC4AA-6F1D-4FFA-B464-439FC8990901}
+		{A939F85B-C90B-448B-A58A-4153EBDE77B5} = {E649F354-5C30-4526-BC56-F418929E3826}
+		{9DD1DA9C-BF2F-49AA-AD64-1D2E062B904E} = {A939F85B-C90B-448B-A58A-4153EBDE77B5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00000000-0000-0000-0000-000000000000}

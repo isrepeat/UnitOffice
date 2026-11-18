@@ -1,0 +1,8 @@
+namespace PersonalEventsBuilder.WinRt
+{
+    runtimeclass EventBuilder
+    {
+        EventBuilder();
+        String GetMessage();
+    }
+}
