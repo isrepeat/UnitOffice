@@ -10,11 +10,17 @@
         <Input role="header">Sources/Windows/PersonalEventsBuilder.WinRt/**/*.h</Input>
         <Input role="source">Sources/Windows/PersonalEventsBuilder.WinRt/**/*.cpp</Input>
         <Input role="source">Sources/Windows/PersonalEventsBuilder.WinRt/**/*.idl</Input>
+        <Group id="BuildFiles">
+          <Ref tag="Output" id="Dependencies" />
+        </Group>
       </Files>
       <Filters>
         <Filter filter="{Tree:Project}"
                 preserveTree="true">
           <Match>Sources/Windows/PersonalEventsBuilder.WinRt/**/*</Match>
+        </Filter>
+        <Filter filter="{Tree:Project}/Build">
+          <Ref tag="Group" id="BuildFiles" />
         </Filter>
       </Filters>
       <Requirements cxxStandard="20" />

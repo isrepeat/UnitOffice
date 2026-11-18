@@ -1,7 +1,5 @@
-namespace PersonalEventsBuilder.WinRt
-{
-    runtimeclass EventBuilder
-    {
+namespace PersonalEventsBuilder.WinRt {
+    runtimeclass EventBuilder {
         EventBuilder();
         String GetMessage();
     }

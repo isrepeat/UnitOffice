@@ -25,7 +25,8 @@
     <Output role="version-props">Projects/!Generated/MsBuild/{solutionName}.Version.{ext}</Output>
     <Output role="sourceIntegration-targets">Projects/!Generated/MsBuild/{solutionName}.Sources.{ext}</Output>
     <Output role="core-exportHeader">Projects/!Generated/Includes/UnitOffice/Export.{ext}</Output>
-    <Output role="dependencies-props">{projectDirectory}/{solutionName}.{name}.Dependencies.{ext}</Output>
+    <Output role="dependencies-props"
+            id="Dependencies">{projectDirectory}/{solutionName}.{name}.Dependencies.{ext}</Output>
     <Output role="project-nativeLibrary">{projectDirectory}/{solutionName}.{name}.{variant:title}.{ext}</Output>
     <Output role="project-nativeApplication">{projectDirectory}/{solutionName}.{name}.{ext}</Output>
     <Output role="project-winrt">{projectDirectory}/{solutionName}.{name}.{ext}</Output>
