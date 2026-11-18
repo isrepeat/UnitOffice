@@ -1,5 +1,11 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "!Repository", "!Repository", "{893C5E75-E59B-42F1-8BF2-FF6581A6031A}"
+	ProjectSection(SolutionItems) = preProject
+		Components.xml = Components.xml
+		Version.json = Version.json
+	EndProjectSection
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projects", "Projects", "{6DB38FB4-DBFA-4A89-A802-E221B5D5C077}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Components", "Components", "{1C1FC4AA-6F1D-4FFA-B464-439FC8990901}"
@@ -9,9 +15,32 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application"
 		Projects\Components\Application\PersonalEventsBuilder.xml = Projects\Components\Application\PersonalEventsBuilder.xml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{91E8FC89-0783-4702-9058-05EB01D2CC3E}"
+	ProjectSection(SolutionItems) = preProject
+		Projects\Components\Library\Excel.Core.xml = Projects\Components\Library\Excel.Core.xml
+		Projects\Components\Library\PersonalEventsBuilder.Core.xml = Projects\Components\Library\PersonalEventsBuilder.Core.xml
+		Projects\Components\Library\PersonalEventsBuilder.WinRt.xml = Projects\Components\Library\PersonalEventsBuilder.WinRt.xml
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1C1FC4AA-6F1D-4FFA-B464-439FC8990901} = {6DB38FB4-DBFA-4A89-A802-E221B5D5C077}
 		{A08695BC-E4C7-4E9B-8D7B-DF86C239446F} = {1C1FC4AA-6F1D-4FFA-B464-439FC8990901}
+		{91E8FC89-0783-4702-9058-05EB01D2CC3E} = {1C1FC4AA-6F1D-4FFA-B464-439FC8990901}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {00000000-0000-0000-0000-000000000000}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+	EndGlobalSection
+	GlobalSection(SolutionInjectorProjectOwnership) = preSolution
 	EndGlobalSection
 EndGlobal

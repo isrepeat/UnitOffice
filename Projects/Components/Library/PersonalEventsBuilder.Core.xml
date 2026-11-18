@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Component name="PersonalEventsBuilder.Core">
+  <Projects>
+    <Project id="native"
+             kind="library"
+             projectType="native"
+             msbuildGuid="{7A55B9D0-4152-4E52-9336-74F2BB02AB55}">
+      <Variants>Static</Variants>
+      <Dependencies>
+        <Dependency component="Excel.Core"
+                    visibility="private"
+                    linkage="same" />
+      </Dependencies>
+      <Files>
+        <Input role="header">Includes/PersonalEventsBuilder.Core/UnitOffice/PersonalEventsBuilder.Core/**/*.h</Input>
+        <Input role="source">Sources/PersonalEventsBuilder.Core/**/*.cpp</Input>
+      </Files>
+      <Filters>
+        <Filter filter="{Tree:Project}"
+                preserveTree="true">
+          <Match>Includes/PersonalEventsBuilder.Core/**/*</Match>
+          <Match>Sources/PersonalEventsBuilder.Core/**/*</Match>
+        </Filter>
+      </Filters>
+      <Requirements cxxStandard="20" />
+      <Compile>
+        <IncludeDirectories>
+          <IncludeDirectory>Includes/PersonalEventsBuilder.Core</IncludeDirectory>
+        </IncludeDirectories>
+        <PrecompiledHeader>notUsing</PrecompiledHeader>
+      </Compile>
+    </Project>
+  </Projects>
+</Component>

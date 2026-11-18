@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Component name="PersonalEventsBuilder">
+  <Projects>
+    <Project id="application"
+             kind="application"
+             projectType="winui"
+             msbuildGuid="{E297DA24-DFCD-433B-84B5-AC3D76CD6579}">
+      <Files>
+        <Input role="source">Sources/Windows/PersonalEventsBuilder/**/*.cs</Input>
+        <Input role="source">Sources/Windows/PersonalEventsBuilder/**/*.xaml</Input>
+      </Files>
+      <Filters>
+        <Filter filter="{Tree:Project}"
+                preserveTree="true">
+          <Match>Sources/Windows/PersonalEventsBuilder/**/*</Match>
+        </Filter>
+      </Filters>
+      <MSBuild>
+        <Properties>
+          <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+          <AssemblyName>PersonalEventsBuilder</AssemblyName>
+          <RootNamespace>PersonalEventsBuilder</RootNamespace>
+        </Properties>
+      </MSBuild>
+      <Dependencies>
+        <Dependency component="PersonalEventsBuilder.WinRt"
+                    visibility="private"
+                    linkage="dynamic" />
+      </Dependencies>
+    </Project>
+  </Projects>
+</Component>

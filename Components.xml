@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ComponentRegistry schemaVersion="7">
+  <Components>
+    <Component>Projects/Components/Library/Excel.Core.xml</Component>
+    <Component>Projects/Components/Library/PersonalEventsBuilder.Core.xml</Component>
+    <Component>Projects/Components/Library/PersonalEventsBuilder.WinRt.xml</Component>
+    <Component>Projects/Components/Application/PersonalEventsBuilder.xml</Component>
+  </Components>
+  <Generation>
+    <MSBuild>
+      <SolutionName>UnitOffice</SolutionName>
+      <SolutionFolder>
+        <Default>Projects/!Generated/MsBuild/{kind:title}/{name}</Default>
+      </SolutionFolder>
+      <ProjectDirectory>
+        <Default>Projects/!Generated/MsBuild/{kind:title}/{name}</Default>
+      </ProjectDirectory>
+      <Configurations>Debug;Release</Configurations>
+      <Platforms>x64</Platforms>
+    </MSBuild>
+  </Generation>
+  <Files>
+    <Input role="version-source">Version.json</Input>
+    <Output role="version-header">Projects/!Generated/Includes/UnitOffice/Version.{ext}</Output>
+    <Output role="version-props">Projects/!Generated/MsBuild/{solutionName}.Version.{ext}</Output>
+    <Output role="sourceIntegration-targets">Projects/!Generated/MsBuild/{solutionName}.Sources.{ext}</Output>
+    <Output role="core-exportHeader">Projects/!Generated/Includes/UnitOffice/Export.{ext}</Output>
+    <Output role="dependencies-props">{projectDirectory}/{solutionName}.{name}.Dependencies.{ext}</Output>
+    <Output role="project-nativeLibrary">{projectDirectory}/{solutionName}.{name}.{variant:title}.{ext}</Output>
+    <Output role="project-nativeApplication">{projectDirectory}/{solutionName}.{name}.{ext}</Output>
+    <Output role="project-winrt">{projectDirectory}/{solutionName}.{name}.{ext}</Output>
+    <Output role="project-winrtProjection">{projectDirectory}/{solutionName}.{name}.Projection.{ext}</Output>
+    <Output role="project-winui">{projectDirectory}/{solutionName}.{name}.{ext}</Output>
+    <Output role="project-headerCheck">{projectDirectory}/{solutionName}.{name}.HeaderCheck.{ext}</Output>
+    <Output role="source-headerCheck">{projectDirectory}/HeaderCheck.{ext}</Output>
+    <Output role="shared-items">{projectDirectory}/{solutionName}.{name}.Shared.{ext}</Output>
+    <Output role="component-exportHeader">Projects/!Generated/Includes/UnitOffice/{name}/Export.{ext}</Output>
+  </Files>
+</ComponentRegistry>

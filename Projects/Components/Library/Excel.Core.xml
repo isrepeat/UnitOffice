@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Component name="Excel.Core">
+  <Projects>
+    <Project id="native"
+             kind="library"
+             projectType="native"
+             msbuildGuid="{1B237096-9F34-4339-9197-9136E329384B}">
+      <Files>
+        <Input role="header">Includes/Excel.Core/UnitOffice/Excel.Core/**/*.h</Input>
+        <Input role="source">Sources/Excel.Core/**/*.cpp</Input>
+      </Files>
+      <Filters>
+        <Filter filter="{Tree:Project}"
+                preserveTree="true">
+          <Match>Includes/Excel.Core/**/*</Match>
+          <Match>Sources/Excel.Core/**/*</Match>
+        </Filter>
+      </Filters>
+      <Requirements cxxStandard="20" />
+    </Project>
+  </Projects>
+</Component>
