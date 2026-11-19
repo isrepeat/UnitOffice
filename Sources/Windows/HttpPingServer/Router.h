@@ -137,7 +137,7 @@ namespace unitoffice::windows::httppingserver {
 			const auto type = details::Header(request, "X-Chat-Type");
 			const bool hasImage = type == "image";
 			const bool hasFiles = type == "file" || type == "files";
-			constexpr std::size_t maxFileBytes = 10 * 1024 * 1024;
+			constexpr std::size_t maxFileBytes = 50 * 1024 * 1024;
 			constexpr std::size_t maxEncodedBytes = ((maxFileBytes + 2) / 3) * 4;
 			constexpr std::size_t maxFileName = 4096;
 			constexpr std::size_t maxFiles = 200;

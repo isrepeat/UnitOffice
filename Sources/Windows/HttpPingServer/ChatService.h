@@ -57,7 +57,7 @@ namespace unitoffice::windows::httppingserver {
 				bytes
 			});
 			storedBytes += bytes;
-			while (messages.size() > 200 || storedBytes > 32 * 1024 * 1024) {
+			while (messages.size() > 200 || storedBytes > 96 * 1024 * 1024) {
 				const auto& oldest = messages.front();
 				storedBytes -= oldest.bytes;
 				messages.pop_front();

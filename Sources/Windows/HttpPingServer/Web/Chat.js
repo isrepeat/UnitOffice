@@ -394,7 +394,7 @@ async function request(url, options = {}) {
 
 async function poll() {
 	try {
-		const response = await request('/messages?after=' + cursor);
+		const response = await request('/messages?after=' + cursor, {signal: AbortSignal.timeout(120000)});
 		const data = await response.json();
 
 		const history = $('messages').parentElement;
@@ -581,8 +581,8 @@ async function attachFiles(files, fromClipboard) {
 		return;
 	}
 	const total = [...pendingFiles, ...incoming].reduce((sum, file) => sum + file.size, 0);
-	if (total > 10 * 1024 * 1024) {
-		$('send-error').textContent = 'Общий размер файлов не должен превышать 10 МБ.';
+	if (total > 50 * 1024 * 1024) {
+		$('send-error').textContent = 'Общий размер файлов не должен превышать 50 МБ.';
 		$('send-error').hidden = false;
 		return;
 	}
