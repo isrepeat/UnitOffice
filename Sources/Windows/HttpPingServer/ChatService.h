@@ -30,13 +30,16 @@ namespace unitoffice::windows::httppingserver {
 		std::uint64_t id;
 		std::string sender;
 		std::string text;
+		std::string image;
 	};
 
 	class ChatService {
 	public:
-		void Add(std::string_view sender, std::string text) {
-			messages.push_back({nextId++, std::string(sender), std::move(text)});
-			if (messages.size() > 200) {
+		void Add(std::string_view sender, std::string text, std::string image = {}) {
+			storedBytes += text.size() + image.size();
+			messages.push_back({nextId++, std::string(sender), std::move(text), std::move(image)});
+			while (messages.size() > 200 || storedBytes > 32 * 1024 * 1024) {
+				storedBytes -= messages.front().text.size() + messages.front().image.size();
 				messages.pop_front();
 			}
 		}
@@ -51,7 +54,7 @@ namespace unitoffice::windows::httppingserver {
 				}
 				first = false;
 				body += "{\"id\":" + std::to_string(message.id) + ",\"sender\":" + details::JsonString(message.sender) +
-					",\"text\":" + details::JsonString(message.text) + "}";
+					",\"text\":" + details::JsonString(message.text) + ",\"image\":" + details::JsonString(message.image) + "}";
 			}
 			body += "]}";
 			return body;
@@ -60,5 +63,6 @@ namespace unitoffice::windows::httppingserver {
 	private:
 		std::deque<Message> messages;
 		std::uint64_t nextId = 1;
+		std::size_t storedBytes = 0;
 	};
 }

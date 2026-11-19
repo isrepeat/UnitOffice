@@ -3,16 +3,22 @@
   <PropertyGroup Condition="Exists('C:\!PackagesFeed\Windows')">
     <RestorePackagesPath Condition="'$(RestorePackagesPath)' == ''">$(MSBuildThisFileDirectory)..\..\..\!artifacts\nuget\HttpPingServer</RestorePackagesPath>
   </PropertyGroup>
+  <PropertyGroup>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="UniversalDevKit.Helpers" Version="[0.1.0]" />
     <PackageReference Include="UniversalDevKit.Diagnostic" Version="[0.1.0]" />
   </ItemGroup>
   <ItemGroup>
-    <HttpPingServerWebAsset Include="$(MSBuildThisFileDirectory)Web\*.html;$(MSBuildThisFileDirectory)Web\*.css;$(MSBuildThisFileDirectory)Web\*.js" />
+    <HttpPingServerWebAsset Include="$(MSBuildThisFileDirectory)Web\**\*" />
   </ItemGroup>
   <Target Name="CopyHttpPingServerWebAssets" AfterTargets="Build">
     <Copy SourceFiles="@(HttpPingServerWebAsset)"
-          DestinationFolder="$(TargetDir)Web"
-          SkipUnchangedFiles="true" />
+          DestinationFiles="@(HttpPingServerWebAsset->'$(TargetDir)Web\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="false" />
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)SetupHttps.ps1;$(MSBuildThisFileDirectory)TrustHttps.ps1"
+          DestinationFolder="$(TargetDir)"
+          SkipUnchangedFiles="false" />
   </Target>
 </Project>

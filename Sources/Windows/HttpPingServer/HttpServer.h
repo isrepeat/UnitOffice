@@ -77,7 +77,8 @@ namespace unitoffice::windows::httppingserver {
 				response.EntityChunkCount = sendBody ? 1 : 0;
 				response.pEntityChunks = sendBody ? &chunk : nullptr;
 				response.Headers.KnownHeaders[HttpHeaderContentType] = {static_cast<USHORT>(std::char_traits<char>::length(contentType)), contentType};
-				response.Headers.KnownHeaders[HttpHeaderCacheControl] = {8, "no-store"};
+				constexpr std::string_view cacheControl = "no-store, no-cache, max-age=0, must-revalidate";
+				response.Headers.KnownHeaders[HttpHeaderCacheControl] = {static_cast<USHORT>(cacheControl.size()), cacheControl.data()};
 
 				// Отправляем ответ и закрываем соединение, включая непрочитанное тело.
 				const ULONG sendStatus = ::HttpSendHttpResponse(

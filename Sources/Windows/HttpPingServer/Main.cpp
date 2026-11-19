@@ -26,28 +26,32 @@ namespace unitoffice::windows::httppingserver {
 	}
 
 	void Run(int argc, wchar_t* argv[]) {
-#ifdef _DEBUG
 		constexpr std::wstring_view defaultAddress = L"192.168.202.46";
-#else
-		constexpr std::wstring_view defaultAddress = L"127.0.0.1";
-#endif
-		const std::wstring_view address = argc == 2 ? argv[1] : defaultAddress;
-		if (argc > 2 || address.empty() || address.find_first_not_of(L"0123456789.") != std::wstring_view::npos) {
-			throw std::runtime_error("Usage: UnitOffice.HttpPingServer.exe [IPv4-address]");
+		const std::wstring_view option = argc > 1 ? argv[argc - 1] : L"";
+		const bool hasProtocolOption = option == L"--https" || option == L"--http";
+		const bool useHttps = option != L"--http";
+		const int addressCount = argc - (hasProtocolOption ? 1 : 0);
+		const std::wstring_view address = addressCount == 2 ? argv[1] : defaultAddress;
+		if (addressCount > 2 || address.empty() || address.find_first_not_of(L"0123456789.") != std::wstring_view::npos) {
+			throw std::runtime_error("Usage: UnitOffice.HttpPingServer.exe [IPv4-address] [--https|--http]");
 		}
 
+		std::string accessKey;
+#ifdef _DEBUG
+		accessKey = "unitoffice-local-test-2026";
+#else
 		std::fprintf(stderr, "Enter the shared chat password: ");
 		std::fflush(stderr);
-		std::string accessKey;
 		if (!std::getline(std::cin, accessKey)) {
 			throw std::runtime_error("Could not read the chat password.");
 		}
+#endif
 		if (accessKey.size() < 16 || accessKey.size() > 1023 ||
 			accessKey.find_first_not_of("!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~") != std::string::npos) {
 			throw std::runtime_error("Use 16 to 1023 printable ASCII characters without spaces for the chat password.");
 		}
 
-		const std::wstring url = L"http://" + std::wstring(address) + L":8080/";
+		const std::wstring url = (useHttps ? L"https://" : L"http://") + std::wstring(address) + (useHttps ? L":8443/" : L":8080/");
 		Router router(accessKey);
 		HttpServer::Run(url, router);
 	}

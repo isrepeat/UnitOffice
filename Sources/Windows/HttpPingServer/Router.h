@@ -3,6 +3,7 @@
 #include "ChatService.h"
 
 #include <filesystem>
+#include <functional>
 #include <stdexcept>
 #include <charconv>
 #include <iterator>
@@ -38,6 +39,24 @@ namespace unitoffice::windows::httppingserver {
 						return HttpResponse::Error(500);
 					}
 					std::string body(std::istreambuf_iterator<char>{file}, std::istreambuf_iterator<char>{});
+					if (std::wstring_view(asset.fileName) == L"Chat.html") {
+						for (const auto* name : {"Chat.css", "Chat.js"}) {
+							std::ifstream resource(this->webDirectory / name, std::ios::binary);
+							if (!resource) {
+								return HttpResponse::Error(500);
+							}
+							const std::string content(std::istreambuf_iterator<char>{resource}, std::istreambuf_iterator<char>{});
+							const std::string reference = std::string(name) + '"';
+							const auto position = body.find(reference);
+							if (position != std::string::npos) {
+								body.replace(
+									position,
+									reference.size(),
+									std::string(name) + "?v=" + std::to_string(std::hash<std::string>{}(content)) + '"'
+								);
+							}
+						}
+					}
 					return {200, std::move(body), asset.contentType};
 				}
 			}
@@ -115,11 +134,27 @@ namespace unitoffice::windows::httppingserver {
 				return HttpResponse::Error(400);
 			}
 			std::string text;
-			const auto status = details::ReadMessage(requestQueue, request.RequestId, text);
+			const bool hasImage = details::Header(request, "X-Chat-Type") == "image";
+			const auto status = details::ReadMessage(requestQueue, request.RequestId, text, hasImage ? 5610000 : 16000);
 			if (status != 200) {
 				return HttpResponse::Error(status);
 			}
-			this->chatService.Add(sender, std::move(text));
+			std::string image;
+			if (hasImage) {
+				const auto separator = text.find('\n');
+				if (separator == std::string::npos || separator > 5592430 || text.size() - separator - 1 > 16000) {
+					return HttpResponse::Error(400);
+				}
+				image = text.substr(0, separator);
+				text.erase(0, separator + 1);
+				constexpr std::string_view prefix = "data:image/png;base64,";
+				if (!image.starts_with(prefix) || !std::string_view(image).substr(prefix.size()).starts_with("iVBORw0KGgo") ||
+					(image.size() - prefix.size()) % 4 != 0 ||
+					image.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", prefix.size()) != std::string::npos) {
+					return HttpResponse::Error(400);
+				}
+			}
+			this->chatService.Add(sender, std::move(text), std::move(image));
 			return {200, "accepted"};
 		}
 

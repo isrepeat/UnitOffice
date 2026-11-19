@@ -233,6 +233,104 @@ button:hover:enabled {
 	overflow-wrap: anywhere;
 }
 
+.message-image {
+	display: block;
+	max-width: 100%;
+	max-height: 60vh;
+	object-fit: contain;
+	margin-top: 8px;
+}
+
+.message a {
+	color: var(--accent);
+}
+
+.image-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.image-action {
+	position: relative;
+	display: inline-grid;
+	place-items: center;
+	width: 30px;
+	height: 30px;
+	padding: 0;
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	color: var(--muted);
+	background: #292827;
+	text-decoration: none;
+}
+
+.image-action:hover:enabled,
+a.image-action:hover {
+	color: var(--accent);
+	background: #3a3630;
+}
+
+.image-action::before,
+.image-action::after {
+	content: "";
+	position: absolute;
+}
+
+.image-action--copy::before,
+.image-action--copy::after {
+	width: 9px;
+	height: 11px;
+	border: 1px solid currentColor;
+	border-radius: 2px;
+}
+
+.image-action--copy::before {
+	transform: translate(-2px, -2px);
+}
+
+.image-action--copy::after {
+	transform: translate(2px, 2px);
+	background: inherit;
+}
+
+.image-action--download::before {
+	width: 14px;
+	height: 16px;
+	background: currentColor;
+	clip-path: polygon(43% 0, 57% 0, 57% 45%, 78% 28%, 88% 39%, 50% 72%, 12% 39%, 22% 28%, 43% 45%);
+}
+
+.image-action--download::after {
+	width: 14px;
+	height: 4px;
+	border: 1px solid currentColor;
+	border-top: 0;
+	transform: translateY(7px);
+}
+
+.image-feedback {
+	flex-basis: 100%;
+	margin: 0;
+	color: var(--muted);
+	font-size: 0.85rem;
+}
+
+#attachment {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 10px;
+}
+
+#preview {
+	max-width: 50%;
+	max-height: 120px;
+	object-fit: contain;
+}
+
 .composer {
 	grid-row: 4;
 	border-top: 1px solid var(--border);
