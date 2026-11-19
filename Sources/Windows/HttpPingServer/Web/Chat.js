@@ -292,6 +292,20 @@ function clearImage() {
 }
 
 $('remove-image').onclick = clearImage;
+$('text').addEventListener('keydown', event => {
+	if (event.key !== 'Enter' || event.isComposing || event.keyCode === 229) return;
+	if (event.shiftKey) return;
+	event.preventDefault();
+	if (event.altKey) {
+		const field = $('text');
+		const length = field.value.length - (field.selectionEnd - field.selectionStart) + 1;
+		if (length > field.maxLength) return;
+		field.setRangeText('\n', field.selectionStart, field.selectionEnd, 'end');
+		field.dispatchEvent(new Event('input', {bubbles: true}));
+		return;
+	}
+	if (!event.repeat && !$('submit').disabled) $('send').requestSubmit($('submit'));
+});
 $('text').addEventListener('paste', async event => {
 	const items = Array.from(event.clipboardData?.items ?? []);
 	const item = items.find(value => value.type.startsWith('image/'));
