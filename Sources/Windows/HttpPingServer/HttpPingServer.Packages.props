@@ -17,8 +17,5 @@
     <Copy SourceFiles="@(HttpPingServerWebAsset)"
           DestinationFiles="@(HttpPingServerWebAsset->'$(TargetDir)Web\%(RecursiveDir)%(Filename)%(Extension)')"
           SkipUnchangedFiles="false" />
-    <Copy SourceFiles="$(MSBuildThisFileDirectory)SetupHttps.ps1;$(MSBuildThisFileDirectory)TrustHttps.ps1"
-          DestinationFolder="$(TargetDir)"
-          SkipUnchangedFiles="false" />
   </Target>
 </Project>

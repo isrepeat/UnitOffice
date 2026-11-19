@@ -6,9 +6,9 @@
 
 Проект использует NuGet-пакеты `UniversalDevKit.Helpers` и `UniversalDevKit.Diagnostic` версии `0.1.0`. Для локальной сборки положи оба `.nupkg` в `C:\!PackagesFeed\Windows` и восстанови пакеты NuGet. Diagnostic должен быть собран той же версией MSVC, что и HttpPingServer.
 
-Собери `UnitOffice.HttpPingServer` в Visual Studio, конфигурация `Debug | x64`. Рядом с exe должны находиться DLL зависимостей, папка `Web`, `SetupHttps.ps1` и `TrustHttps.ps1`. При переносе сервера переноси этот комплект целиком. Путь к exe смотри в выводе сборки; в текущей конфигурации Visual Studio используется `C:\WORK\Windows\Projects\UnitOffice\x64\Debug`.
+Собери `UnitOffice.HttpPingServer` в Visual Studio, конфигурация `Debug | x64`. Рядом с exe должны находиться DLL зависимостей и папка `Web`. При переносе сервера переноси этот комплект целиком. Скрипты настройки `SetupHttps.ps1` и `TrustHttps.ps1` хранятся в `Sources/Windows/HttpPingServer` и запускаются отдельно из исходников. Путь к exe смотри в выводе сборки; в текущей конфигурации Visual Studio используется `C:\WORK\Windows\Projects\UnitOffice\x64\Debug`.
 
-При каждой сборке, включая сборку без изменений C++, MSBuild копирует всё содержимое `Web` с заменой в `$(TargetDir)Web`, сохраняя подпапки, и копирует оба HTTPS-скрипта рядом с exe. Быстрый пропуск сборки Visual Studio отключён для этого проекта. Сервер читает ресурсы рядом со своим exe, запрещает кеширование ответов и добавляет к URL CSS/JS версию по содержимому. После обновления ресурсов достаточно обновить вкладку; после замены exe сервер нужно перезапустить. Для просмотра дизайна без сервера открой `Web/Chat.html`.
+При каждой сборке, включая сборку без изменений C++, MSBuild копирует всё содержимое `Web` с заменой в `$(TargetDir)Web`, сохраняя подпапки. Быстрый пропуск сборки Visual Studio отключён для этого проекта. Сервер читает ресурсы рядом со своим exe, запрещает кеширование ответов и добавляет к URL CSS/JS версию по содержимому. После обновления ресурсов достаточно обновить вкладку; после замены exe сервер нужно перезапустить. Для просмотра дизайна без сервера открой `Web/Chat.html`.
 
 ## Первичная настройка HTTPS на локальном ПК
 
@@ -27,7 +27,7 @@
 Открой Windows PowerShell **от имени администратора** и выполни:
 
 ```powershell
-cd C:\WORK\Windows\Projects\UnitOffice\x64\Debug
+cd C:\WORK\Windows\Projects\UnitOffice\Sources\Windows\HttpPingServer
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\SetupHttps.ps1 -ServerUser "$env:USERDOMAIN\$env:USERNAME"
 ```
 
