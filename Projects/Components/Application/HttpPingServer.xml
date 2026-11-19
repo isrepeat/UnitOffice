@@ -7,13 +7,29 @@
              msbuildGuid="{B582509A-99A0-484D-82ED-D9DC1A4342BF}">
       <Files>
         <Input role="source">Sources/Windows/HttpPingServer/**/*.cpp</Input>
+        <Input role="header">Sources/Windows/HttpPingServer/**/*.h</Input>
+        <Input role="header">Sources/Windows/HttpPingServer/Web/**/*.inc</Input>
+        <Input role="msbuild-props">Sources/Windows/HttpPingServer/HttpPingServer.Packages.props</Input>
       </Files>
       <Filters>
         <Filter filter="{Tree:Project}">
           <Match>Sources/Windows/HttpPingServer/**/*</Match>
         </Filter>
+        <Filter filter="{Tree:Project}/Web">
+          <Match>Sources/Windows/HttpPingServer/Web/**/*</Match>
+        </Filter>
+				<Filter filter="{Tree:Project}/Build">
+					<Match>Sources/Windows/HttpPingServer/**/*.props</Match>
+					<Match>Sources/Windows/HttpPingServer/**/*.targets</Match>
+				</Filter>
       </Filters>
       <Requirements cxxStandard="20" />
+      <MSBuild>
+        <Properties>
+          <EnableNativePackageReferenceSupport>true</EnableNativePackageReferenceSupport>
+          <UniversalDevKitComponents>Helpers;Diagnostic</UniversalDevKitComponents>
+        </Properties>
+      </MSBuild>
     </Project>
   </Projects>
 </Component>

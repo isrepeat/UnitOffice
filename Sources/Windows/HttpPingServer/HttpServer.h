@@ -1,29 +1,28 @@
 #pragma once
+#include <UniversalDevKit/Diagnostic/Logging.h>
+
 #include "Router.h"
 
 #include <system_error>
-#include <cstdio>
-#include <cwchar>
 #include <memory>
 
 #pragma comment(lib, "Httpapi.lib")
 
-namespace unitoffice::windows::httppingserver::details {
-
+namespace unitoffice::windows::httppingserver {
 	class HttpServer {
 	public:
 		static void Run(const std::wstring& url, Router& router) {
 			HttpServer httpServer;
-			Check(::HttpCreateHttpHandle(&httpServer.requestQueue, 0), "HttpCreateHttpHandle");
-			Check(::HttpAddUrl(httpServer.requestQueue, url.c_str(), nullptr), "HttpAddUrl");
+			HttpServer::Check(::HttpCreateHttpHandle(&httpServer.requestQueue, 0), "HttpCreateHttpHandle");
+			HttpServer::Check(::HttpAddUrl(httpServer.requestQueue, url.c_str(), nullptr), "HttpAddUrl");
 			httpServer.registeredUrl = url.c_str();
-			std::wprintf(L"Listening on %ls\n", url.c_str());
-			Serve(httpServer.requestQueue, router);
+			UDK_LOG_INFO("HttpPingServer", L"Listening on {}", url);
+			HttpServer::Serve(httpServer.requestQueue, router);
 		}
 
 	private:
 		HttpServer() {
-			Check(::HttpInitialize(HTTPAPI_VERSION_1, HTTP_INITIALIZE_SERVER, nullptr), "HttpInitialize");
+			HttpServer::Check(::HttpInitialize(HTTPAPI_VERSION_1, HTTP_INITIALIZE_SERVER, nullptr), "HttpInitialize");
 		}
 
 		~HttpServer() {
@@ -63,7 +62,7 @@ namespace unitoffice::windows::httppingserver::details {
 					&bytesReceived,
 					nullptr
 				);
-				Check(receiveStatus, "HttpReceiveHttpRequest");
+				HttpServer::Check(receiveStatus, "HttpReceiveHttpRequest");
 				auto [statusCode, body, contentType] = router.Route(requestQueue, *request);
 				const bool sendBody = request->Verb != HttpVerbHEAD;
 				HTTP_DATA_CHUNK chunk{};
@@ -94,11 +93,11 @@ namespace unitoffice::windows::httppingserver::details {
 					nullptr
 				);
 				if (sendStatus != NO_ERROR) {
-					std::fprintf(stderr, "HttpSendHttpResponse: %lu\n", sendStatus);
+					UDK_LOG_ERROR("HttpPingServer", "HttpSendHttpResponse failed (Win32 error {})", sendStatus);
 				} else {
 					const char* method = request->Verb == HttpVerbGET ? "GET" :
 						request->Verb == HttpVerbHEAD ? "HEAD" : request->Verb == HttpVerbPOST ? "POST" : "OTHER";
-					std::fprintf(stderr, "%s -> %u\n", method, static_cast<unsigned>(response.StatusCode));
+					UDK_LOG_INFO("HttpPingServer", "{} -> {}", method, response.StatusCode);
 				}
 			}
 		}

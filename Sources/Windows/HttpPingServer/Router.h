@@ -5,21 +5,31 @@
 #include <charconv>
 #include <optional>
 
-namespace unitoffice::windows::httppingserver::details {
+namespace unitoffice::windows::httppingserver {
 
 	class Router {
 	public:
-		explicit Router(std::string_view accessKey) : accessKey(accessKey) {}
+		explicit Router(std::string_view accessKey)
+			: accessKey(accessKey) {
+		}
 
 		HttpResponse Route(HANDLE requestQueue, const HTTP_REQUEST& request) {
 			const auto& url = request.CookedUrl;
 			const std::wstring_view path(url.pAbsPath, url.AbsPathLength / sizeof(wchar_t));
-			if (path == L"/messages") return RouteMessages(requestQueue, request);
-			if (path == L"/ping" && request.Verb == HttpVerbPOST) return {200, "pong\n"};
-			if (request.Verb != HttpVerbGET && request.Verb != HttpVerbHEAD) return HttpResponse::Error(404);
+			if (path == L"/messages") {
+				return this->RouteMessages(requestQueue, request);
+			}
+			if (path == L"/ping" && request.Verb == HttpVerbPOST) {
+				return {200, "pong\n"};
+			}
+			if (request.Verb != HttpVerbGET && request.Verb != HttpVerbHEAD) {
+				return HttpResponse::Error(404);
+			}
 
 			for (const auto& asset : assets) {
-				if (asset.path == path) return {200, asset.body, asset.contentType};
+				if (asset.path == path) {
+					return {200, asset.body, asset.contentType};
+				}
 			}
 			return HttpResponse::Error(404);
 		}
@@ -54,35 +64,53 @@ namespace unitoffice::windows::httppingserver::details {
 		};
 
 		static std::optional<std::uint64_t> ParseCursor(const HTTP_COOKED_URL& url) {
-			if (url.QueryStringLength == 0) return 0;
+			if (url.QueryStringLength == 0) {
+				return 0;
+			}
 			std::wstring_view query(url.pQueryString, url.QueryStringLength / sizeof(wchar_t));
-			if (!query.starts_with(L"?after=") || query.size() == 7) return std::nullopt;
+			if (!query.starts_with(L"?after=") || query.size() == 7) {
+				return std::nullopt;
+			}
 
 			std::string digits;
 			for (const wchar_t character : query.substr(7)) {
-				if (character < L'0' || character > L'9') return std::nullopt;
+				if (character < L'0' || character > L'9') {
+					return std::nullopt;
+				}
 				digits += static_cast<char>(character);
 			}
 			std::uint64_t after = 0;
 			const auto parsed = std::from_chars(digits.data(), digits.data() + digits.size(), after);
-			if (parsed.ec != std::errc{} || parsed.ptr != digits.data() + digits.size()) return std::nullopt;
+			if (parsed.ec != std::errc{} || parsed.ptr != digits.data() + digits.size()) {
+				return std::nullopt;
+			}
 			return after;
 		}
 
 		HttpResponse RouteMessages(HANDLE requestQueue, const HTTP_REQUEST& request) {
-			if (Header(request, "X-Chat-Key") != accessKey) return HttpResponse::Error(401);
-			if (request.Verb == HttpVerbGET) {
-				const auto after = ParseCursor(request.CookedUrl);
-				if (!after) return HttpResponse::Error(400);
-				return {200, chatService.ReadAfter(*after), "application/json; charset=utf-8"};
+			if (details::Header(request, "X-Chat-Key") != accessKey) {
+				return HttpResponse::Error(401);
 			}
-			if (request.Verb != HttpVerbPOST) return HttpResponse::Error(405);
-			const auto sender = Header(request, "X-Chat-Sender");
-			if (sender != "local" && sender != "sedo") return HttpResponse::Error(400);
+			if (request.Verb == HttpVerbGET) {
+				const auto after = Router::ParseCursor(request.CookedUrl);
+				if (!after) {
+					return HttpResponse::Error(400);
+				}
+				return {200, this->chatService.ReadAfter(*after), "application/json; charset=utf-8"};
+			}
+			if (request.Verb != HttpVerbPOST) {
+				return HttpResponse::Error(405);
+			}
+			const auto sender = details::Header(request, "X-Chat-Sender");
+			if (sender != "local" && sender != "sedo") {
+				return HttpResponse::Error(400);
+			}
 			std::string text;
-			const auto status = ReadMessage(requestQueue, request.RequestId, text);
-			if (status != 200) return HttpResponse::Error(status);
-			chatService.Add(sender, std::move(text));
+			const auto status = details::ReadMessage(requestQueue, request.RequestId, text);
+			if (status != 200) {
+				return HttpResponse::Error(status);
+			}
+			this->chatService.Add(sender, std::move(text));
 			return {200, "accepted"};
 		}
 

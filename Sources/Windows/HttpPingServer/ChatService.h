@@ -1,40 +1,44 @@
 #pragma once
 #include <string_view>
 #include <cstdint>
+#include <utility>
 #include <string>
 #include <deque>
-#include <utility>
 
-namespace unitoffice::windows::httppingserver::details {
+namespace unitoffice::windows::httppingserver {
+	namespace details {
+		inline std::string JsonString(std::string_view value) {
+			std::string result = "\"";
+			constexpr char hex[] = "0123456789abcdef";
+			for (unsigned char character : value) {
+				if (character == '"' || character == '\\') {
+					result += '\\';
+					result += character;
+				} else if (character < 32) {
+					result += "\\u00";
+					result += hex[character >> 4];
+					result += hex[character & 15];
+				} else {
+					result += character;
+				}
+			}
+			return result + '"';
+		}
+	} // namespace details
+
 	struct Message {
 		std::uint64_t id;
 		std::string sender;
 		std::string text;
 	};
 
-	inline std::string JsonString(std::string_view value) {
-		std::string result = "\"";
-		constexpr char hex[] = "0123456789abcdef";
-		for (unsigned char character : value) {
-			if (character == '"' || character == '\\') {
-				result += '\\';
-				result += character;
-			} else if (character < 32) {
-				result += "\\u00";
-				result += hex[character >> 4];
-				result += hex[character & 15];
-			} else {
-				result += character;
-			}
-		}
-		return result + '"';
-	}
-
 	class ChatService {
 	public:
 		void Add(std::string_view sender, std::string text) {
 			messages.push_back({nextId++, std::string(sender), std::move(text)});
-			if (messages.size() > 200) messages.pop_front();
+			if (messages.size() > 200) {
+				messages.pop_front();
+			}
 		}
 
 		std::string ReadAfter(std::uint64_t after) const {
@@ -42,10 +46,12 @@ namespace unitoffice::windows::httppingserver::details {
 			bool first = true;
 			for (const auto& message : messages) {
 				if (message.id <= after) continue;
-				if (!first) body += ',';
+				if (!first) {
+					body += ',';
+				}
 				first = false;
-				body += "{\"id\":" + std::to_string(message.id) + ",\"sender\":" + JsonString(message.sender) +
-					",\"text\":" + JsonString(message.text) + "}";
+				body += "{\"id\":" + std::to_string(message.id) + ",\"sender\":" + details::JsonString(message.sender) +
+					",\"text\":" + details::JsonString(message.text) + "}";
 			}
 			body += "]}";
 			return body;
