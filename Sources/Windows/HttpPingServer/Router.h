@@ -75,6 +75,8 @@ namespace unitoffice::windows::httppingserver {
 			{L"/local", L"Chat.html", "text/html; charset=utf-8"},
 			{L"/sedo", L"Chat.html", "text/html; charset=utf-8"},
 			{L"/test", L"Diagnostics.html", "text/html; charset=utf-8"},
+			{L"/page1", L"Page1.html", "text/html; charset=utf-8"},
+			{L"/page1/card", L"Page1.html", "text/html; charset=utf-8"},
 			{L"/Chat.css", L"Chat.css", "text/css; charset=utf-8"},
 			{L"/Chat.js", L"Chat.js", "text/javascript; charset=utf-8"},
 			{L"/web/chat.css", L"Chat.css", "text/css; charset=utf-8"},
