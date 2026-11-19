@@ -54,6 +54,7 @@ namespace unitoffice::windows::httppingserver {
 		USHORT statusCode;
 		std::string body;
 		const char* contentType = "text/plain; charset=utf-8";
+		bool allowAnyOrigin = false;
 
 		static HttpResponse Error(USHORT statusCode) {
 			return {statusCode, "Request rejected"};

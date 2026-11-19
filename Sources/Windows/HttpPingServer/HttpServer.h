@@ -63,7 +63,7 @@ namespace unitoffice::windows::httppingserver {
 					nullptr
 				);
 				HttpServer::Check(receiveStatus, "HttpReceiveHttpRequest");
-				auto [statusCode, body, contentType] = router.Route(requestQueue, *request);
+				auto [statusCode, body, contentType, allowAnyOrigin] = router.Route(requestQueue, *request);
 				const bool sendBody = request->Verb != HttpVerbHEAD;
 				HTTP_DATA_CHUNK chunk{};
 				chunk.DataChunkType = HttpDataChunkFromMemory;
@@ -79,6 +79,12 @@ namespace unitoffice::windows::httppingserver {
 				response.Headers.KnownHeaders[HttpHeaderContentType] = {static_cast<USHORT>(std::char_traits<char>::length(contentType)), contentType};
 				constexpr std::string_view cacheControl = "no-store, no-cache, max-age=0, must-revalidate";
 				response.Headers.KnownHeaders[HttpHeaderCacheControl] = {static_cast<USHORT>(cacheControl.size()), cacheControl.data()};
+				constexpr char corsHeaderName[] = "Access-Control-Allow-Origin";
+				HTTP_UNKNOWN_HEADER corsHeader{sizeof(corsHeaderName) - 1, 1, corsHeaderName, "*"};
+				if (allowAnyOrigin) {
+					response.Headers.UnknownHeaderCount = 1;
+					response.Headers.pUnknownHeaders = &corsHeader;
+				}
 
 				// Отправляем ответ и закрываем соединение, включая непрочитанное тело.
 				const ULONG sendStatus = ::HttpSendHttpResponse(

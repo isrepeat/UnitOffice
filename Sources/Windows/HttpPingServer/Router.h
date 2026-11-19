@@ -26,7 +26,7 @@ namespace unitoffice::windows::httppingserver {
 				return this->RouteMessages(requestQueue, request);
 			}
 			if (path == L"/ping" && request.Verb == HttpVerbPOST) {
-				return {200, "pong\n"};
+				return {200, "pong\n", "text/plain; charset=utf-8", true};
 			}
 			if (request.Verb != HttpVerbGET && request.Verb != HttpVerbHEAD) {
 				return HttpResponse::Error(404);
