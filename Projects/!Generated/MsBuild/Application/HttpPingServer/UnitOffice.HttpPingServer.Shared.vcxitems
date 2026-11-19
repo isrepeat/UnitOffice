@@ -18,6 +18,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Router.h">
       <__UniversalDevKitFilter></__UniversalDevKitFilter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Snippets\SedoDiagnostics.js">
+      <__UniversalDevKitFilter>Snippets</__UniversalDevKitFilter>
+    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Chat.css">
       <__UniversalDevKitFilter>Web</__UniversalDevKitFilter>
     </ClInclude>
@@ -37,6 +40,15 @@
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\HttpPingServer.Packages.props">
       <__UniversalDevKitFilter>Build</__UniversalDevKitFilter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\README.md">
+      <__UniversalDevKitFilter></__UniversalDevKitFilter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\SetupHttps.ps1">
+      <__UniversalDevKitFilter></__UniversalDevKitFilter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\TrustHttps.ps1">
+      <__UniversalDevKitFilter></__UniversalDevKitFilter>
     </None>
   </ItemGroup>
 </Project>

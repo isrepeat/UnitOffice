@@ -11,14 +11,21 @@
         <Input role="header">Sources/Windows/HttpPingServer/Web/**/*.html</Input>
         <Input role="header">Sources/Windows/HttpPingServer/Web/**/*.css</Input>
         <Input role="header">Sources/Windows/HttpPingServer/Web/**/*.js</Input>
+        <Input role="header">Sources/Windows/HttpPingServer/Snippets/**/*.js</Input>
         <Input role="msbuild-props">Sources/Windows/HttpPingServer/HttpPingServer.Packages.props</Input>
       </Files>
+      <BrowseFiles>
+        <File>Sources/Windows/HttpPingServer/**/*</File>
+      </BrowseFiles>
       <Filters>
         <Filter filter="{Tree:Project}">
           <Match>Sources/Windows/HttpPingServer/**/*</Match>
         </Filter>
         <Filter filter="{Tree:Project}/Web">
           <Match>Sources/Windows/HttpPingServer/Web/**/*</Match>
+        </Filter>
+        <Filter filter="{Tree:Project}/Snippets">
+          <Match>Sources/Windows/HttpPingServer/Snippets/**/*</Match>
         </Filter>
 				<Filter filter="{Tree:Project}/Build">
 					<Match>Sources/Windows/HttpPingServer/**/*.props</Match>

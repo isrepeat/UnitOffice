@@ -3,6 +3,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Build" />
+    <Filter Include="Snippets" />
     <Filter Include="Web" />
   </ItemGroup>
   <ItemGroup>
@@ -11,6 +12,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\HttpExchange.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\HttpServer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Router.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Snippets\SedoDiagnostics.js">
+      <Filter>Snippets</Filter>
+    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Chat.css">
       <Filter>Web</Filter>
     </ClInclude>
@@ -26,5 +30,8 @@
     <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\HttpPingServer.Packages.props">
       <Filter>Build</Filter>
     </None>
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\README.md" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\SetupHttps.ps1" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\TrustHttps.ps1" />
   </ItemGroup>
 </Project>
