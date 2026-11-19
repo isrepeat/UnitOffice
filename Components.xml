@@ -5,6 +5,7 @@
     <Component>Projects/Components/Library/PersonalEventsBuilder.Core.xml</Component>
     <Component>Projects/Components/Library/PersonalEventsBuilder.WinRt.xml</Component>
     <Component>Projects/Components/Application/PersonalEventsBuilder.xml</Component>
+    <Component>Projects/Components/Application/HttpPingServer.xml</Component>
   </Components>
   <Generation>
     <MSBuild>

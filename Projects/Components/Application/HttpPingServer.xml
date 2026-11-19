@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Component name="HttpPingServer">
+  <Projects>
+    <Project id="native"
+             kind="application"
+             projectType="native"
+             msbuildGuid="{B582509A-99A0-484D-82ED-D9DC1A4342BF}">
+      <Files>
+        <Input role="source">Sources/Windows/HttpPingServer/**/*.cpp</Input>
+      </Files>
+      <Filters>
+        <Filter filter="{Tree:Project}">
+          <Match>Sources/Windows/HttpPingServer/**/*</Match>
+        </Filter>
+      </Filters>
+      <Requirements cxxStandard="20" />
+    </Project>
+  </Projects>
+</Component>

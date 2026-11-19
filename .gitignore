@@ -10,6 +10,26 @@ Desktop.ini
 # Результаты сборки
 [Bb]in/
 [Oo]bj/
+*.exe
+*.dll
+*.lib
+*.obj
+*.o
+*.a
+*.so
+*.dylib
+*.pdb
+*.idb
+*.ilk
+*.pch
+*.exp
+*.tlog
+*.log
+*.lastbuildstate
+*.recipe
+/!artifacts/
+*.obj.dt.*
+*.FileListAbsolute.txt
 
 # Временные файлы Office и локальные рабочие данные
 ~$*
