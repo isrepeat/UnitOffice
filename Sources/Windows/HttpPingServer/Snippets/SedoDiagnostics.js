@@ -10,10 +10,14 @@
 	let stopped = false;
 
 	function record(entry) {
-		if (!['fetch', 'xmlhttprequest', 'beacon', 'eventsource'].includes(entry.initiatorType)) return;
+		if (!['fetch', 'xmlhttprequest', 'beacon', 'eventsource'].includes(entry.initiatorType)) {
+			return;
+		}
 		try {
 			const url = new URL(entry.name, location.href);
-			if (!['http:', 'https:'].includes(url.protocol) || url.origin === server) return;
+			if (!['http:', 'https:'].includes(url.protocol) || url.origin === server) {
+				return;
+			}
 			const parameters = [...new Set(url.searchParams.keys())].sort();
 			const path = url.pathname.replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi, ':id')
 				.replace(/\/\d+(?=\/|$)/g, '/:id');
@@ -27,11 +31,15 @@
 				count: (previous?.count ?? 0) + 1,
 				status: entry.responseStatus || 'unknown',
 			};
-			if (!previous && endpoints.size >= 500) endpoints.delete(endpoints.keys().next().value);
+			if (!previous && endpoints.size >= 500) {
+				endpoints.delete(endpoints.keys().next().value);
+			}
 			endpoints.set(key, row);
-			if (!previous) console.log('[SEDO API candidate]', row);
+			if (!previous) {
+				console.log('[SEDO API candidate]', row);
+			}
 		} catch {
-			// Некорректная запись не должна прерывать наблюдение.
+			// Skip malformed entries so monitoring can continue.
 		}
 	}
 
@@ -71,7 +79,9 @@
 	}
 
 	function stop() {
-		if (stopped) return;
+		if (stopped) {
+			return;
+		}
 		if (observer) {
 			observer.takeRecords().forEach(record);
 			observer.disconnect();
@@ -83,14 +93,18 @@
 
 	performance.getEntriesByType('resource').forEach(record);
 	try {
-		observer = new PerformanceObserver(list => list.getEntries().forEach(record));
+		observer = new PerformanceObserver(list => {
+			list.getEntries().forEach(record);
+		});
 		observer.observe({type: 'resource'});
 	} catch {
 		console.warn('[SEDO diagnostics] Доступен только снимок уже выполненных запросов.');
 		stopped = true;
 	}
 	window.sedoProbe = {report, ping, stop};
-	if (!stopped) timer = setTimeout(stop, 5 * 60 * 1000);
+	if (!stopped) {
+		timer = setTimeout(stop, 5 * 60 * 1000);
+	}
 	console.log('[SEDO diagnostics] Origin:', location.origin, '| secure context:', window.isSecureContext);
 	console.log('Выполни обычные действия в СЕДО, затем sedoProbe.report(). Остановка: sedoProbe.stop(). Автоостановка через 5 минут.');
 	report();

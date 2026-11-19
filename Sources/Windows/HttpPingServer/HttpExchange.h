@@ -18,7 +18,7 @@ namespace unitoffice::windows::httppingserver {
 		}
 
 		inline USHORT ReadMessage(HANDLE requestQueue, HTTP_REQUEST_ID requestId, std::string& body, std::size_t limit = 16000) {
-			// Читаем тело частями и ограничиваем размер до выделения истории.
+			// Read the request body in chunks and enforce the size limit before storing the message.
 			char buffer[4096];
 			for (;;) {
 				ULONG received = 0;
@@ -35,7 +35,9 @@ namespace unitoffice::windows::httppingserver {
 					return 413;
 				}
 				body.append(buffer, received);
-				if (status == ERROR_HANDLE_EOF) break;
+				if (status == ERROR_HANDLE_EOF) {
+					break;
+				}
 				if (status != NO_ERROR) {
 					return 400;
 				}

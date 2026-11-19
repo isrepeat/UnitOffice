@@ -51,7 +51,7 @@ namespace unitoffice::windows::httppingserver {
 			auto* request = reinterpret_cast<HTTP_REQUEST*>(requestBuffer.get());
 
 			for (;;) {
-				// Получаем следующий HTTP-запрос.
+				// Receive the next HTTP request.
 				ULONG bytesReceived = 0;
 				const ULONG receiveStatus = ::HttpReceiveHttpRequest(
 					requestQueue,
@@ -86,7 +86,7 @@ namespace unitoffice::windows::httppingserver {
 					response.Headers.pUnknownHeaders = &corsHeader;
 				}
 
-				// Отправляем ответ и закрываем соединение, включая непрочитанное тело.
+				// Send the response and close the connection even if the request body has unread data.
 				const ULONG sendStatus = ::HttpSendHttpResponse(
 					requestQueue,
 					request->RequestId,

@@ -134,12 +134,24 @@ namespace unitoffice::windows::httppingserver {
 				return HttpResponse::Error(400);
 			}
 			std::string text;
-			const bool hasImage = details::Header(request, "X-Chat-Type") == "image";
-			const auto status = details::ReadMessage(requestQueue, request.RequestId, text, hasImage ? 5610000 : 16000);
+			const auto type = details::Header(request, "X-Chat-Type");
+			const bool hasImage = type == "image";
+			const bool hasFiles = type == "file" || type == "files";
+			constexpr std::size_t maxFileBytes = 10 * 1024 * 1024;
+			constexpr std::size_t maxEncodedBytes = ((maxFileBytes + 2) / 3) * 4;
+			constexpr std::size_t maxFileName = 4096;
+			constexpr std::size_t maxFiles = 200;
+			const auto status = details::ReadMessage(
+				requestQueue,
+				request.RequestId,
+				text,
+				hasFiles ? maxEncodedBytes + maxFiles * (maxFileName + 6) + 16001 : (hasImage ? 5610000 : 16000)
+			);
 			if (status != 200) {
 				return HttpResponse::Error(status);
 			}
 			std::string image;
+			std::vector<Attachment> attachments;
 			if (hasImage) {
 				const auto separator = text.find('\n');
 				if (separator == std::string::npos || separator > 5592430 || text.size() - separator - 1 > 16000) {
@@ -153,8 +165,42 @@ namespace unitoffice::windows::httppingserver {
 					image.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", prefix.size()) != std::string::npos) {
 					return HttpResponse::Error(400);
 				}
+			} else if (hasFiles) {
+				std::string_view remaining(text);
+				std::size_t totalBytes = 0;
+				do {
+					const auto nameEnd = remaining.find('\n');
+					const auto dataEnd = nameEnd == std::string_view::npos ? nameEnd : remaining.find('\n', nameEnd + 1);
+					if (nameEnd == 0 || nameEnd > maxFileName || dataEnd == std::string_view::npos || attachments.size() == maxFiles) {
+						return HttpResponse::Error(400);
+					}
+					const auto name = remaining.substr(0, nameEnd);
+					const auto data = remaining.substr(nameEnd + 1, dataEnd - nameEnd - 1);
+					if (name.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.!~*'()%") != std::string_view::npos ||
+						data.size() % 4 != 0) {
+						return HttpResponse::Error(400);
+					}
+					const std::size_t padding = data.ends_with("==") ? 2 : (data.ends_with("=") ? 1 : 0);
+					if (data.substr(0, data.size() - padding).find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")
+						!= std::string_view::npos) {
+						return HttpResponse::Error(400);
+					}
+					totalBytes += data.size() / 4 * 3 - padding;
+					if (totalBytes > maxFileBytes) {
+						return HttpResponse::Error(413);
+					}
+					attachments.push_back({std::string(name), std::string(data)});
+					remaining.remove_prefix(dataEnd + 1);
+				} while (type == "files" && !remaining.starts_with('\n'));
+				if (type == "files") {
+					remaining.remove_prefix(1);
+				}
+				if (remaining.size() > 16000) {
+					return HttpResponse::Error(400);
+				}
+				text.erase(0, text.size() - remaining.size());
 			}
-			this->chatService.Add(sender, std::move(text), std::move(image));
+			this->chatService.Add(sender, std::move(text), std::move(image), std::move(attachments));
 			return {200, "accepted"};
 		}
 

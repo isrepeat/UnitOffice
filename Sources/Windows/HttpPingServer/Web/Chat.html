@@ -37,10 +37,11 @@
 			<div class="composer-field">
 				<div id="attachment" hidden>
 					<img id="preview" alt="Скриншот перед отправкой">
-					<button id="remove-image" type="button">Убрать изображение</button>
+					<span id="file-name"></span>
+					<button id="remove-image" type="button">Убрать вложения</button>
 				</div>
 				<textarea id="text" maxlength="4000" disabled
-					aria-label="Сообщение" title="Enter — отправить; Shift+Enter или Alt+Enter — новая строка" placeholder="Напиши сообщение…" rows="3"></textarea>
+					aria-label="Сообщение" title="Enter — отправить; Shift+Enter или Alt+Enter — новая строка. Файлы общим размером до 10 МБ можно перетащить сюда или вставить через Ctrl+V." placeholder="Напиши сообщение или перетащи файлы…" rows="3"></textarea>
 			</div>
 			<button id="submit" disabled>Отправить</button>
 			<p id="send-error" class="send-error" role="status" hidden></p>

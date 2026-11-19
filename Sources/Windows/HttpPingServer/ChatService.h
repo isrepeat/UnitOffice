@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <utility>
 #include <string>
+#include <vector>
 #include <deque>
 
 namespace unitoffice::windows::httppingserver {
@@ -26,20 +27,39 @@ namespace unitoffice::windows::httppingserver {
 		}
 	} // namespace details
 
+	struct Attachment {
+		std::string name;
+		std::string data;
+	};
+
 	struct Message {
 		std::uint64_t id;
 		std::string sender;
 		std::string text;
 		std::string image;
+		std::vector<Attachment> attachments;
+		std::size_t bytes;
 	};
 
 	class ChatService {
 	public:
-		void Add(std::string_view sender, std::string text, std::string image = {}) {
-			storedBytes += text.size() + image.size();
-			messages.push_back({nextId++, std::string(sender), std::move(text), std::move(image)});
+		void Add(std::string_view sender, std::string text, std::string image, std::vector<Attachment> attachments) {
+			std::size_t bytes = text.size() + image.size();
+			for (const auto& attachment : attachments) {
+				bytes += sizeof(Attachment) + attachment.name.size() + attachment.data.size();
+			}
+			messages.push_back({
+				nextId++,
+				std::string(sender),
+				std::move(text),
+				std::move(image),
+				std::move(attachments),
+				bytes
+			});
+			storedBytes += bytes;
 			while (messages.size() > 200 || storedBytes > 32 * 1024 * 1024) {
-				storedBytes -= messages.front().text.size() + messages.front().image.size();
+				const auto& oldest = messages.front();
+				storedBytes -= oldest.bytes;
 				messages.pop_front();
 			}
 		}
@@ -48,13 +68,26 @@ namespace unitoffice::windows::httppingserver {
 			std::string body = "{\"latest\":" + std::to_string(nextId - 1) + ",\"messages\":[";
 			bool first = true;
 			for (const auto& message : messages) {
-				if (message.id <= after) continue;
+				if (message.id <= after) {
+					continue;
+				}
 				if (!first) {
 					body += ',';
 				}
 				first = false;
 				body += "{\"id\":" + std::to_string(message.id) + ",\"sender\":" + details::JsonString(message.sender) +
-					",\"text\":" + details::JsonString(message.text) + ",\"image\":" + details::JsonString(message.image) + "}";
+					",\"text\":" + details::JsonString(message.text) + ",\"image\":" + details::JsonString(message.image);
+				if (!message.attachments.empty()) {
+					body += ",\"files\":[";
+					for (const auto& attachment : message.attachments) {
+						if (&attachment != &message.attachments.front()) {
+							body += ',';
+						}
+						body += "{\"name\":" + details::JsonString(attachment.name) + ",\"data\":" + details::JsonString(attachment.data) + '}';
+					}
+					body += ']';
+				}
+				body += '}';
 			}
 			body += "]}";
 			return body;

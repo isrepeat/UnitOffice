@@ -5,6 +5,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+    <OutDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\..\!artifacts\projects\Windows\msbuild\$(MSBuildProjectName)\bin\$(Platform)\$(Configuration)'))\</OutDir>
+    <IntDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\..\!artifacts\projects\Windows\msbuild\$(MSBuildProjectName)\obj\$(Platform)\$(Configuration)'))\</IntDir>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="UniversalDevKit.Helpers" Version="[0.1.0]" />

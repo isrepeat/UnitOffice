@@ -221,8 +221,14 @@ button:hover:enabled {
 	margin: 0;
 }
 
+.message-header {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
 .message-meta {
-	padding-inline-end: 28px;
+	flex: 1;
 	color: var(--muted);
 	font-size: 0.78rem;
 	font-weight: 650;
@@ -233,12 +239,36 @@ button:hover:enabled {
 	overflow-wrap: anywhere;
 }
 
+.message--gallery {
+	width: 364px;
+}
+
+.image-gallery {
+	display: grid;
+	grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+	height: 272px;
+	gap: 8px;
+	margin-top: 8px;
+	margin-bottom: 6px;
+}
+
+.image-gallery--grid {
+	grid-template: repeat(2, minmax(0, 1fr)) / repeat(2, minmax(0, 1fr));
+}
+
+.image-tile {
+	position: relative;
+	min-width: 0;
+	min-height: 0;
+}
+
 .message-image {
 	display: block;
-	max-width: 100%;
-	max-height: 60vh;
+	width: 100%;
+	height: 100%;
 	object-fit: contain;
-	margin-top: 8px;
+	background: #171717;
+	border-radius: 4px;
 }
 
 .message a {
@@ -246,11 +276,55 @@ button:hover:enabled {
 }
 
 .image-actions {
+	position: absolute;
+	inset: auto 5px 5px;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
+	justify-content: flex-end;
+	gap: 4px;
+}
+
+.image-actions .image-action {
+	background: #252422;
+	color: #e1dcd4;
+}
+
+.image-actions .image-action:hover:enabled,
+.image-actions a.image-action:hover {
+	background: #3a3630;
+	color: var(--accent);
+}
+
+.file-attachment {
+	display: flex;
+	align-items: center;
 	gap: 8px;
-	margin-top: 8px;
+}
+
+.file-attachment span {
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.file-attachment .image-action {
+	flex-shrink: 0;
+}
+
+.download-all {
+	flex: none;
+}
+
+.file-attachment .image-action[data-result]::before {
+	content: attr(data-result);
+	position: static;
+	width: auto;
+	height: auto;
+	border: 0;
+}
+
+.file-attachment .image-action[data-result]::after {
+	content: none;
 }
 
 .image-action {
@@ -314,8 +388,13 @@ a.image-action:hover {
 .image-feedback {
 	flex-basis: 100%;
 	margin: 0;
-	color: var(--muted);
+	padding: 4px 6px;
+	border-radius: 4px;
+	background: #252422;
+	color: #e1dcd4;
 	font-size: 0.85rem;
+	max-height: 52px;
+	overflow: auto;
 }
 
 #attachment {
@@ -331,6 +410,10 @@ a.image-action:hover {
 	object-fit: contain;
 }
 
+#file-name {
+	overflow-wrap: anywhere;
+}
+
 .composer {
 	grid-row: 4;
 	border-top: 1px solid var(--border);
@@ -341,7 +424,8 @@ a.image-action:hover {
 }
 
 .copy-message {
-	position: absolute;
+	position: relative;
+	flex: none;
 	display: grid;
 	place-items: center;
 	width: 26px;
@@ -353,8 +437,6 @@ a.image-action:hover {
 }
 
 .copy-message {
-	top: 4px;
-	right: 4px;
 	opacity: 0;
 	pointer-events: none;
 }
