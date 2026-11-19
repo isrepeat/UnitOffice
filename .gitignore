@@ -28,8 +28,8 @@ Desktop.ini
 *.lastbuildstate
 *.recipe
 /!artifacts/
-/Projects/!Generated/MsBuild/Application/HttpPingServer/x64/*/Web/
-/x64/*/Web/
+/Projects/!Generated/MsBuild/Application/HttpPingServer/x64/
+/x64/
 *.obj.dt.*
 *.FileListAbsolute.txt
 
