@@ -281,6 +281,22 @@ function makeDownloadAllButton(attachments, id) {
 	return button;
 }
 
+function updateMessageTextToggle(text) {
+	const toggle = text.nextElementSibling;
+	if (toggle.getAttribute('aria-expanded') === 'true') {
+		return;
+	}
+	const clipped = text.scrollHeight > text.clientHeight;
+	toggle.hidden = !clipped;
+	text.classList.toggle('message-text--fade', clipped);
+}
+
+const messageTextObserver = new ResizeObserver(entries => {
+	for (const {target} of entries) {
+		updateMessageTextToggle(target);
+	}
+});
+
 function appendMessage(message) {
 	const item = document.createElement('article');
 	item.className = 'message';
@@ -294,13 +310,7 @@ function appendMessage(message) {
 	meta.textContent = sender + ' · #' + message.id;
 	header.append(meta);
 
-	const text = document.createElement('p');
-	text.className = 'message-text';
-	text.textContent = message.text;
-	item.append(header, text);
-	if (message.text) {
-		header.append(makeCopyButton(message.text));
-	}
+	item.append(header);
 	const attachments = [];
 	const pngPrefix = 'data:image/png;base64,';
 	if (typeof message.image === 'string' && /^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(message.image)) {
@@ -326,10 +336,37 @@ function appendMessage(message) {
 			appendFile(item, attachment);
 		}
 	}
+	const text = document.createElement('p');
+	text.className = 'message-text message-text--collapsed';
+	text.id = 'message-text-' + message.id;
+	text.textContent = message.text;
+	if (message.text) {
+		header.append(makeCopyButton(message.text));
+		const toggle = document.createElement('button');
+		toggle.className = 'message-text-toggle';
+		toggle.type = 'button';
+		toggle.textContent = 'Показать полностью';
+		toggle.hidden = true;
+		toggle.setAttribute('aria-controls', text.id);
+		toggle.setAttribute('aria-expanded', 'false');
+		toggle.addEventListener('click', () => {
+			const expand = toggle.getAttribute('aria-expanded') === 'false';
+			text.classList.toggle('message-text--collapsed', !expand);
+			text.classList.remove('message-text--fade');
+			toggle.setAttribute('aria-expanded', String(expand));
+			toggle.textContent = expand ? 'Свернуть' : 'Показать полностью';
+			updateMessageTextToggle(text);
+		});
+		item.append(text, toggle);
+	}
 	if (attachments.length > 1) {
 		header.append(makeDownloadAllButton(attachments, message.id));
 	}
 	$('messages').append(item);
+	if (message.text) {
+		updateMessageTextToggle(text);
+		messageTextObserver.observe(text);
+	}
 }
 
 function headers() {
@@ -366,6 +403,7 @@ async function poll() {
 
 		if (data.latest < cursor) {
 			cursor = 0;
+			messageTextObserver.disconnect();
 			$('messages').replaceChildren();
 			$('empty').hidden = false;
 			setStatus('online', 'Подключено · история сброшена');
@@ -377,7 +415,12 @@ async function poll() {
 			cursor = message.id;
 
 			while ($('messages').children.length > 200) {
-				$('messages').firstChild.remove();
+				const oldest = $('messages').firstElementChild;
+				const text = oldest.querySelector('.message-text');
+				if (text) {
+					messageTextObserver.unobserve(text);
+				}
+				oldest.remove();
 			}
 		}
 

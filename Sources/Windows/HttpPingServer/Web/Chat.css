@@ -239,6 +239,34 @@ button:hover:enabled {
 	overflow-wrap: anywhere;
 }
 
+.file-attachment + .message-text {
+	margin-top: 6px;
+}
+
+.message-text--collapsed {
+	max-height: 12lh;
+	overflow: hidden;
+}
+
+.message-text--fade {
+	mask-image: linear-gradient(to bottom, #000 calc(100% - 1.5lh), transparent);
+}
+
+.message-text-toggle {
+	display: block;
+	padding: 0;
+	border: 0;
+	border-radius: 4px;
+	background: transparent;
+	color: var(--accent);
+	font-size: 0.85rem;
+}
+
+.message-text-toggle:hover:enabled {
+	background: transparent;
+	text-decoration: underline;
+}
+
 .message--gallery {
 	width: 364px;
 }
