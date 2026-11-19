@@ -11,6 +11,37 @@
 #pragma comment(lib, "Httpapi.lib")
 
 namespace unitoffice::windows::httppingserver::details {
+	char diagnosticPage[] = R"HTML(<!doctype html>
+<meta charset="utf-8">
+<title>HttpPingServer diagnostics</title>
+<h1>HttpPingServer diagnostics</h1>
+<pre id="results">GET /test: page loaded
+</pre>
+<script>
+const results = document.getElementById('results');
+async function run() {
+	for (const [method, path, body, expected] of [
+		['GET', '/test', undefined, 200],
+		['HEAD', '/test', undefined, 200],
+		['GET', '/missing', undefined, 404],
+		['POST', '/ping', '', 200],
+		['POST', '/ping', 'diagnostic-ping', 200],
+	]) {
+		try {
+			const response = await fetch(path, {method, body, cache: 'no-store', signal: AbortSignal.timeout(5000)});
+			const valid = response.status === expected &&
+				(method !== 'POST' || (await response.text()).trim() === 'pong');
+			results.textContent += method + ' ' + path + (body ? ' (with body)' : '') +
+				': ' + response.status + (valid ? ' PASS' : ' FAIL') + '\n';
+		} catch (error) {
+			results.textContent += method + ' ' + path + ': ' + error + '\n';
+		}
+	}
+}
+run();
+</script>
+)HTML";
+
 	ULONG Serve(HANDLE requestQueue) {
 		constexpr auto requestBufferSize = 32768;
 		const auto requestBuffer = std::make_unique<unsigned char[]>(requestBufferSize);
@@ -34,22 +65,27 @@ namespace unitoffice::windows::httppingserver::details {
 
 			// Build the response for the requested route.
 			const auto& url = request->CookedUrl;
-			const bool isPing = request->Verb == HttpVerbPOST &&
-				std::wstring_view(url.pAbsPath, url.AbsPathLength / sizeof(wchar_t)) == L"/ping";
+			const std::wstring_view path(url.pAbsPath, url.AbsPathLength / sizeof(wchar_t));
+			const bool isPing = request->Verb == HttpVerbPOST && path == L"/ping";
+			const bool isTest = (request->Verb == HttpVerbGET || request->Verb == HttpVerbHEAD) && path == L"/test";
+			const bool found = isPing || isTest;
+			const bool sendBody = found && request->Verb != HttpVerbHEAD;
 
 			char pong[] = "pong\n";
 			HTTP_DATA_CHUNK chunk{};
 			chunk.DataChunkType = HttpDataChunkFromMemory;
-			chunk.FromMemory.pBuffer = pong;
-			chunk.FromMemory.BufferLength = sizeof(pong) - 1;
+			chunk.FromMemory.pBuffer = isTest ? diagnosticPage : pong;
+			chunk.FromMemory.BufferLength = isTest ? sizeof(diagnosticPage) - 1 : sizeof(pong) - 1;
 
 			HTTP_RESPONSE response{};
-			response.StatusCode = isPing ? 200 : 404;
-			response.pReason = isPing ? "OK" : "Not Found";
-			response.ReasonLength = isPing ? 2 : 9;
-			response.EntityChunkCount = isPing ? 1 : 0;
-			response.pEntityChunks = isPing ? &chunk : nullptr;
-			response.Headers.KnownHeaders[HttpHeaderContentType] = {10, "text/plain"};
+			response.StatusCode = found ? 200 : 404;
+			response.pReason = found ? "OK" : "Not Found";
+			response.ReasonLength = found ? 2 : 9;
+			response.EntityChunkCount = sendBody ? 1 : 0;
+			response.pEntityChunks = sendBody ? &chunk : nullptr;
+			response.Headers.KnownHeaders[HttpHeaderContentType] = isTest
+				? HTTP_KNOWN_HEADER{9, "text/html"}
+				: HTTP_KNOWN_HEADER{10, "text/plain"};
 
 			// Send the response to the client.
 			const ULONG sendStatus = ::HttpSendHttpResponse(
@@ -66,6 +102,10 @@ namespace unitoffice::windows::httppingserver::details {
 			);
 			if (sendStatus != NO_ERROR) {
 				std::fprintf(stderr, "HttpSendHttpResponse: %lu\n", sendStatus);
+			} else {
+				const char* method = request->Verb == HttpVerbGET ? "GET" :
+					request->Verb == HttpVerbHEAD ? "HEAD" : request->Verb == HttpVerbPOST ? "POST" : "OTHER";
+				std::fprintf(stderr, "%s %ls -> %u\n", method, isTest ? L"/test" : isPing ? L"/ping" : L"(unknown)", static_cast<unsigned>(response.StatusCode));
 			}
 		}
 	}
@@ -102,7 +142,12 @@ int wmain(int argc, wchar_t* argv[]) {
 		::CloseHandle(queue);
 	}
 
+	system("pause");
+
 	::HttpTerminate(HTTP_INITIALIZE_SERVER, nullptr);
 	std::fprintf(stderr, "Server stopped with Win32 error %lu\n", status);
+
+	system("pause");
+
 	return 1;
 }
