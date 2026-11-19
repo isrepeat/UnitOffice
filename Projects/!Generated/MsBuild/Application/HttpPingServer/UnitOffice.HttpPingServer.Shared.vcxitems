@@ -33,6 +33,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Diagnostics.html">
       <__UniversalDevKitFilter>Web</__UniversalDevKitFilter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Page1.html">
+      <__UniversalDevKitFilter>Web</__UniversalDevKitFilter>
+    </ClInclude>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Main.cpp">
       <__UniversalDevKitFilter></__UniversalDevKitFilter>
     </ClCompile>
@@ -40,6 +43,18 @@
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\HttpPingServer.Packages.props">
       <__UniversalDevKitFilter>Build</__UniversalDevKitFilter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Extension\background.js">
+      <__UniversalDevKitFilter></__UniversalDevKitFilter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Extension\content.js">
+      <__UniversalDevKitFilter></__UniversalDevKitFilter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Extension\manifest.json">
+      <__UniversalDevKitFilter></__UniversalDevKitFilter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Extension\README.md">
+      <__UniversalDevKitFilter></__UniversalDevKitFilter>
     </None>
     <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\README.md">
       <__UniversalDevKitFilter></__UniversalDevKitFilter>

@@ -12,7 +12,4 @@
       <Filter>Build</Filter>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Midl Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\PersonalEventsBuilder.WinRt\EventBuilder.idl" />
-  </ItemGroup>
 </Project>

@@ -2,10 +2,12 @@
 <ComponentRegistry schemaVersion="7">
   <Components>
     <Component>Projects/Components/Library/Excel.Core.xml</Component>
+    <Component>Projects/Components/Library/HttpHosting.xml</Component>
     <Component>Projects/Components/Library/PersonalEventsBuilder.Core.xml</Component>
     <Component>Projects/Components/Library/PersonalEventsBuilder.WinRt.xml</Component>
     <Component>Projects/Components/Application/PersonalEventsBuilder.xml</Component>
     <Component>Projects/Components/Application/HttpPingServer.xml</Component>
+    <Component>Projects/Components/Application/AscodSite.xml</Component>
   </Components>
   <Generation>
     <MSBuild>

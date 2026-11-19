@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Component name="HttpHosting">
+  <Projects>
+    <Project id="native"
+             kind="library"
+             projectType="native"
+             libraryType="headerOnly"
+             msbuildGuid="{91651791-87AF-49D5-B4D5-533383F584F5}">
+      <Files>
+        <Input role="header">Sources/Windows/HttpHosting/**/*.h</Input>
+      </Files>
+      <Requirements cxxStandard="20" />
+    </Project>
+  </Projects>
+</Component>

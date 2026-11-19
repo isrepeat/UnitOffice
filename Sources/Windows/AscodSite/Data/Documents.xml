@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<documents>
+  <document id="DEMO-001" folder="Incoming" date="2026-01-16" subject="Sample request" correspondent="Example Office A" status="New">
+    <file>test-request.txt</file>
+    <file>test-annex.txt</file>
+  </document>
+  <document id="DEMO-002" folder="Incoming" date="2026-01-15" subject="Sample meeting agenda" correspondent="Example Office B" status="In review">
+    <file>test-agenda.txt</file>
+  </document>
+  <document id="DEMO-003" folder="Outgoing" date="2026-01-14" subject="Sample reply" correspondent="Example Office A" status="Closed">
+    <file>test-reply.txt</file>
+  </document>
+  <document id="DEMO-004" folder="Internal" date="2026-01-13" subject="Sample internal note" correspondent="Example Team" status="New">
+    <file>test-note.txt</file>
+  </document>
+  <document id="DEMO-005" folder="Archive" date="2026-01-12" subject="Sample archived report" correspondent="Example Team" status="Closed">
+    <file>test-report.txt</file>
+  </document>
+</documents>

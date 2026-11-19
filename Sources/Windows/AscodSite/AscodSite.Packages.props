@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="Exists('C:\!PackagesFeed\Windows')">
+    <RestorePackagesPath Condition="'$(RestorePackagesPath)' == ''">$(MSBuildThisFileDirectory)..\..\..\!artifacts\nuget\AscodSite</RestorePackagesPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+    <OutDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\..\!artifacts\projects\Windows\msbuild\$(MSBuildProjectName)\bin\$(Platform)\$(Configuration)'))\</OutDir>
+    <IntDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\..\!artifacts\projects\Windows\msbuild\$(MSBuildProjectName)\obj\$(Platform)\$(Configuration)'))\</IntDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="UniversalDevKit.Helpers" Version="[0.1.0]" />
+    <PackageReference Include="UniversalDevKit.Diagnostic" Version="[0.1.0]" />
+  </ItemGroup>
+  <ItemGroup>
+    <AscodSiteWebAsset Include="$(MSBuildThisFileDirectory)Web\**\*" />
+  </ItemGroup>
+  <ItemGroup>
+    <AscodSiteData Include="$(MSBuildThisFileDirectory)Data\Documents.xml" />
+  </ItemGroup>
+  <Target Name="CopyAscodSiteWebAssets" AfterTargets="Build">
+    <Copy SourceFiles="@(AscodSiteWebAsset)"
+          DestinationFiles="@(AscodSiteWebAsset->'$(TargetDir)Web\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="false" />
+    <Copy SourceFiles="@(AscodSiteData)" DestinationFolder="$(TargetDir)Data" />
+  </Target>
+</Project>

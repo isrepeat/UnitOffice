@@ -27,6 +27,13 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Diagnostics.html">
       <Filter>Web</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Page1.html">
+      <Filter>Web</Filter>
+    </ClInclude>
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Extension\README.md" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Extension\background.js" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Extension\content.js" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Extension\manifest.json" />
     <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\HttpPingServer.Packages.props">
       <Filter>Build</Filter>
     </None>

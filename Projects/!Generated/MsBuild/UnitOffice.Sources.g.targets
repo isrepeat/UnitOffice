@@ -13,12 +13,14 @@
   <Import Project="$(MSBuildThisFileDirectory)UnitOffice.Sources.Public.g.props"
           Condition="'$(__IsUniversalDevKitPublicPropsImported)' != 'true'" />
   <ItemGroup>
-    <__UniversalDevKitAvailableComponent Include="Excel.Core;PersonalEventsBuilder.Core;PersonalEventsBuilder.WinRt" />
+    <__UniversalDevKitAvailableComponent Include="Excel.Core;HttpHosting;PersonalEventsBuilder.Core;PersonalEventsBuilder.WinRt" />
     <__UniversalDevKitComponent Include="$(UniversalDevKitComponents)" />
   </ItemGroup>
   <PropertyGroup>
     <__HasUniversalDevKitExcel.Core>false</__HasUniversalDevKitExcel.Core>
     <__HasUniversalDevKitExcel.Core Condition="$([System.String]::Copy(';$(UniversalDevKitComponents);').Contains(';Excel.Core;')) Or $([System.String]::Copy(';$(UniversalDevKitComponents);').Contains(';PersonalEventsBuilder.Core;')) Or $([System.String]::Copy(';$(UniversalDevKitComponents);').Contains(';PersonalEventsBuilder.WinRt;'))">true</__HasUniversalDevKitExcel.Core>
+    <__HasUniversalDevKitHttpHosting>false</__HasUniversalDevKitHttpHosting>
+    <__HasUniversalDevKitHttpHosting Condition="$([System.String]::Copy(';$(UniversalDevKitComponents);').Contains(';HttpHosting;'))">true</__HasUniversalDevKitHttpHosting>
     <__HasUniversalDevKitPersonalEventsBuilder.Core>false</__HasUniversalDevKitPersonalEventsBuilder.Core>
     <__HasUniversalDevKitPersonalEventsBuilder.Core Condition="$([System.String]::Copy(';$(UniversalDevKitComponents);').Contains(';PersonalEventsBuilder.Core;')) Or $([System.String]::Copy(';$(UniversalDevKitComponents);').Contains(';PersonalEventsBuilder.WinRt;'))">true</__HasUniversalDevKitPersonalEventsBuilder.Core>
     <__HasUniversalDevKitPersonalEventsBuilder.WinRt>false</__HasUniversalDevKitPersonalEventsBuilder.WinRt>
@@ -26,6 +28,9 @@
   </PropertyGroup>
   <Import Project="Library\Excel.Core\UnitOffice.Excel.Core.Shared.vcxitems"
           Condition="'$(__HasUniversalDevKitExcel.Core)' == 'true'"
+          Label="Shared" />
+  <Import Project="Library\HttpHosting\UnitOffice.HttpHosting.Shared.vcxitems"
+          Condition="'$(__HasUniversalDevKitHttpHosting)' == 'true'"
           Label="Shared" />
   <Import Project="Library\PersonalEventsBuilder.Core\UnitOffice.PersonalEventsBuilder.Core.Shared.vcxitems"
           Condition="'$(__HasUniversalDevKitPersonalEventsBuilder.Core)' == 'true'"
@@ -40,6 +45,13 @@
     </__UniversalDevKitCompileRequirement>
   </ItemGroup>
   <ItemGroup Condition="$([System.String]::Copy(';$(UniversalDevKitComponents);').Contains(';Excel.Core;')) Or $([System.String]::Copy(';$(UniversalDevKitComponents);').Contains(';PersonalEventsBuilder.Core;')) Or $([System.String]::Copy(';$(UniversalDevKitComponents);').Contains(';PersonalEventsBuilder.WinRt;'))">
+  </ItemGroup>
+  <ItemGroup Condition="$([System.String]::Copy(';$(UniversalDevKitComponents);').Contains(';HttpHosting;'))">
+    <__UniversalDevKitCompileRequirement Include="HttpHosting">
+      <MinimumStandard>20</MinimumStandard>
+    </__UniversalDevKitCompileRequirement>
+  </ItemGroup>
+  <ItemGroup Condition="$([System.String]::Copy(';$(UniversalDevKitComponents);').Contains(';HttpHosting;'))">
   </ItemGroup>
   <ItemGroup Condition="$([System.String]::Copy(';$(UniversalDevKitComponents);').Contains(';PersonalEventsBuilder.Core;')) Or $([System.String]::Copy(';$(UniversalDevKitComponents);').Contains(';PersonalEventsBuilder.WinRt;'))">
     <__UniversalDevKitCompileRequirement Include="PersonalEventsBuilder.Core">
@@ -61,7 +73,7 @@
           BeforeTargets="PrepareForBuild">
     <Error Condition="'$(UniversalDevKitComponents)' == ''"
            Text="UniversalDevKitComponents must be specified." />
-    <Error Condition="'%(__UniversalDevKitComponent.Identity)' != 'Excel.Core' and '%(__UniversalDevKitComponent.Identity)' != 'PersonalEventsBuilder.Core' and '%(__UniversalDevKitComponent.Identity)' != 'PersonalEventsBuilder.WinRt'"
+    <Error Condition="'%(__UniversalDevKitComponent.Identity)' != 'Excel.Core' and '%(__UniversalDevKitComponent.Identity)' != 'HttpHosting' and '%(__UniversalDevKitComponent.Identity)' != 'PersonalEventsBuilder.Core' and '%(__UniversalDevKitComponent.Identity)' != 'PersonalEventsBuilder.WinRt'"
            Text="Unsupported UniversalDevKit component: %(__UniversalDevKitComponent.Identity)" />
   </Target>
 </Project>

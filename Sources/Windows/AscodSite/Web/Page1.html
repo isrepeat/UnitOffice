@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Document workspace</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: white; color: #111; font: 12px Arial, sans-serif; }
+    .layout { min-height: 100vh; border-inline: 2px solid #484848; }
+    summary { cursor: pointer; font-weight: 650; margin-bottom: 8px; }
+    button, input { font: inherit; color: inherit; background: white; border: 1px solid #aaa; border-radius: 4px; padding: 5px 8px; }
+    button { cursor: pointer; }
+    h1 { margin: 0 0 16px; }
+    .table { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    dt { font-weight: 650; }
+    dd { margin: 0 0 12px; }
+    #path { margin: 0; height: 23px; padding: 2px 5px; background: #e5e5e5; border-bottom: 1px solid #d7d7d7; color: #333; }
+    .toolbar { display: flex; align-items: center; gap: 10px; height: 35px; padding: 0 8px; background: #eee; border-bottom: 1px solid #ddd; white-space: nowrap; overflow: auto hidden; }
+    .toolbar button, .row-tools button, .record { border: 0; background: transparent; padding: 0; border-radius: 0; }
+    .toolbar button, .row-tools button { color: #656867; font: bold 16px Arial, sans-serif; }
+    .toolbar button:hover, .row-tools button:hover, .record:hover { color: #135a9e; }
+    .toolbar .dot, .row-tools .dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: var(--dot, #45be37); vertical-align: middle; }
+    .toolbar .dot { box-shadow: 0 1px 4px #0002; }
+    .toolbar .dot[aria-pressed="true"] { outline: 2px solid #2866a7; outline-offset: 2px; }
+    .separator { height: 14px; border-left: 1px solid #ccc; }
+    .toolbar label { display: inline-flex; align-items: center; gap: 4px; }
+    .toolbar input[type="radio"] { margin: 0; }
+    .toolbar input[type="date"] { width: 104px; border: 0; border-bottom: 1px solid #777; border-radius: 0; background: transparent; font: inherit; padding: 1px 0; }
+    .toolbar input[type="date"]:invalid:not(:focus) { color: transparent; }
+    table { min-width: 1190px; table-layout: fixed; }
+    th, td { padding: 0 5px; border: 0; font-weight: normal; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    thead th { height: 41px; background: #efefef; border-bottom: 1px solid #ddd; }
+    thead .column-filters th { height: 35px; background: #ebebeb; }
+    .column-filter { display: flex; align-items: center; gap: 2px; }
+    .column-filter input { flex: 1; min-width: 0; width: 100%; height: 22px; border: 1px solid #999; border-radius: 4px; padding: 1px 4px; }
+    .column-filter span { width: 22px; height: 22px; border: 1px solid #bbb; border-radius: 2px; background: linear-gradient(#f3f3f3, #ccc); color: #777; display: grid; place-items: center; }
+    .funnel { width: 12px; height: 12px; background: currentColor; clip-path: polygon(0 0, 100% 0, 62% 50%, 62% 100%, 38% 80%, 38% 50%); display: inline-block; }
+    tbody td { height: 30px; }
+    tbody tr:nth-child(even) { background: #efefef; }
+    tbody tr:hover { background: #e5edf7; }
+    .row-tools { display: grid; grid-template-columns: 35px 32px 28px 1fr 20px; align-items: center; justify-items: start; }
+    .record { font: inherit; color: inherit; }
+    .card-header { height: 13px; background: #2d4250; }
+    .card-tabs, .card-tools, .card-sections { display: flex; align-items: center; gap: 4px; overflow-x: auto; white-space: nowrap; }
+    .card-tabs { background: #d5d5d5; height: 30px; }
+    .card-tabs > * { padding: 7px 10px; }
+    #card-title { margin: 0; font-size: 13px; background: #e6e6e6; }
+    .card-tools { min-height: 55px; background: #efefef; }
+    .card-tools > * { min-width: 70px; text-align: center; padding: 4px; }
+    .card-tools i { display: block; color: #717580; font: bold 20px Arial; }
+    .rtbSplBtnActivator { min-width: 40px; height: 44px; padding: 3px 5px; border-color: transparent; background: transparent; }
+    .rtbSplBtnActivator:hover { border-color: #92aac9; background: #dce9fa; }
+    #print-dialog { border: 1px solid #a6a6a6; border-radius: 5px; padding: 20px; }
+    #print-dialog::backdrop { background: #0005; }
+    #print-dialog form { display: flex; justify-content: end; gap: 8px; }
+    #print-output { max-width: 860px; margin: 24px auto; padding: 0 16px; }
+    #print-output article { border: 1px solid #ccc; padding: 16px; margin-bottom: 16px; }
+    #print-output pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+    .card-sections { min-height: 34px; border-bottom: 1px solid #174bab; padding: 3px 5px 0; }
+    .card-sections button { border-radius: 5px 5px 0 0; padding-inline: 14px; }
+    .card-sections button[aria-pressed="true"] { background: #3477c3; color: white; }
+    .card-sections label:first-of-type { margin-left: auto; }
+    .card-body { display: grid; grid-template-columns: minmax(310px, 48%) minmax(0, 1fr); min-height: calc(100vh - 132px); background: #f5f6f7; }
+    .card-body.without-files { grid-template-columns: 1fr; }
+    .card-form, .card-files { padding: 12px 8px; min-width: 0; color: #51555a; }
+    .card-form { border-right: 5px solid #d7d7d7; }
+    .card-form label { display: block; margin: 0 0 7px; }
+    .card-form input, .card-form textarea { display: block; width: 100%; margin-top: 3px; padding: 2px 4px; border: 1px solid #c8c8c8; border-radius: 2px; font: inherit; }
+    .card-form textarea { min-height: 110px; }
+    .field-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .file-tools, #files { border: 1px solid #c8c8c8; border-radius: 3px; margin: 5px 0; padding: 3px 8px; }
+    #files { min-height: 105px; padding-left: 26px; list-style: none; }
+    #files li { padding: 5px 0; }
+    #files a { color: #405568; }
+    #file-preview { min-height: 390px; margin: 0; padding: 20px; background: #252525; color: #eee; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <main>
+      <section id="registry" class="sheet" aria-labelledby="path">
+        <p id="path">&#1050;&#1072;&#1088;&#1090;&#1086;&#1090;&#1077;&#1082;&#1072; &gt; &#1042;&#1093;&#1110;&#1076;&#1085;&#1110; &gt; &#1042;&#1093;&#1110;&#1076;&#1085;&#1110; (&#1087;&#1086;&#1090;&#1086;&#1095;&#1085;&#1110;)</p>
+        <div class="toolbar" aria-label="Registry tools">
+          <button type="button" id="toggle-filters" title="Toggle filters">&#9776;</button>
+          <button type="button" id="refresh" title="Refresh">&#10227;</button>
+          <button type="button" id="open-first" title="Open sample document">&#8853;</button>
+          <button type="button" id="reset" title="Reset filters">&#8610;</button>
+          <button type="button" id="focus-filter" title="Search"><i class="funnel"></i></button>
+          <button type="button" id="clear-columns" title="Clear column filters" style="color:#bd3333"><i class="funnel"></i><small>&times;</small></button>
+          <button type="button" id="focus-date" title="Filter by registration date">&#9874;</button>
+          <span class="separator"></span>
+          <button type="button" class="dot" data-status="New" title="New"></button>
+          <button type="button" class="dot" data-status="In review" title="In review" style="--dot:#2e87b1"></button>
+          <button type="button" class="dot" data-status="Closed" title="Closed" style="--dot:#be3236"></button>
+          <button type="button" class="dot" data-status="Approved" title="Approved" style="--dot:#3955b5"></button>
+          <button type="button" class="dot" data-status="Pending" title="Pending" style="--dot:#e9f652"></button>
+          <button type="button" class="dot" data-status="Deferred" title="Deferred" style="--dot:#e9bb52"></button>
+          <span class="separator"></span>
+          <label>&#1044;&#1072;&#1090;&#1072; &#1088;&#1077;&#1108;&#1089;&#1090;&#1088;&#1072;&#1094;&#1110;&#1111; &#1079;: <input id="from" type="date" required></label>
+          <label>&#1076;&#1086;: <input id="to" type="date" required></label>
+          <button type="button" id="apply-dates" title="Apply date filter"><i class="funnel"></i></button>
+          <button type="button" id="clear-dates" title="Clear dates" style="color:#ddad42"><i class="funnel"></i></button>
+          <button type="button" id="reset-all" title="Reset all filters" style="color:#ba3135">&#8855;</button>
+          <span class="separator"></span>
+          <label><input type="radio" name="scope" value="mine"> &#1052;&#1086;&#1111;</label>
+          <label><input type="radio" name="scope" value="team"> &#1052;&#1086;&#1075;&#1086; &#1087;&#1110;&#1076;&#1088;&#1086;&#1079;&#1076;&#1110;&#1083;&#1091;</label>
+          <label><input type="radio" name="scope" value="" checked> &#1059;&#1089;&#1110;</label>
+          <span class="separator"></span>
+          <button type="button" data-export="txt" title="Export text" style="color:#15498d">W</button>
+          <button type="button" data-export="csv" title="Export CSV" style="color:#18753b">X</button>
+          <button type="button" data-export="tsv" title="Export TSV">X&#10140;</button>
+        </div>
+        <div class="table">
+          <table>
+            <colgroup><col style="width:193px"><col style="width:80px"><col style="width:100px"><col style="width:100px"><col style="width:160px"><col style="width:60px"><col><col style="width:80px"><col style="width:176px"></colgroup>
+            <thead>
+              <tr><th></th><th>&#8470; &#1079;/&#1087;</th><th>&#8470; &#1076;&#1086;&#1082;&#1091;&#1084;&#1077;&#1085;&#1090;&#1072;</th><th>&#1056;&#1086;&#1079;&#1075;&#1083;&#1103;&#1076;&#1072;&#1108;</th><th>&#1044;&#1072;&#1090;&#1072; &#1088;&#1077;&#1108;&#1089;&#1090;&#1088;&#1072;&#1094;&#1110;&#1111;</th><th>&#1060;&#1072;&#1081;&#1083;&#1080;</th><th>&#1050;&#1086;&#1088;&#1086;&#1090;&#1082;&#1080;&#1081; &#1079;&#1084;&#1110;&#1089;&#1090;</th><th>&#1040;&#1088;&#1082;.</th><th>&#1044;&#1072;&#1090;&#1072; &#1079;&#1085;&#1103;&#1090;&#1090;&#1103; &#1079; &#1082;&#1086;&#1085;&#1090;&#1088;&#1086;&#1083;&#1102;</th></tr>
+              <tr class="column-filters" id="column-filters"></tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </section>
+      <section id="card" class="sheet" aria-labelledby="card-title" hidden>
+        <div class="card-header"></div>
+        <div class="card-tabs"><span>&#1057;&#1100;&#1086;&#1075;&#1086;&#1076;&#1085;&#1110;</span><a href="/page1">&#1042;&#1093;&#1110;&#1076;&#1085;&#1110; (&#1087;&#1086;&#1090;&#1086;&#1095;&#1085;&#1110;)</a><h1 id="card-title" tabindex="-1"></h1></div>
+        <div class="card-tools" aria-label="Document commands">
+          <span><i>&#128427;</i>&#1047;&#1073;&#1077;&#1088;&#1077;&#1075;&#1090;&#1080;</span><span><i>&#10227;</i>&#1054;&#1085;&#1086;&#1074;&#1080;&#1090;&#1080;</span><span><i>&#128206;</i><span id="file-command"></span></span>
+          <span><button type="button" id="print-button" class="rtbSplBtnActivator" aria-haspopup="dialog"><i aria-hidden="true">&#9113;</i>&#1044;&#1088;&#1091;&#1082;</button></span><span><i>&#10697;</i>&#1044;&#1091;&#1073;&#1083;&#1102;&#1074;&#1072;&#1090;&#1080;</span><span><i>&#8629;</i>&#1042;&#1110;&#1076;&#1087;&#1086;&#1074;&#1110;&#1089;&#1090;&#1080;</span>
+          <span><i>&#9636;</i>&#1053;&#1072; &#1087;&#1086;&#1075;&#1086;&#1076;&#1078;.</span><span><i>&#10148;</i>&#1042;&#1110;&#1076;&#1087;&#1088;&#1072;&#1074;&#1080;&#1090;&#1080;</span><span><i>&#9638;</i>&#1054;&#1087;&#1088;&#1072;&#1094;&#1102;&#1074;&#1072;&#1085;&#1085;&#1103;</span><span><i>&#8943;</i>&#1044;&#1086;&#1076;&#1072;&#1090;&#1082;&#1086;&#1074;&#1086;...</span>
+        </div>
+        <div class="card-sections">
+          <button type="button" data-panel="info" aria-pressed="true">&#1030;&#1085;&#1092;&#1086;&#1088;&#1084;&#1072;&#1094;&#1110;&#1103;</button>
+          <button type="button" data-panel="related" aria-pressed="false">&#1055;&#1110;&#1076;&#1083;&#1077;&#1075;&#1083;&#1110; &#1087;&#1077;&#1088;&#1077;&#1083;&#1110;&#1082;&#1080;</button>
+          <button type="button" data-panel="approval" aria-pressed="false">&#1055;&#1086;&#1075;&#1086;&#1076;&#1078;&#1077;&#1085;&#1085;&#1103;</button>
+          <button type="button" data-panel="progress" aria-pressed="false">&#1061;&#1110;&#1076; &#1074;&#1080;&#1082;&#1086;&#1085;&#1072;&#1085;&#1085;&#1103;</button>
+          <label><input id="show-preview" type="checkbox" checked>&#1055;&#1077;&#1088;&#1077;&#1075;&#1083;&#1103;&#1076;&#1072;&#1095;</label>
+          <label><input id="show-files" type="checkbox" checked>&#1060;&#1072;&#1081;&#1083;&#1080;</label>
+        </div>
+        <div class="card-body" id="card-body">
+          <div class="card-form">
+            <div id="info">
+              <div class="field-row"><label>&#1050;&#1086;&#1088;&#1077;&#1089;&#1087;&#1086;&#1085;&#1076;&#1077;&#1085;&#1090;<input id="correspondent" readonly></label><label>&#1053;&#1072;&#1079;&#1074;&#1072; &#1082;&#1086;&#1088;&#1077;&#1089;&#1087;&#1086;&#1085;&#1076;&#1077;&#1085;&#1090;&#1072;<input id="correspondent-name" readonly></label></div>
+              <div class="field-row"><label>&#1042;&#1080;&#1093;. &#8470;<input id="card-number" readonly></label><label>&#1044;&#1072;&#1090;&#1072;<input id="card-date" readonly></label></div>
+              <label>&#1053;&#1086;&#1084;&#1077;&#1088; &#1090;&#1072; &#1076;&#1072;&#1090;&#1072; &#1076;&#1086;&#1082;&#1091;&#1084;&#1077;&#1085;&#1090;&#1072;<input id="registration" readonly></label>
+              <div class="field-row"><label>&#1054;&#1079;&#1085;&#1072;&#1082;&#1072; &#1086;&#1073;&#1084;. &#1076;&#1086;&#1089;&#1090;.<input readonly></label><label>&#1050;-&#1090;&#1100; &#1087;&#1088;&#1080;&#1084;.<input value="1" readonly></label></div>
+              <label>&#1053;&#1072;&#1087;&#1088;&#1072;&#1074;&#1083;&#1077;&#1085;&#1086; &#1091; &#1089;&#1087;&#1088;&#1072;&#1074;&#1091;<input readonly></label>
+              <div class="field-row"><label>&#1040;&#1088;&#1082;.<input value="1" readonly></label><label>&#1044;&#1086;&#1076;&#1072;&#1090;&#1082;&#1080; (&#1084;&#1072;&#1090;&#1077;&#1088;&#1110;&#1072;&#1083;&#1080;)<input id="attachment-count" readonly></label></div>
+              <div class="field-row">
+                <div><p>&#1061;&#1072;&#1088;&#1072;&#1082;&#1090;&#1077;&#1088;&#1080;&#1089;&#1090;&#1080;&#1082;&#1080; &#1076;&#1086;&#1082;&#1091;&#1084;&#1077;&#1085;&#1090;&#1072;</p><label>&#1042;&#1080;&#1076; &#1076;&#1086;&#1089;&#1090;&#1072;&#1074;&#1082;&#1080;<input readonly></label><label>&#1042;&#1080;&#1076; &#1076;&#1086;&#1082;&#1091;&#1084;&#1077;&#1085;&#1090;&#1072;<input readonly></label><label>&#1058;&#1077;&#1084;&#1072;&#1090;&#1080;&#1082;&#1072;<input readonly></label><label>&#1050;&#1083;&#1072;&#1089;&#1080;&#1092;&#1110;&#1082;&#1072;&#1094;&#1110;&#1103;<input readonly></label></div>
+                <label>&#1050;&#1086;&#1088;&#1086;&#1090;&#1082;&#1080;&#1081; &#1079;&#1084;&#1110;&#1089;&#1090;<textarea id="card-subject" readonly></textarea></label>
+              </div>
+            </div>
+            <p id="related" hidden>&#1055;&#1086;&#1074;&#8217;&#1103;&#1079;&#1072;&#1085;&#1110; &#1076;&#1086;&#1082;&#1091;&#1084;&#1077;&#1085;&#1090;&#1080; &#1074;&#1110;&#1076;&#1089;&#1091;&#1090;&#1085;&#1110;.</p>
+            <p id="approval" hidden>&#1047;&#1072;&#1087;&#1080;&#1089;&#1080; &#1087;&#1086;&#1075;&#1086;&#1076;&#1078;&#1077;&#1085;&#1085;&#1103; &#1074;&#1110;&#1076;&#1089;&#1091;&#1090;&#1085;&#1110;.</p>
+            <p id="progress" hidden></p>
+          </div>
+          <aside class="card-files" id="card-files" aria-labelledby="file-count">
+            <div id="file-count"></div>
+            <div class="file-tools" aria-hidden="true">&#128193; &nbsp; &#128206; &nbsp; &#9998; &nbsp; &#9113; &nbsp; &#10227; &nbsp; &#8595;</div>
+            <ul id="files"></ul>
+            <pre id="file-preview" aria-label="Attachment preview"></pre>
+          </aside>
+        </div>
+      </section>
+      <section id="print-output" hidden aria-labelledby="print-title">
+        <h1 id="print-title">&#1044;&#1086;&#1082;&#1091;&#1084;&#1077;&#1085;&#1090;&#1080; &#1076;&#1086; &#1076;&#1088;&#1091;&#1082;&#1091;</h1>
+        <div id="print-files"></div>
+      </section>
+      <dialog id="print-dialog" aria-labelledby="print-dialog-title">
+        <h2 id="print-dialog-title">&#1055;&#1110;&#1076;&#1090;&#1074;&#1077;&#1088;&#1076;&#1078;&#1077;&#1085;&#1085;&#1103; &#1076;&#1088;&#1091;&#1082;&#1091;</h2>
+        <p>&#1042;&#1110;&#1076;&#1082;&#1088;&#1080;&#1090;&#1080; &#1074;&#1089;&#1110; &#1092;&#1072;&#1081;&#1083;&#1080; &#1076;&#1086;&#1082;&#1091;&#1084;&#1077;&#1085;&#1090;&#1072; &#1076;&#1083;&#1103; &#1087;&#1077;&#1088;&#1077;&#1075;&#1083;&#1103;&#1076;&#1091; &#1087;&#1077;&#1088;&#1077;&#1076; &#1076;&#1088;&#1091;&#1082;&#1086;&#1084;?</p>
+        <form method="dialog">
+          <button value="cancel" autofocus>&#1057;&#1082;&#1072;&#1089;&#1091;&#1074;&#1072;&#1090;&#1080;</button>
+          <button id="confirm-print" value="confirm">&#1055;&#1110;&#1076;&#1090;&#1074;&#1077;&#1088;&#1076;&#1080;&#1090;&#1080;</button>
+        </form>
+      </dialog>
+    </main>
+  </div>
+  <script>
+    const documents = [];
+    async function loadDocuments() {
+      const response = await fetch('/api/v1/documents');
+      if (!response.ok) throw new Error('Could not load the document registry.');
+      const xml = new DOMParser().parseFromString(await response.text(), 'application/xml');
+      if (xml.documentElement.localName !== 'documents') throw new Error('Invalid document registry XML.');
+      for (const entry of xml.documentElement.children) {
+        const record = Object.fromEntries(Array.from(entry.attributes, item => [item.name, item.value]));
+        record.files = Array.from(entry.querySelectorAll('file'), item => item.textContent);
+        documents.push(record);
+      }
+    }
+    const byId = id => document.getElementById(id);
+    const statusButtons = document.querySelectorAll('[data-status]');
+    const filterRow = byId('column-filters');
+    const headers = filterRow.previousElementSibling.cells;
+    const filters = new Map();
+    const from = byId('from');
+    const to = byId('to');
+    let selectedStatus = '';
+    let visibleRecords = [];
+
+    for (const [index, header] of Array.from(headers).entries()) {
+      const cell = document.createElement('th');
+      filterRow.append(cell);
+      if (index === 0 || index === 5) continue;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'column-filter';
+      const input = document.createElement('input');
+      input.setAttribute('aria-label', header.textContent);
+      if (index === 4) input.style.flex = '0 1 97px';
+      const icon = document.createElement('span');
+      if (index === 4) {
+        wrapper.style.justifyContent = 'space-between';
+        icon.style.color = '#f27819';
+      }
+      const funnel = document.createElement('i');
+      funnel.className = 'funnel';
+      icon.append(funnel);
+      wrapper.append(input, icon);
+      cell.append(wrapper);
+      filters.set(index, input);
+      input.addEventListener('input', renderRegistry);
+    }
+
+    function showCard(visible) {
+      byId('registry').hidden = visible;
+      byId('card').hidden = !visible;
+    }
+
+    function openDocument(record) {
+      const url = new URL('/page1/card', location.href);
+      url.search = new URLSearchParams({ document: record.id }).toString();
+      window.open(url.href, '_blank', 'noopener');
+    }
+
+    function attachmentContent(record, name) {
+      return name + '\n\nTest attachment for ' + record.id + '\n' + record.subject;
+    }
+
+    function renderPrintOutput(record) {
+      byId('registry').hidden = true;
+      byId('print-output').hidden = false;
+      document.title = byId('print-title').textContent + ' - ' + record.id;
+      for (const name of record.files) {
+        const page = document.createElement('article');
+        const heading = document.createElement('h2');
+        const content = document.createElement('pre');
+        heading.textContent = name;
+        content.textContent = attachmentContent(record, name);
+        page.append(heading, content);
+        byId('print-files').append(page);
+      }
+    }
+
+    function renderCard(record) {
+      byId('card-title').textContent = '\u0412\u0445\u0456\u0434\u043d\u0430 - ' + record.id;
+      document.title = byId('card-title').textContent;
+      byId('correspondent').value = record.correspondent;
+      byId('correspondent-name').value = record.correspondent;
+      byId('card-number').value = record.id;
+      byId('card-date').value = record.date;
+      byId('registration').value = record.id + ' / ' + record.date;
+      byId('attachment-count').value = record.files.length;
+      byId('card-subject').value = record.subject;
+      const fileLabel = '\u0424\u0430\u0439\u043b\u0438 (' + record.files.length + ')';
+      byId('file-command').textContent = fileLabel;
+      byId('file-count').textContent = fileLabel;
+      const files = byId('files');
+      files.replaceChildren();
+      for (const name of record.files) {
+        const item = document.createElement('li');
+        const link = document.createElement('a');
+        const content = attachmentContent(record, name);
+        const preview = action(name, 'Preview ' + name, () => { byId('file-preview').textContent = content; });
+        preview.className = 'record';
+        link.textContent = ' \u2193';
+        link.setAttribute('aria-label', 'Download ' + name);
+        link.download = name;
+        link.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(content);
+        item.append(preview, link);
+        files.append(item);
+      }
+      byId('progress').textContent = {
+        New: 'Waiting for review.', 'In review': 'Assigned to the demo reviewer.', Closed: 'Review completed.'
+      }[record.status];
+      showCard(true);
+      byId('card-title').focus();
+    }
+
+    function values(record, index) {
+      const date = record.date.split('-').reverse().join('.');
+      return ['', String(index + 1), record.id, '', date + ' 20:0' + index, '', record.subject, '', ''];
+    }
+
+    function renderRegistry() {
+      const scope = document.querySelector('[name="scope"]:checked').value;
+      visibleRecords = documents.map((record, index) => ({ record, cells: values(record, index) }))
+        .filter(({ record, cells }) => (!selectedStatus || record.status === selectedStatus) &&
+          (!from.value || record.date >= from.value) && (!to.value || record.date <= to.value) &&
+          (!scope || (scope === 'mine' ? record.folder === 'Incoming' : record.folder !== 'Archive')) &&
+          [...filters].every(([index, input]) => cells[index].toLowerCase().includes(input.value.trim().toLowerCase())));
+      const rows = byId('rows');
+      rows.replaceChildren();
+      for (const { record, cells } of visibleRecords) {
+        const row = rows.insertRow();
+        row.addEventListener('dblclick', event => {
+          if (!event.target.closest('button, a')) openDocument(record);
+        });
+        const tools = document.createElement('div');
+        tools.className = 'row-tools';
+        const favorite = action('\u2606', 'Toggle favorite', event => {
+          const button = event.currentTarget;
+          const marked = button.getAttribute('aria-pressed') !== 'true';
+          button.setAttribute('aria-pressed', marked);
+          button.textContent = marked ? '\u2605' : '\u2606';
+        });
+        favorite.setAttribute('aria-pressed', 'false');
+        const dot = document.createElement('span');
+        dot.className = 'dot';
+        dot.title = record.status;
+        tools.append(favorite, action('\u270E', 'Open document', () => openDocument(record)),
+          action('\u25a4', 'Document details', () => openDocument(record)), dot,
+          action('\u25b1', 'Open card', () => openDocument(record)));
+        row.insertCell().append(tools);
+        for (let index = 1; index < cells.length; index++) {
+          const cell = row.insertCell();
+          if (index === 2 || index === 5) {
+            const button = action(index === 5 ? '\ud83d\udcce\ufe0e' : cells[index],
+              index === 5 ? record.files.join(', ') : 'Open document', () => openDocument(record));
+            button.className = 'record';
+            cell.append(button);
+          } else {
+            cell.textContent = cells[index];
+          }
+        }
+      }
+      if (!visibleRecords.length) {
+        const cell = rows.insertRow().insertCell();
+        cell.colSpan = headers.length;
+        cell.textContent = 'No matching documents';
+      }
+    }
+
+    function action(label, title, handler) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.title = title;
+      button.setAttribute('aria-label', title);
+      button.textContent = label;
+      button.addEventListener('click', handler);
+      return button;
+    }
+
+    function clearColumns() {
+      for (const input of filters.values()) input.value = '';
+      renderRegistry();
+    }
+
+    function clearDates() {
+      from.value = '';
+      to.value = '';
+      renderRegistry();
+    }
+
+    function reset() {
+      selectedStatus = '';
+      for (const button of statusButtons) button.setAttribute('aria-pressed', 'false');
+      document.querySelector('[name="scope"][value=""]').checked = true;
+      clearDates();
+      clearColumns();
+    }
+
+    for (const button of statusButtons) {
+      button.setAttribute('aria-pressed', 'false');
+      button.addEventListener('click', () => {
+        selectedStatus = selectedStatus === button.dataset.status ? '' : button.dataset.status;
+        for (const item of statusButtons) item.setAttribute('aria-pressed', item.dataset.status === selectedStatus);
+        renderRegistry();
+      });
+    }
+    const panelButtons = document.querySelectorAll('[data-panel]');
+    for (const button of panelButtons) {
+      button.addEventListener('click', () => {
+        for (const item of panelButtons) {
+          const active = item === button;
+          item.setAttribute('aria-pressed', active);
+          byId(item.dataset.panel).hidden = !active;
+        }
+      });
+    }
+    byId('show-preview').addEventListener('change', event => {
+      byId('file-preview').hidden = !event.target.checked;
+    });
+    byId('show-files').addEventListener('change', event => {
+      byId('card-files').hidden = !event.target.checked;
+      byId('card-body').classList.toggle('without-files', !event.target.checked);
+    });
+    byId('toggle-filters').addEventListener('click', () => { filterRow.hidden = !filterRow.hidden; });
+    byId('refresh').addEventListener('click', renderRegistry);
+    byId('open-first').addEventListener('click', () => {
+      if (visibleRecords.length) openDocument(visibleRecords[0].record);
+    });
+    byId('reset').addEventListener('click', reset);
+    byId('reset-all').addEventListener('click', reset);
+    byId('focus-filter').addEventListener('click', () => {
+      filterRow.hidden = false;
+      filters.get(6).focus();
+    });
+    byId('clear-columns').addEventListener('click', clearColumns);
+    byId('focus-date').addEventListener('click', () => from.focus());
+    byId('apply-dates').addEventListener('click', renderRegistry);
+    byId('clear-dates').addEventListener('click', clearDates);
+    for (const radio of document.querySelectorAll('[name="scope"]')) radio.addEventListener('change', renderRegistry);
+    for (const button of document.querySelectorAll('[data-export]')) {
+      button.addEventListener('click', () => {
+        const extension = button.dataset.export;
+        const separator = extension === 'csv' ? ',' : '\t';
+        const content = visibleRecords.map(({ record }) =>
+          [record.id, record.date, record.subject, record.files.join('; ')].join(separator)).join('\n');
+        const link = document.createElement('a');
+        link.download = 'test-register.' + extension;
+        link.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(content);
+        link.click();
+      });
+    }
+    async function start() {
+      await loadDocuments();
+      const parameters = new URLSearchParams(location.search);
+      const requestedId = parameters.get('document');
+      const requestedRecord = documents.find(record => record.id === requestedId);
+      if (location.pathname === '/page1/card') {
+        if (!requestedRecord) {
+          location.replace('/page1');
+        } else if (parameters.get('view') === 'print') {
+          renderPrintOutput(requestedRecord);
+        } else {
+          renderCard(requestedRecord);
+          const dialog = byId('print-dialog');
+          byId('print-button').addEventListener('click', () => dialog.showModal());
+          byId('confirm-print').addEventListener('click', () => {
+            const url = new URL(location.href);
+            url.searchParams.set('view', 'print');
+            window.open(url.href, '_blank', 'noopener');
+          });
+        }
+      }
+      else renderRegistry();
+    }
+    start().catch(error => {
+      byId('registry').hidden = true;
+      const message = document.createElement('p');
+      message.setAttribute('role', 'alert');
+      message.textContent = error.message;
+      document.querySelector('main').append(message);
+    });
+  </script>
+</body>
+</html>
