@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ru">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Чат UnitOffice</title>
+	<link rel="stylesheet" href="Chat.css">
+</head>
+<body>
+	<main class="chat">
+		<header class="chat-header">
+			<div>
+				<p class="brand">UnitOffice</p>
+				<h1>Локальный ↔ СЕДО</h1>
+			</div>
+			<p id="status" class="status" data-state="idle" role="status">Ожидает подключения</p>
+		</header>
+		<form id="connect" class="connect">
+			<label>
+				Этот компьютер
+				<select id="sender">
+					<option value="local">Локальный</option>
+					<option value="sedo">СЕДО</option>
+				</select>
+			</label>
+			<label class="key-field">
+				Код доступа
+				<input id="key" type="password" required autocomplete="off">
+			</label>
+			<button>Подключиться</button>
+		</form>
+		<section class="history" aria-label="История чата">
+			<p id="empty" class="empty">Здесь появятся сообщения</p>
+			<div id="messages" role="log" aria-label="Сообщения"></div>
+		</section>
+		<form id="send" class="composer">
+			<div class="composer-field">
+				<textarea id="text" maxlength="4000" required disabled
+					aria-label="Сообщение" placeholder="Напиши сообщение…" rows="3"></textarea>
+			</div>
+			<button id="submit" disabled>Отправить</button>
+			<p id="send-error" class="send-error" role="status" hidden></p>
+		</form>
+	</main>
+	<script src="Chat.js"></script>
+</body>
+</html>

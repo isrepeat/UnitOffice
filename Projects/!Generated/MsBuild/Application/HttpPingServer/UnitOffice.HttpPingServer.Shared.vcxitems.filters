@@ -11,16 +11,16 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\HttpExchange.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\HttpServer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Router.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Chat.css.inc">
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Chat.css">
       <Filter>Web</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Chat.html.inc">
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Chat.html">
       <Filter>Web</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Chat.js.inc">
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Chat.js">
       <Filter>Web</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Diagnostics.html.inc">
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Diagnostics.html">
       <Filter>Web</Filter>
     </ClInclude>
     <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\HttpPingServer.Packages.props">

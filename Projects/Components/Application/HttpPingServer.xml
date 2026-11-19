@@ -8,7 +8,9 @@
       <Files>
         <Input role="source">Sources/Windows/HttpPingServer/**/*.cpp</Input>
         <Input role="header">Sources/Windows/HttpPingServer/**/*.h</Input>
-        <Input role="header">Sources/Windows/HttpPingServer/Web/**/*.inc</Input>
+        <Input role="header">Sources/Windows/HttpPingServer/Web/**/*.html</Input>
+        <Input role="header">Sources/Windows/HttpPingServer/Web/**/*.css</Input>
+        <Input role="header">Sources/Windows/HttpPingServer/Web/**/*.js</Input>
         <Input role="msbuild-props">Sources/Windows/HttpPingServer/HttpPingServer.Packages.props</Input>
       </Files>
       <Filters>

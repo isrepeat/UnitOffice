@@ -2,15 +2,20 @@
 #include "HttpExchange.h"
 #include "ChatService.h"
 
+#include <filesystem>
+#include <stdexcept>
 #include <charconv>
+#include <iterator>
 #include <optional>
+#include <fstream>
 
 namespace unitoffice::windows::httppingserver {
 
 	class Router {
 	public:
 		explicit Router(std::string_view accessKey)
-			: accessKey(accessKey) {
+			: accessKey(accessKey)
+			, webDirectory(Router::GetWebDirectory()) {
 		}
 
 		HttpResponse Route(HANDLE requestQueue, const HTTP_REQUEST& request) {
@@ -28,7 +33,12 @@ namespace unitoffice::windows::httppingserver {
 
 			for (const auto& asset : assets) {
 				if (asset.path == path) {
-					return {200, asset.body, asset.contentType};
+					std::ifstream file(this->webDirectory / asset.fileName, std::ios::binary);
+					if (!file) {
+						return HttpResponse::Error(500);
+					}
+					std::string body(std::istreambuf_iterator<char>{file}, std::istreambuf_iterator<char>{});
+					return {200, std::move(body), asset.contentType};
 				}
 			}
 			return HttpResponse::Error(404);
@@ -37,31 +47,30 @@ namespace unitoffice::windows::httppingserver {
 	private:
 		struct Asset {
 			std::wstring_view path;
-			const char* body;
+			const wchar_t* fileName;
 			const char* contentType;
 		};
 
-		static constexpr char chatPage[] =
-#include "Web/Chat.html.inc"
-		;
-		static constexpr char chatCss[] =
-#include "Web/Chat.css.inc"
-		;
-		static constexpr char chatScript[] =
-#include "Web/Chat.js.inc"
-		;
-		static constexpr char diagnosticsPage[] =
-#include "Web/Diagnostics.html.inc"
-		;
-
 		static constexpr Asset assets[] = {
-			{L"/chat", chatPage, "text/html; charset=utf-8"},
-			{L"/local", chatPage, "text/html; charset=utf-8"},
-			{L"/sedo", chatPage, "text/html; charset=utf-8"},
-			{L"/test", diagnosticsPage, "text/html; charset=utf-8"},
-			{L"/web/chat.css", chatCss, "text/css; charset=utf-8"},
-			{L"/web/chat.js", chatScript, "text/javascript; charset=utf-8"},
+			{L"/chat", L"Chat.html", "text/html; charset=utf-8"},
+			{L"/local", L"Chat.html", "text/html; charset=utf-8"},
+			{L"/sedo", L"Chat.html", "text/html; charset=utf-8"},
+			{L"/test", L"Diagnostics.html", "text/html; charset=utf-8"},
+			{L"/Chat.css", L"Chat.css", "text/css; charset=utf-8"},
+			{L"/Chat.js", L"Chat.js", "text/javascript; charset=utf-8"},
+			{L"/web/chat.css", L"Chat.css", "text/css; charset=utf-8"},
+			{L"/web/chat.js", L"Chat.js", "text/javascript; charset=utf-8"},
 		};
+
+		static std::filesystem::path GetWebDirectory() {
+			std::wstring executable(32768, L'\0');
+			const auto length = ::GetModuleFileNameW(nullptr, executable.data(), static_cast<DWORD>(executable.size()));
+			if (length == 0 || length >= executable.size()) {
+				throw std::runtime_error("Could not find the HttpPingServer executable directory.");
+			}
+			executable.resize(length);
+			return std::filesystem::path(executable).parent_path() / L"Web";
+		}
 
 		static std::optional<std::uint64_t> ParseCursor(const HTTP_COOKED_URL& url) {
 			if (url.QueryStringLength == 0) {
@@ -115,6 +124,7 @@ namespace unitoffice::windows::httppingserver {
 		}
 
 		std::string accessKey;
+		std::filesystem::path webDirectory;
 		ChatService chatService;
 	};
 }

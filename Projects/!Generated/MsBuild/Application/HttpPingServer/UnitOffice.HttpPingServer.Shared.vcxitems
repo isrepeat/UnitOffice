@@ -18,16 +18,16 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Router.h">
       <__UniversalDevKitFilter></__UniversalDevKitFilter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Chat.css.inc">
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Chat.css">
       <__UniversalDevKitFilter>Web</__UniversalDevKitFilter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Chat.html.inc">
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Chat.html">
       <__UniversalDevKitFilter>Web</__UniversalDevKitFilter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Chat.js.inc">
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Chat.js">
       <__UniversalDevKitFilter>Web</__UniversalDevKitFilter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Diagnostics.html.inc">
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Web\Diagnostics.html">
       <__UniversalDevKitFilter>Web</__UniversalDevKitFilter>
     </ClInclude>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpPingServer\Main.cpp">
