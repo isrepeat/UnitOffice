@@ -1,0 +1,19 @@
+{
+	"manifest_version": 3,
+	"name": "SEDO diagnostics bridge",
+	"version": "1.0.0",
+	"description": "Injects SEDO connectivity diagnostics before disable-devtool runs, without opening DevTools, and relays results to the local HttpPingServer.",
+	"minimum_chrome_version": "102",
+	"content_scripts": [
+		{
+			"matches": ["https://SEDO-HOST.EXAMPLE/*"],
+			"run_at": "document_start",
+			"all_frames": false,
+			"js": ["content.js"]
+		}
+	],
+	"background": {
+		"service_worker": "background.js"
+	},
+	"host_permissions": ["https://192.168.202.46:8443/*"]
+}
