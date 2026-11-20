@@ -14,9 +14,6 @@
         </Group>
       </Files>
       <Filters>
-        <Filter filter="{Tree:Solution}/Sources/Windows/AscodSite" preserveTree="true">
-          <Ref tag="Group" id="SolutionFiles" />
-        </Filter>
         <Filter filter="{Tree:Project}">
           <Match>Sources/Windows/AscodSite/**/*</Match>
         </Filter>

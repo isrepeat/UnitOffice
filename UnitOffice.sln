@@ -81,69 +81,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{91E8
 		Projects\Components\Library\PersonalEventsBuilder.WinRt.xml = Projects\Components\Library\PersonalEventsBuilder.WinRt.xml
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sources", "Sources", "{DD63AF60-7281-8EB9-0738-AF5A6E25AE7A}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Windows", "Windows", "{1E2FDD5B-DC67-7E41-C027-4F8D53A6977C}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HttpHosting", "HttpHosting", "{75F13277-7BDD-8ACF-459E-740629A6DAC4}"
-	ProjectSection(SolutionItems) = preProject
-		Sources\Windows\HttpHosting\HttpExchange.h = Sources\Windows\HttpHosting\HttpExchange.h
-		Sources\Windows\HttpHosting\HttpHosting.Usage.props = Sources\Windows\HttpHosting\HttpHosting.Usage.props
-		Sources\Windows\HttpHosting\HttpServer.h = Sources\Windows\HttpHosting\HttpServer.h
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HttpPingServer", "HttpPingServer", "{FA8AF122-14C7-FB8E-378B-275FFC4D9248}"
-	ProjectSection(SolutionItems) = preProject
-		Sources\Windows\HttpPingServer\ChatService.h = Sources\Windows\HttpPingServer\ChatService.h
-		Sources\Windows\HttpPingServer\HttpExchange.h = Sources\Windows\HttpPingServer\HttpExchange.h
-		Sources\Windows\HttpPingServer\HttpPingServer.Packages.props = Sources\Windows\HttpPingServer\HttpPingServer.Packages.props
-		Sources\Windows\HttpPingServer\HttpServer.h = Sources\Windows\HttpPingServer\HttpServer.h
-		Sources\Windows\HttpPingServer\Main.cpp = Sources\Windows\HttpPingServer\Main.cpp
-		Sources\Windows\HttpPingServer\README.md = Sources\Windows\HttpPingServer\README.md
-		Sources\Windows\HttpPingServer\Router.h = Sources\Windows\HttpPingServer\Router.h
-		Sources\Windows\HttpPingServer\SetupHttps.ps1 = Sources\Windows\HttpPingServer\SetupHttps.ps1
-		Sources\Windows\HttpPingServer\TrustHttps.ps1 = Sources\Windows\HttpPingServer\TrustHttps.ps1
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extension", "Extension", "{ADEBB434-E9C9-B64F-E327-4247D800FA0B}"
-	ProjectSection(SolutionItems) = preProject
-		Sources\Windows\HttpPingServer\Extension\background.js = Sources\Windows\HttpPingServer\Extension\background.js
-		Sources\Windows\HttpPingServer\Extension\content.js = Sources\Windows\HttpPingServer\Extension\content.js
-		Sources\Windows\HttpPingServer\Extension\manifest.json = Sources\Windows\HttpPingServer\Extension\manifest.json
-		Sources\Windows\HttpPingServer\Extension\README.md = Sources\Windows\HttpPingServer\Extension\README.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Snippets", "Snippets", "{1F0F1782-D61A-2CEF-873D-A81EE8943795}"
-	ProjectSection(SolutionItems) = preProject
-		Sources\Windows\HttpPingServer\Snippets\SedoDiagnostics.js = Sources\Windows\HttpPingServer\Snippets\SedoDiagnostics.js
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{D5F7B08B-7FE7-AE70-3B67-E02900E9383F}"
-	ProjectSection(SolutionItems) = preProject
-		Sources\Windows\HttpPingServer\Web\Chat.css = Sources\Windows\HttpPingServer\Web\Chat.css
-		Sources\Windows\HttpPingServer\Web\Chat.html = Sources\Windows\HttpPingServer\Web\Chat.html
-		Sources\Windows\HttpPingServer\Web\Chat.js = Sources\Windows\HttpPingServer\Web\Chat.js
-		Sources\Windows\HttpPingServer\Web\Diagnostics.html = Sources\Windows\HttpPingServer\Web\Diagnostics.html
-		Sources\Windows\HttpPingServer\Web\Page1.html = Sources\Windows\HttpPingServer\Web\Page1.html
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AscodSite", "AscodSite", "{43B8DDAE-6FA6-FD48-36A9-1725EEAB48E9}"
-	ProjectSection(SolutionItems) = preProject
-		Sources\Windows\AscodSite\AscodSite.Packages.props = Sources\Windows\AscodSite\AscodSite.Packages.props
-		Sources\Windows\AscodSite\Main.cpp = Sources\Windows\AscodSite\Main.cpp
-		Sources\Windows\AscodSite\README.md = Sources\Windows\AscodSite\README.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{A75EE1CB-C399-960F-CFF3-8630F82F15B6}"
-	ProjectSection(SolutionItems) = preProject
-		Sources\Windows\AscodSite\Data\Documents.xml = Sources\Windows\AscodSite\Data\Documents.xml
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{47E04628-070B-366A-96A3-24F022E1B6CE}"
-	ProjectSection(SolutionItems) = preProject
-		Sources\Windows\AscodSite\Web\Page1.html = Sources\Windows\AscodSite\Web\Page1.html
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -220,15 +157,6 @@ Global
 		{1C1FC4AA-6F1D-4FFA-B464-439FC8990901} = {6DB38FB4-DBFA-4A89-A802-E221B5D5C077}
 		{A08695BC-E4C7-4E9B-8D7B-DF86C239446F} = {1C1FC4AA-6F1D-4FFA-B464-439FC8990901}
 		{91E8FC89-0783-4702-9058-05EB01D2CC3E} = {1C1FC4AA-6F1D-4FFA-B464-439FC8990901}
-		{1E2FDD5B-DC67-7E41-C027-4F8D53A6977C} = {DD63AF60-7281-8EB9-0738-AF5A6E25AE7A}
-		{75F13277-7BDD-8ACF-459E-740629A6DAC4} = {1E2FDD5B-DC67-7E41-C027-4F8D53A6977C}
-		{FA8AF122-14C7-FB8E-378B-275FFC4D9248} = {1E2FDD5B-DC67-7E41-C027-4F8D53A6977C}
-		{ADEBB434-E9C9-B64F-E327-4247D800FA0B} = {FA8AF122-14C7-FB8E-378B-275FFC4D9248}
-		{1F0F1782-D61A-2CEF-873D-A81EE8943795} = {FA8AF122-14C7-FB8E-378B-275FFC4D9248}
-		{D5F7B08B-7FE7-AE70-3B67-E02900E9383F} = {FA8AF122-14C7-FB8E-378B-275FFC4D9248}
-		{43B8DDAE-6FA6-FD48-36A9-1725EEAB48E9} = {1E2FDD5B-DC67-7E41-C027-4F8D53A6977C}
-		{A75EE1CB-C399-960F-CFF3-8630F82F15B6} = {43B8DDAE-6FA6-FD48-36A9-1725EEAB48E9}
-		{47E04628-070B-366A-96A3-24F022E1B6CE} = {43B8DDAE-6FA6-FD48-36A9-1725EEAB48E9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00000000-0000-0000-0000-000000000000}
@@ -264,44 +192,5 @@ Global
 		{B582509A-99A0-484D-82ED-D9DC1A4342BF} = ProjectTools|{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}|Projects\!Generated\MsBuild\Application\HttpPingServer\UnitOffice.HttpPingServer.vcxproj
 		{C7126B91-444C-7D84-5B96-36BD9A3204CE} = ProjectTools|{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}|Projects\!Generated\MsBuild\Application\AscodSite\UnitOffice.AscodSite.Shared.vcxitems
 		{E297DA24-DFCD-433B-84B5-AC3D76CD6579} = ProjectTools|{9A19103F-16F7-4668-BE54-9A1E7A4F7556}|Projects\!Generated\MsBuild\Application\PersonalEventsBuilder\UnitOffice.PersonalEventsBuilder.csproj
-	EndGlobalSection
-	GlobalSection(ProjectToolsSolutionItems) = preSolution
-		{031150F4-9A7C-7742-89AA-08CAC32BBFCE} = {43B8DDAE-6FA6-FD48-36A9-1725EEAB48E9}|Sources\Windows\AscodSite\README.md
-		{10D16455-D98F-9C7C-4B57-5CB21BC3C0D8} = {43B8DDAE-6FA6-FD48-36A9-1725EEAB48E9}|Sources\Windows\AscodSite\AscodSite.Packages.props
-		{16FDF04D-0EFB-0FFF-4A15-FA2E6746E4FE} = {FA8AF122-14C7-FB8E-378B-275FFC4D9248}|Sources\Windows\HttpPingServer\HttpExchange.h
-		{17C2C95B-5CDB-D95C-F867-B605E446276D} = {FA8AF122-14C7-FB8E-378B-275FFC4D9248}|Sources\Windows\HttpPingServer\ChatService.h
-		{1E2FDD5B-DC67-7E41-C027-4F8D53A6977C} = folder
-		{1F0F1782-D61A-2CEF-873D-A81EE8943795} = folder
-		{1F488724-E34B-68A3-BAB9-DD22DFA88197} = {43B8DDAE-6FA6-FD48-36A9-1725EEAB48E9}|Sources\Windows\AscodSite\Main.cpp
-		{1F8C9B5E-520C-BEA3-8911-6AEF4B1DEE0F} = {ADEBB434-E9C9-B64F-E327-4247D800FA0B}|Sources\Windows\HttpPingServer\Extension\README.md
-		{242E70C4-490D-BEBA-70D2-92D5FAA3B378} = {D5F7B08B-7FE7-AE70-3B67-E02900E9383F}|Sources\Windows\HttpPingServer\Web\Chat.html
-		{41800879-B4EF-7372-F25C-B835A7C7FC8A} = {47E04628-070B-366A-96A3-24F022E1B6CE}|Sources\Windows\AscodSite\Web\Page1.html
-		{43B8DDAE-6FA6-FD48-36A9-1725EEAB48E9} = folder
-		{47331030-4CCB-0082-6254-56D79CBB3349} = {D5F7B08B-7FE7-AE70-3B67-E02900E9383F}|Sources\Windows\HttpPingServer\Web\Chat.css
-		{47E04628-070B-366A-96A3-24F022E1B6CE} = folder
-		{5358BA92-A04F-B36D-9BAC-FCDB4EDD3E26} = {FA8AF122-14C7-FB8E-378B-275FFC4D9248}|Sources\Windows\HttpPingServer\HttpServer.h
-		{585C1426-9964-EFF6-9608-88FD34A57A35} = {FA8AF122-14C7-FB8E-378B-275FFC4D9248}|Sources\Windows\HttpPingServer\README.md
-		{6415BFAC-AD60-00D9-B734-2AB697DBC2AD} = {D5F7B08B-7FE7-AE70-3B67-E02900E9383F}|Sources\Windows\HttpPingServer\Web\Chat.js
-		{72230C4B-97E1-DDBA-5AF3-61AFA357E544} = {FA8AF122-14C7-FB8E-378B-275FFC4D9248}|Sources\Windows\HttpPingServer\Router.h
-		{735EE7DC-E27F-6C14-9084-87910E40E138} = {FA8AF122-14C7-FB8E-378B-275FFC4D9248}|Sources\Windows\HttpPingServer\TrustHttps.ps1
-		{75F13277-7BDD-8ACF-459E-740629A6DAC4} = folder
-		{89CF9067-B46A-EC79-2F3C-61DBDCBA901D} = {FA8AF122-14C7-FB8E-378B-275FFC4D9248}|Sources\Windows\HttpPingServer\SetupHttps.ps1
-		{8A8CBF9D-9C45-4D66-8B39-A28AD2263978} = {FA8AF122-14C7-FB8E-378B-275FFC4D9248}|Sources\Windows\HttpPingServer\HttpPingServer.Packages.props
-		{8F54AD75-7533-0DCC-425C-5056A3DBEDD4} = {ADEBB434-E9C9-B64F-E327-4247D800FA0B}|Sources\Windows\HttpPingServer\Extension\manifest.json
-		{90D1A1FD-BA0A-23FA-0B3E-E14F0BC736DF} = {75F13277-7BDD-8ACF-459E-740629A6DAC4}|Sources\Windows\HttpHosting\HttpServer.h
-		{A75EE1CB-C399-960F-CFF3-8630F82F15B6} = folder
-		{ADEBB434-E9C9-B64F-E327-4247D800FA0B} = folder
-		{B5E062CC-0A36-BB15-F239-F6196384B4E8} = {FA8AF122-14C7-FB8E-378B-275FFC4D9248}|Sources\Windows\HttpPingServer\Main.cpp
-		{C1C233DC-33BF-FDF3-2FCA-7BC6E43BD1FB} = {75F13277-7BDD-8ACF-459E-740629A6DAC4}|Sources\Windows\HttpHosting\HttpHosting.Usage.props
-		{C6EAC95C-07CD-A4D3-57F9-0324DD32A21D} = {75F13277-7BDD-8ACF-459E-740629A6DAC4}|Sources\Windows\HttpHosting\HttpExchange.h
-		{CDAB5CAB-6022-48AC-CEC6-4E1CA68462FD} = {D5F7B08B-7FE7-AE70-3B67-E02900E9383F}|Sources\Windows\HttpPingServer\Web\Page1.html
-		{D5F7B08B-7FE7-AE70-3B67-E02900E9383F} = folder
-		{DAD9269C-2C9B-F43E-E528-586948CE2C97} = {D5F7B08B-7FE7-AE70-3B67-E02900E9383F}|Sources\Windows\HttpPingServer\Web\Diagnostics.html
-		{DD63AF60-7281-8EB9-0738-AF5A6E25AE7A} = folder
-		{E2000EB0-610A-B949-92E7-AE743D8CD939} = {1F0F1782-D61A-2CEF-873D-A81EE8943795}|Sources\Windows\HttpPingServer\Snippets\SedoDiagnostics.js
-		{E70C956D-DABE-281B-5C1B-D11C88CA35CD} = {ADEBB434-E9C9-B64F-E327-4247D800FA0B}|Sources\Windows\HttpPingServer\Extension\background.js
-		{EFD74678-1E1E-A1CA-914E-1CBC3856A927} = {A75EE1CB-C399-960F-CFF3-8630F82F15B6}|Sources\Windows\AscodSite\Data\Documents.xml
-		{FA8AF122-14C7-FB8E-378B-275FFC4D9248} = folder
-		{FDB18C9F-417B-8A78-88D2-7BEE54C3A381} = {ADEBB434-E9C9-B64F-E327-4247D800FA0B}|Sources\Windows\HttpPingServer\Extension\content.js
 	EndGlobalSection
 EndGlobal

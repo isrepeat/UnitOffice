@@ -17,9 +17,6 @@
         </Group>
       </Files>
       <Filters>
-        <Filter filter="{Tree:Solution}/Sources/Windows/HttpPingServer" preserveTree="true">
-          <Ref tag="Group" id="SolutionFiles" />
-        </Filter>
         <Filter filter="{Tree:Project}">
           <Match>Sources/Windows/HttpPingServer/**/*</Match>
         </Filter>

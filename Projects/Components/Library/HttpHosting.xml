@@ -13,11 +13,6 @@
           <File>Sources/Windows/HttpHosting/**/*</File>
         </Group>
       </Files>
-      <Filters>
-        <Filter filter="{Tree:Solution}/Sources/Windows/HttpHosting" preserveTree="true">
-          <Ref tag="Group" id="SolutionFiles" />
-        </Filter>
-      </Filters>
       <Extension buildSystem="MSBuild">
         <ConsumerIntegration.Files.Input role="msbuild-props">Sources/Windows/HttpHosting/HttpHosting.Usage.props</ConsumerIntegration.Files.Input>
       </Extension>
