@@ -6,11 +6,7 @@
     <ItemsProjectGuid>{91651791-87AF-49D5-B4D5-533383F584F5}</ItemsProjectGuid>
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)..\..\UnitOffice.Sources.Public.g.props" Condition="'$(__IsUniversalDevKitPublicPropsImported)' != 'true'" />
-  <ItemDefinitionGroup>
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)..\..\..\..\..\Includes\HttpHosting;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
-  </ItemDefinitionGroup>
+  <Import Project="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpHosting\HttpHosting.Usage.props" />
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpHosting\HttpExchange.h">
       <__UniversalDevKitFilter></__UniversalDevKitFilter>
@@ -28,4 +24,9 @@
     </__UniversalDevKitCompileRequirement>
   </ItemGroup>
   <Import Project="$(MSBuildThisFileDirectory)..\..\UnitOffice.Sources.Requirements.g.targets" Condition="'$(__IsUniversalDevKitRequirementsImported)' != 'true'" />
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpHosting\HttpHosting.Usage.props">
+      <__UniversalDevKitFilter></__UniversalDevKitFilter>
+    </None>
+  </ItemGroup>
 </Project>

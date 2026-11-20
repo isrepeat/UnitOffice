@@ -53,7 +53,7 @@
   <ItemGroup>
     <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\Library\PersonalEventsBuilder.WinRt\UnitOffice.PersonalEventsBuilder.WinRt.Projection.csproj" />
     <UniversalDevKitWinRTManifest Include="$(MSBuildThisFileDirectory)..\..\..\..\..\!artifacts\projects\Windows\msbuild\PersonalEventsBuilder.WinRt\$(Platform)\$(Configuration)\activation.g.manifest" />
-    <__UniversalDevKitWinRTProject Include="$(MSBuildThisFileDirectory)..\..\Library\PersonalEventsBuilder.WinRt\UnitOffice.PersonalEventsBuilder.WinRt.vcxproj" />
+    <__UniversalDevKitWinRTProject Include="$(MSBuildThisFileDirectory)..\..\Library\PersonalEventsBuilder.WinRt\PersonalEventsBuilder.WinRt.vcxproj" />
   </ItemGroup>
   <PropertyGroup><UniversalDevKitWinRTManifestTasks>$(MSBuildThisFileDirectory)..\..\..\..\..\!artifacts\projects\Windows\msbuild\WinRT.ManifestTasks\bin\$(Configuration)\netstandard2.0\UniversalDevKit.WinRT.ManifestTasks.dll</UniversalDevKitWinRTManifestTasks></PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)..\..\WinRT.Support\UniversalDevKit.WinRT.Runtime.g.targets" />

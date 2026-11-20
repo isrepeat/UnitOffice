@@ -4,7 +4,7 @@
     <Project id="native"
              kind="application"
              projectType="native"
-             msbuildGuid="{B582509A-99A0-484D-82ED-D9DC1A4342BF}">
+             projectGuid="{B582509A-99A0-484D-82ED-D9DC1A4342BF}">
       <Files>
         <Input role="source">Sources/Windows/HttpPingServer/**/*.cpp</Input>
         <Input role="header">Sources/Windows/HttpPingServer/**/*.h</Input>
@@ -12,12 +12,14 @@
         <Input role="header">Sources/Windows/HttpPingServer/Web/**/*.css</Input>
         <Input role="header">Sources/Windows/HttpPingServer/Web/**/*.js</Input>
         <Input role="header">Sources/Windows/HttpPingServer/Snippets/**/*.js</Input>
-        <Input role="msbuild-props">Sources/Windows/HttpPingServer/HttpPingServer.Packages.props</Input>
+        <Group id="SolutionFiles">
+          <File>Sources/Windows/HttpPingServer/**/*</File>
+        </Group>
       </Files>
-      <BrowseFiles>
-        <File>Sources/Windows/HttpPingServer/**/*</File>
-      </BrowseFiles>
       <Filters>
+        <Filter filter="{Tree:Solution}/Sources/Windows/HttpPingServer" preserveTree="true">
+          <Ref tag="Group" id="SolutionFiles" />
+        </Filter>
         <Filter filter="{Tree:Project}">
           <Match>Sources/Windows/HttpPingServer/**/*</Match>
         </Filter>
@@ -33,12 +35,13 @@
 				</Filter>
       </Filters>
       <Requirements cxxStandard="20" />
-      <MSBuild>
+      <Extension buildSystem="MSBuild">
+        <Files.Input role="msbuild-props">Sources/Windows/HttpPingServer/HttpPingServer.Packages.props</Files.Input>
         <Properties>
           <EnableNativePackageReferenceSupport>true</EnableNativePackageReferenceSupport>
           <UniversalDevKitComponents>Helpers;Diagnostic</UniversalDevKitComponents>
         </Properties>
-      </MSBuild>
+      </Extension>
     </Project>
   </Projects>
 </Component>

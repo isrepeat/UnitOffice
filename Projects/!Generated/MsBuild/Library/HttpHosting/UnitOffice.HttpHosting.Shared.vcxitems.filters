@@ -7,5 +7,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Projects\!Generated\Includes\UnitOffice\HttpHosting\Export.g.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpHosting\HttpExchange.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpHosting\HttpServer.h" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpHosting\HttpHosting.Usage.props" />
   </ItemGroup>
 </Project>

@@ -4,7 +4,7 @@
     <Project id="application"
              kind="application"
              projectType="winui"
-             msbuildGuid="{E297DA24-DFCD-433B-84B5-AC3D76CD6579}">
+             projectGuid="{E297DA24-DFCD-433B-84B5-AC3D76CD6579}">
       <Files>
         <Input role="source">Sources/Windows/PersonalEventsBuilder/**/*.cs</Input>
         <Input role="source">Sources/Windows/PersonalEventsBuilder/**/*.xaml</Input>
@@ -15,13 +15,13 @@
           <Match>Sources/Windows/PersonalEventsBuilder/**/*</Match>
         </Filter>
       </Filters>
-      <MSBuild>
+      <Extension buildSystem="MSBuild">
         <Properties>
           <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
           <AssemblyName>PersonalEventsBuilder</AssemblyName>
           <RootNamespace>PersonalEventsBuilder</RootNamespace>
         </Properties>
-      </MSBuild>
+      </Extension>
       <Dependencies>
         <Dependency component="PersonalEventsBuilder.WinRt"
                     visibility="private"

@@ -4,10 +4,11 @@
     <Project id="native"
              kind="library"
              projectType="native"
-             msbuildGuid="{7A55B9D0-4152-4E52-9336-74F2BB02AB55}">
-      <Variants>Static</Variants>
+             target="PersonalEventsBuilder.Core.Native"
+             projectGuid="{7A55B9D0-4152-4E52-9336-74F2BB02AB55}">
+      <Variants>static</Variants>
       <Dependencies>
-        <Dependency component="Excel.Core"
+        <Dependency target="Excel.Core.Native"
                     visibility="private"
                     linkage="same" />
       </Dependencies>
@@ -15,7 +16,7 @@
         <Input role="header">Includes/PersonalEventsBuilder.Core/UnitOffice/PersonalEventsBuilder.Core/**/*.h</Input>
         <Input role="source">Sources/PersonalEventsBuilder.Core/**/*.cpp</Input>
         <Group id="BuildFiles">
-          <Ref tag="Output" id="Dependencies" />
+          <Ref tag="Output" id="ROOT-Dependencies" />
         </Group>
       </Files>
       <Filters>

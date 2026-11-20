@@ -1,5 +1,5 @@
 #define WIN32_LEAN_AND_MEAN
-#include "../HttpHosting/HttpServer.h"
+#include <HttpHosting/HttpServer.h>
 
 #include <filesystem>
 #include <iterator>

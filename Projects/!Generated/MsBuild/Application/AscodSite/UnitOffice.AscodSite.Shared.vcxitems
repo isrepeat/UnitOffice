@@ -9,12 +9,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\AscodSite\Web\Page1.html">
       <__UniversalDevKitFilter>Web</__UniversalDevKitFilter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpHosting\HttpExchange.h">
-      <__UniversalDevKitFilter></__UniversalDevKitFilter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpHosting\HttpServer.h">
-      <__UniversalDevKitFilter></__UniversalDevKitFilter>
-    </ClInclude>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\AscodSite\Main.cpp">
       <__UniversalDevKitFilter></__UniversalDevKitFilter>
     </ClCompile>

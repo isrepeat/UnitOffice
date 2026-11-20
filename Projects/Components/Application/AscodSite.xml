@@ -4,18 +4,19 @@
     <Project id="native"
              kind="application"
              projectType="native"
-             msbuildGuid="{47FC5A4E-AC67-458B-A158-95518B88E8B9}">
+             projectGuid="{47FC5A4E-AC67-458B-A158-95518B88E8B9}">
       <Files>
         <Input role="source">Sources/Windows/AscodSite/**/*.cpp</Input>
         <Input role="header">Sources/Windows/AscodSite/**/*.h</Input>
         <Input role="header">Sources/Windows/AscodSite/Web/**/*.html</Input>
-        <Input role="header">Sources/Windows/HttpHosting/**/*.h</Input>
-        <Input role="msbuild-props">Sources/Windows/AscodSite/AscodSite.Packages.props</Input>
+        <Group id="SolutionFiles">
+          <File>Sources/Windows/AscodSite/**/*</File>
+        </Group>
       </Files>
-      <BrowseFiles>
-        <File>Sources/Windows/AscodSite/**/*</File>
-      </BrowseFiles>
       <Filters>
+        <Filter filter="{Tree:Solution}/Sources/Windows/AscodSite" preserveTree="true">
+          <Ref tag="Group" id="SolutionFiles" />
+        </Filter>
         <Filter filter="{Tree:Project}">
           <Match>Sources/Windows/AscodSite/**/*</Match>
         </Filter>
@@ -27,13 +28,17 @@
 					<Match>Sources/Windows/AscodSite/**/*.targets</Match>
 				</Filter>
       </Filters>
+      <Dependencies>
+        <Dependency target="HttpHosting.Native" />
+      </Dependencies>
       <Requirements cxxStandard="20" />
-      <MSBuild>
+      <Extension buildSystem="MSBuild">
+        <Files.Input role="msbuild-props">Sources/Windows/AscodSite/AscodSite.Packages.props</Files.Input>
         <Properties>
           <EnableNativePackageReferenceSupport>true</EnableNativePackageReferenceSupport>
           <UniversalDevKitComponents>Helpers;Diagnostic</UniversalDevKitComponents>
         </Properties>
-      </MSBuild>
+      </Extension>
     </Project>
   </Projects>
 </Component>

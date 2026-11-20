@@ -4,12 +4,13 @@
     <Project id="native"
              kind="library"
              projectType="native"
-             msbuildGuid="{1B237096-9F34-4339-9197-9136E329384B}">
+             target="Excel.Core.Native"
+             projectGuid="{1B237096-9F34-4339-9197-9136E329384B}">
       <Files>
         <Input role="header">Includes/Excel.Core/UnitOffice/Excel.Core/**/*.h</Input>
         <Input role="source">Sources/Excel.Core/**/*.cpp</Input>
         <Group id="BuildFiles">
-          <Ref tag="Output" id="Dependencies" />
+          <Ref tag="Output" id="ROOT-Dependencies" />
         </Group>
       </Files>
       <Filters>

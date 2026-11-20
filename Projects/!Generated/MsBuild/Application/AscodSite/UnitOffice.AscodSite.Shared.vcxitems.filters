@@ -10,8 +10,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\AscodSite\Web\Page1.html">
       <Filter>Web</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpHosting\HttpExchange.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\HttpHosting\HttpServer.h" />
     <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\AscodSite\AscodSite.Packages.props">
       <Filter>Build</Filter>
     </None>

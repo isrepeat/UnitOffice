@@ -25,13 +25,13 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.3.1" PrivateAssets="build;buildTransitive;analyzers;contentfiles" />
-    <ProjectReference Include="$(MSBuildThisFileDirectory)UnitOffice.PersonalEventsBuilder.WinRt.vcxproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)PersonalEventsBuilder.WinRt.vcxproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
     <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\WinRT.Support\ManifestTasks.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" GlobalPropertiesToRemove="Platform;RuntimeIdentifier;SelfContained" />
 
   </ItemGroup>
   <UsingTask TaskName="UniversalDevKit.WinRT.ReadActivationManifest" AssemblyFile="$(UniversalDevKitWinRTManifestTasks)" />
   <Target Name="__UniversalDevKitWinRTInputs" BeforeTargets="CsWinRTPrepareProjection" DependsOnTargets="ResolveProjectReferences">
-    <MSBuild Projects="$(MSBuildThisFileDirectory)UnitOffice.PersonalEventsBuilder.WinRt.vcxproj" Targets="__UniversalDevKitGetWinRTArtifacts" Properties="Configuration=$(Configuration);Platform=$(Platform)">
+    <MSBuild Projects="$(MSBuildThisFileDirectory)PersonalEventsBuilder.WinRt.vcxproj" Targets="__UniversalDevKitGetWinRTArtifacts" Properties="Configuration=$(Configuration);Platform=$(Platform)">
       <Output TaskParameter="TargetOutputs" ItemName="__UniversalDevKitWinRTArtifact" />
     </MSBuild>
     <ItemGroup>
@@ -50,7 +50,7 @@
     <ItemGroup>
       <__UniversalDevKitPackagePlatform Include="$(UniversalDevKitWinRTPackagePlatforms)" />
     </ItemGroup>
-    <MSBuild Projects="$(MSBuildThisFileDirectory)UnitOffice.PersonalEventsBuilder.WinRt.vcxproj" Targets="Build;__UniversalDevKitGetWinRTArtifacts" Properties="Configuration=$(Configuration);Platform=%(__UniversalDevKitPackagePlatform.Identity)">
+    <MSBuild Projects="$(MSBuildThisFileDirectory)PersonalEventsBuilder.WinRt.vcxproj" Targets="Build;__UniversalDevKitGetWinRTArtifacts" Properties="Configuration=$(Configuration);Platform=%(__UniversalDevKitPackagePlatform.Identity)">
       <Output TaskParameter="TargetOutputs" ItemName="__UniversalDevKitPackageArtifact" />
     </MSBuild>
     <ItemGroup>

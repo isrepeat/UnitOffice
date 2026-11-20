@@ -11,7 +11,7 @@
         <Input role="source">Sources/Windows/PersonalEventsBuilder.WinRt/**/*.cpp</Input>
         <Input role="source">Sources/Windows/PersonalEventsBuilder.WinRt/**/*.idl</Input>
         <Group id="BuildFiles">
-          <Ref tag="Output" id="Dependencies" />
+          <Ref tag="Output" id="ROOT-Dependencies" />
         </Group>
       </Files>
       <Filters>

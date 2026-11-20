@@ -4,11 +4,23 @@
     <Project id="native"
              kind="library"
              projectType="native"
+             target="HttpHosting.Native"
              libraryType="headerOnly"
-             msbuildGuid="{91651791-87AF-49D5-B4D5-533383F584F5}">
+             projectGuid="{91651791-87AF-49D5-B4D5-533383F584F5}">
       <Files>
         <Input role="header">Sources/Windows/HttpHosting/**/*.h</Input>
+        <Group id="SolutionFiles">
+          <File>Sources/Windows/HttpHosting/**/*</File>
+        </Group>
       </Files>
+      <Filters>
+        <Filter filter="{Tree:Solution}/Sources/Windows/HttpHosting" preserveTree="true">
+          <Ref tag="Group" id="SolutionFiles" />
+        </Filter>
+      </Filters>
+      <Extension buildSystem="MSBuild">
+        <ConsumerIntegration.Files.Input role="msbuild-props">Sources/Windows/HttpHosting/HttpHosting.Usage.props</ConsumerIntegration.Files.Input>
+      </Extension>
       <Requirements cxxStandard="20" />
     </Project>
   </Projects>
