@@ -20,6 +20,9 @@
         <Filter filter="{Tree:Project}/Web">
           <Match>Sources/Windows/AscodSite/Web/**/*</Match>
         </Filter>
+        <Filter filter="{Tree:Project}/Data">
+          <Match>Sources/Windows/AscodSite/Data/**/*</Match>
+        </Filter>
         <Filter filter="{Tree:Project}/Build">
 					<Match>Sources/Windows/AscodSite/**/*.props</Match>
 					<Match>Sources/Windows/AscodSite/**/*.targets</Match>

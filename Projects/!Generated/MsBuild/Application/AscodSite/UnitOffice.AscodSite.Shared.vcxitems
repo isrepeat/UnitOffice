@@ -18,7 +18,7 @@
       <__UniversalDevKitFilter>Build</__UniversalDevKitFilter>
     </None>
     <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\AscodSite\Data\Documents.xml">
-      <__UniversalDevKitFilter></__UniversalDevKitFilter>
+      <__UniversalDevKitFilter>Data</__UniversalDevKitFilter>
     </None>
     <None Include="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\AscodSite\README.md">
       <__UniversalDevKitFilter></__UniversalDevKitFilter>
