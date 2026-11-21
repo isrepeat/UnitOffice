@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "AscodExtension",
+  "version": "0.2.0",
+  "description": "Records local AscodSite requests across Microsoft Edge tabs.",
+  "permissions": [
+    "sidePanel",
+    "storage",
+    "webRequest"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Open Ascod API"
+  },
+  "side_panel": {
+    "default_path": "panel.html"
+  }
+}

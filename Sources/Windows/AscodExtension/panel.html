@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Ascod API</title>
+  <style>
+    body {
+      font: 13px system-ui, sans-serif;
+      margin: 12px;
+    }
+
+    button {
+      margin: 0 6px 6px 0;
+    }
+
+    table {
+      width: 100%;
+      text-align: left;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid #8885;
+      padding: 5px 8px;
+    }
+
+    td {
+      overflow-wrap: anywhere;
+    }
+
+    details div {
+      white-space: pre-wrap;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+    }
+  </style>
+  <script src="panel.js" defer></script>
+</head>
+<body>
+  <button id="toggle" disabled>Start recording</button>
+  <button id="clear" disabled>Clear</button>
+  <button id="export" disabled>Export JSON</button>
+  <button id="reload" disabled>Reload extension</button>
+  <span id="status" role="status">Stopped</span>
+  <p>Monitoring http://127.0.0.1:8091 across all tabs. Up to 1,000 requests per browser session.</p>
+  <h2>Endpoints</h2>
+  <p id="endpoint-summary" role="status">No endpoints recorded yet.</p>
+  <div class="table-scroll">
+    <table aria-label="Endpoint summary">
+      <thead>
+        <tr>
+          <th>Method</th>
+          <th>Path</th>
+          <th>Calls</th>
+          <th>Last result</th>
+          <th>Content type</th>
+        </tr>
+      </thead>
+      <tbody id="endpoints"></tbody>
+    </table>
+  </div>
+  <h2>Request log</h2>
+  <div class="table-scroll">
+    <table aria-label="Request log">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Tab</th>
+          <th>Method</th>
+          <th>Path</th>
+          <th>Result</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody id="requests"></tbody>
+    </table>
+  </div>
+</body>
+</html>
