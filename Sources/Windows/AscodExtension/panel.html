@@ -3,91 +3,142 @@
 <head>
   <meta charset="utf-8">
   <title>Ascod API</title>
-  <style>
-    body {
-      font: 13px system-ui, sans-serif;
-      margin: 12px;
-    }
-
-    button {
-      margin: 0 6px 6px 0;
-    }
-
-    table {
-      width: 100%;
-      text-align: left;
-      border-collapse: collapse;
-      margin-top: 12px;
-    }
-
-    th,
-    td {
-      border-bottom: 1px solid #8885;
-      padding: 5px 8px;
-    }
-
-    td {
-      overflow-wrap: anywhere;
-    }
-
-    details div {
-      white-space: pre-wrap;
-    }
-
-    .table-scroll {
-      overflow-x: auto;
-    }
-  </style>
+  <link rel="stylesheet" href="panel.css">
+  <script src="download-first.js" defer></script>
+  <script src="save-file.js" defer></script>
   <script src="panel.js" defer></script>
 </head>
 <body>
-  <button id="toggle" disabled>Start recording</button>
-  <button id="clear" disabled>Clear</button>
-  <button id="export" disabled>Export JSON</button>
-  <button id="reload" disabled>Reload extension</button>
-  <span id="status" role="status">Stopped</span>
-  <p>
-    <label for="server-origin">Server address</label>
-    <input id="server-origin" type="url" value="http://127.0.0.1:8091" disabled>
-  </p>
-  <p>Monitors the selected server across all tabs. Up to 1,000 requests per browser session.</p>
-  <form id="date-filter">
-    <label for="registration-date">Registration date</label>
-    <input id="registration-date" type="date" required>
-    <button id="apply-date" type="submit">Apply date filter</button>
-    <p id="date-result" role="status"></p>
-  </form>
-  <h2>Endpoints</h2>
-  <p id="endpoint-summary" role="status">No endpoints recorded yet.</p>
-  <div class="table-scroll">
-    <table aria-label="Endpoint summary">
-      <thead>
-        <tr>
-          <th>Method</th>
-          <th>Path</th>
-          <th>Calls</th>
-          <th>Last result</th>
-          <th>Content type</th>
-        </tr>
-      </thead>
-      <tbody id="endpoints"></tbody>
-    </table>
-  </div>
-  <h2>Request log</h2>
-  <div class="table-scroll">
-    <table aria-label="Request log">
-      <thead>
-        <tr>
-          <th>Time</th>
-          <th>Tab</th>
-          <th>Method</th>
-          <th>Path</th>
-          <th>Result</th>
-          <th>Details</th>
-        </tr>
-      </thead>
-      <tbody id="requests"></tbody>
-    </table>
-  </div>
+  <header class="panel-heading">
+    <p class="brand">UnitOffice</p>
+    <h1>AscodExtension</h1>
+    <button id="reload" class="reload-icon" type="button" title="Reload extension" aria-label="Reload extension" disabled>
+      <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 11a8 8 0 1 0-2 6m2-11v5h-5"/>
+      </svg>
+    </button>
+    <span id="status" class="status" role="status">Stopped</span>
+  </header>
+  <section class="surface connection-settings" aria-label="Server and mode">
+    <p>
+      <label for="server-origin">Server address</label>
+      <input id="server-origin" type="url" value="http://127.0.0.1:8091" disabled>
+    </p>
+    <fieldset id="operation-modes">
+      <legend>Operation mode</legend>
+      <label><input type="radio" name="operation-mode" value="requests"> Direct requests</label>
+      <label><input type="radio" name="operation-mode" value="interface" checked> Website interface</label>
+    </fieldset>
+  </section>
+  <section class="surface direct-settings" id="request-mode" aria-label="Direct requests" hidden>
+    <form id="direct-filter">
+      <label for="direct-date">Registration date</label>
+      <input id="direct-date" type="date" required>
+      <button class="primary" type="submit">Load documents</button>
+    </form>
+    <p id="direct-result" role="status"></p>
+    <ol id="direct-documents"></ol>
+    <details id="direct-json-details" hidden>
+      <summary>Response JSON</summary>
+      <pre id="direct-json"></pre>
+    </details>
+    <details class="capture-tools">
+      <summary>API diagnostics and manual capture</summary>
+      <form id="filter-payload-form">
+        <label for="filter-payload-date">Date for manual capture</label>
+        <input id="filter-payload-date" type="date" required>
+        <button id="capture-filter-payload" type="submit">Record next GetData payload</button>
+        <button id="clear-filter-payloads" type="button">Clear filter samples</button>
+      </form>
+      <p id="filter-payload-status" role="status"></p>
+      <p>Save the captured payload samples from JSON trace folder. Recording is available without DevTools.</p>
+      <button id="capture-zip" type="button" disabled>Record one manual ZIP</button>
+      <button id="export-zip" type="button" disabled>Save ZIP trace &amp; copy link</button>
+      <p id="capture-status" role="status"></p>
+    </details>
+  </section>
+  <section class="surface" id="interface-mode" aria-label="Website interface">
+    <form id="date-filter">
+      <label for="registration-date">Registration date</label>
+      <input id="registration-date" type="date" required>
+      <button id="apply-date" class="primary" type="submit">Apply date filter</button>
+      <p id="date-result" role="status"></p>
+    </form>
+    <form id="download-form">
+      <label for="download-count">First documents to download</label>
+      <input id="download-count" type="number" min="1" max="20" step="1" value="3" required>
+      <button id="download-first" class="primary" type="submit">Download ZIP files</button>
+    </form>
+    <p id="download-result" role="status"></p>
+  </section>
+  <section class="surface" aria-labelledby="export-heading">
+    <h2 id="export-heading">Logs and traces</h2>
+    <button class="primary" id="save-all" type="button" disabled>Save all to folder</button>
+    <button id="change-output-folder" type="button" hidden>Change folder</button>
+    <p id="output-folder-name" class="muted">Choose a folder on first save.</p>
+    <p id="save-all-status" role="status"></p>
+    <details>
+      <summary>Individual files and copy links</summary>
+      <div class="export-folders">
+        <fieldset>
+          <legend>Log folder</legend>
+          <input id="download-log-folder" aria-label="Log folder" type="text" value="C:\TMP\">
+          <button id="save-log" type="button">Save</button>
+          <button id="copy-log" type="button">Save &amp; copy link</button>
+          <p id="log-file-status" role="status"></p>
+        </fieldset>
+        <fieldset>
+          <legend>JSON trace folder</legend>
+          <input id="trace-folder" aria-label="JSON trace folder" type="text" value="C:\TMP\">
+          <button id="save-traces" type="button" disabled>Save</button>
+          <button id="export" type="button" disabled>Save &amp; copy link</button>
+          <p id="trace-file-status" role="status"></p>
+        </fieldset>
+      </div>
+    </details>
+  </section>
+  <details class="surface" id="network-details">
+    <summary>Network and diagnostic logs</summary>
+    <div class="actions">
+      <button id="toggle" disabled>Start recording</button>
+      <button id="clear" disabled>Clear</button>
+    </div>
+    <details>
+      <summary>Download log</summary>
+      <ol id="download-log"></ol>
+    </details>
+    <h2>Endpoints</h2>
+    <p id="endpoint-summary" role="status">No endpoints recorded yet.</p>
+    <div class="table-scroll">
+      <table aria-label="Endpoint summary">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Path</th>
+            <th>Calls</th>
+            <th>Last result</th>
+            <th>Content type</th>
+          </tr>
+        </thead>
+        <tbody id="endpoints"></tbody>
+      </table>
+    </div>
+    <h2>Request log</h2>
+    <div class="table-scroll">
+      <table aria-label="Request log">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Tab</th>
+            <th>Method</th>
+            <th>Path</th>
+            <th>Result</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody id="requests"></tbody>
+      </table>
+    </div>
+  </details>
 </body>
 </html>

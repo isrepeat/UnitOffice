@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Ascod Filter Trace</title>
+  <script src="save-file.js" defer></script>
+  <script src="filter-redaction.js" defer></script>
+  <script src="filter-trace.js" defer></script>
+</head>
+<body>
+  <h1>Ascod Filter Trace</h1>
+  <p>Choose a date here, arm the capture, then apply the same date manually in the inspected registry. Repeat with a second date.</p>
+  <form id="capture-filter">
+    <label for="filter-date">Registration date</label>
+    <input id="filter-date" type="date" required>
+    <button type="submit">Record next GetData</button>
+  </form>
+  <button id="cancel-filter" type="button" disabled>Cancel capture</button>
+  <button id="clear-filters" type="button">Clear samples</button>
+  <button id="save-filters" type="button" disabled>Save JSON &amp; copy link</button>
+  <p id="filter-status" role="status">Ready</p>
+  <ol id="filter-samples"></ol>
+</body>
+</html>

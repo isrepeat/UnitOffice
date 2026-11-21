@@ -11,11 +11,320 @@ const dateFilter = document.getElementById('date-filter');
 const registrationDate = document.getElementById('registration-date');
 const applyDate = document.getElementById('apply-date');
 const dateResult = document.getElementById('date-result');
+const downloadFirst = document.getElementById('download-first');
+const downloadResult = document.getElementById('download-result');
+const downloadCount = document.getElementById('download-count');
+const downloadForm = document.getElementById('download-form');
+const downloadLog = document.getElementById('download-log');
+const logFolder = document.getElementById('download-log-folder');
+const saveLog = document.getElementById('save-log');
+const copyLog = document.getElementById('copy-log');
+const logFileStatus = document.getElementById('log-file-status');
+const traceFolder = document.getElementById('trace-folder');
+const saveTraces = document.getElementById('save-traces');
+const traceFileStatus = document.getElementById('trace-file-status');
+const captureZip = document.getElementById('capture-zip');
+const exportZip = document.getElementById('export-zip');
+const captureStatus = document.getElementById('capture-status');
+const filterPayloadForm = document.getElementById('filter-payload-form');
+const filterPayloadDate = document.getElementById('filter-payload-date');
+const captureFilterPayload = document.getElementById('capture-filter-payload');
+const clearFilterPayloads = document.getElementById('clear-filter-payloads');
+const filterPayloadStatus = document.getElementById('filter-payload-status');
+const operationModes = document.getElementById('operation-modes');
+const requestMode = document.getElementById('request-mode');
+const interfaceMode = document.getElementById('interface-mode');
+const directFilter = document.getElementById('direct-filter');
+const directDate = document.getElementById('direct-date');
+const directResult = document.getElementById('direct-result');
+const directDocuments = document.getElementById('direct-documents');
+const directJson = document.getElementById('direct-json');
+const directJsonDetails = document.getElementById('direct-json-details');
+const saveAll = document.getElementById('save-all');
+const changeOutputFolder = document.getElementById('change-output-folder');
+const outputFolderName = document.getElementById('output-folder-name');
+const saveAllStatus = document.getElementById('save-all-status');
+let outputDirectory;
+let savingAll = false;
+let logDirectory;
+let confirmedFolderHint;
+let traceDirectory;
+let confirmedTraceFolderHint;
+let savingTraces = false;
 let monitor = {
   recording: false,
   entries: []
 };
 let busy = true;
+let savingExport = false;
+
+function showOperationMode(mode) {
+  const direct = mode === 'requests';
+  requestMode.hidden = !direct;
+  interfaceMode.hidden = direct;
+  operationModes.querySelector('[value="' + (direct ? 'requests' : 'interface') + '"]').checked = true;
+}
+
+operationModes.addEventListener('change', event => {
+  const mode = event.target.value;
+  showOperationMode(mode);
+  chrome.storage.local.set({
+    operationMode: mode
+  }).catch(error => {
+    console.error('Ascod API:', error);
+  });
+});
+
+directFilter.addEventListener('submit', async event => {
+  event.preventDefault();
+  const button = directFilter.querySelector('button');
+  button.disabled = true;
+  directDocuments.replaceChildren();
+  directJson.textContent = '';
+  directJsonDetails.hidden = true;
+  directJsonDetails.open = false;
+  directResult.textContent = 'Loading the registry…';
+  try {
+    const server = readServerAddress();
+    const date = directDate.value;
+    if (server.origin !== 'http://127.0.0.1:8091') {
+      const result = await chrome.runtime.sendMessage({
+        command: 'directFilter',
+        origin: server.origin,
+        date
+      });
+      if (!result?.ok) {
+        throw new Error(result?.error ?? 'GetData failed.');
+      }
+      directJson.textContent = JSON.stringify(result.data, null, 2);
+      directJsonDetails.hidden = false;
+      directResult.textContent = 'Response received for ' + date + '. Open Response JSON to view it.';
+      return;
+    }
+    const response = await fetch(new URL('/api/v1/documents', server.origin), {
+      cache: 'no-store',
+      redirect: 'error'
+    });
+    if (!response.ok) {
+      throw new Error('Registry request failed: HTTP ' + response.status);
+    }
+    const registry = new DOMParser().parseFromString(await response.text(), 'application/xml');
+    if (registry.documentElement.localName !== 'documents') {
+      throw new Error('Invalid registry XML.');
+    }
+    const documents = [...registry.documentElement.children].filter(record =>
+      record.localName === 'document' && record.getAttribute('date') === date);
+    for (const record of documents) {
+      const item = document.createElement('li');
+      item.textContent = record.getAttribute('id') + ' — ' + record.getAttribute('subject');
+      directDocuments.append(item);
+    }
+    directResult.textContent = 'Documents on ' + date + ': ' + documents.length + '.';
+  } catch (error) {
+    directResult.textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
+
+function downloadLogText() {
+  const entries = [...(monitor.downloadLog ?? [])];
+  entries.sort((first, second) => first.time.localeCompare(second.time));
+  const lines = entries.map(entry => entry.time + ' ' + entry.message).join('\n');
+  return lines ? lines + '\n' : '';
+}
+
+async function writeFolderFile(directory, filename, text) {
+  const file = await directory.getFileHandle(filename, {
+    create: true
+  });
+  const stream = await file.createWritable();
+  try {
+    await stream.write(text);
+    await stream.close();
+  } catch (error) {
+    await stream.abort().catch(abortError => {
+      console.error('Ascod API:', abortError);
+    });
+    throw error;
+  }
+}
+
+saveLog.addEventListener('click', async () => {
+  const text = downloadLogText();
+  if (!text) {
+    logFileStatus.textContent = 'The download log is empty.';
+    return;
+  }
+  if (typeof window.showDirectoryPicker !== 'function') {
+    logFileStatus.textContent = 'Edge cannot open a folder picker here.';
+    return;
+  }
+  const path = logFolder.value.trim();
+  saveLog.disabled = true;
+  logFolder.disabled = true;
+  try {
+    if (!logDirectory || confirmedFolderHint !== path) {
+      logDirectory = await window.showDirectoryPicker({
+        id: 'ascod-log-folder',
+        mode: 'readwrite'
+      });
+      confirmedFolderHint = path;
+    }
+    await chrome.storage.local.set({
+      preferredLogFolder: path
+    });
+    await writeFolderFile(logDirectory, 'AscodExtension.log', text);
+    logFileStatus.textContent = 'Saved: ' + logDirectory.name + '/AscodExtension.log';
+  } catch (error) {
+    if (error.name !== 'AbortError') {
+      logFileStatus.textContent = error.message;
+    }
+  } finally {
+    saveLog.disabled = false;
+    logFolder.disabled = false;
+  }
+});
+
+function getZipTrace() {
+  const capture = monitor.zipCapture;
+  if (capture?.archive) {
+    return {
+      origin: capture.origin,
+      preceding: capture.preceding,
+      archive: capture.archive
+    };
+  }
+  return null;
+}
+
+function getJsonTraces() {
+  const files = [];
+  if (monitor.entries.length > 0) {
+    files.push(['ascod-requests.json', monitor.entries]);
+  }
+  const zipTrace = getZipTrace();
+  if (zipTrace) {
+    files.push(['ascod-zip-trace.json', zipTrace]);
+  }
+  if (monitor.filterCapture?.samples?.length) {
+    files.push(['ascod-filter-payloads.json', {
+      origin: monitor.filterCapture.origin,
+      samples: monitor.filterCapture.samples
+    }]);
+  }
+  return files;
+}
+
+async function chooseOutputDirectory() {
+  if (typeof window.showDirectoryPicker !== 'function') {
+    throw new Error('Edge cannot open a folder picker here.');
+  }
+  const directory = await window.showDirectoryPicker({
+    id: 'ascod-export-folder',
+    mode: 'readwrite'
+  });
+  outputDirectory = directory;
+  outputFolderName.textContent = 'Selected folder: ' + directory.name;
+  changeOutputFolder.hidden = false;
+}
+
+changeOutputFolder.onclick = async () => {
+  changeOutputFolder.disabled = true;
+  try {
+    await chooseOutputDirectory();
+    saveAllStatus.textContent = '';
+  } catch (error) {
+    if (error.name !== 'AbortError') {
+      saveAllStatus.textContent = error.message;
+    }
+  } finally {
+    updateControls();
+  }
+};
+
+saveAll.onclick = async () => {
+  const files = getJsonTraces().map(([name, value]) => [name, JSON.stringify(value, null, 2) + '\n']);
+  const log = downloadLogText();
+  if (log) {
+    files.unshift(['AscodExtension.log', log]);
+  }
+  if (!files.length || savingAll) {
+    return;
+  }
+  savingAll = true;
+  updateControls();
+  saveAllStatus.textContent = '';
+  let saved = 0;
+  try {
+    if (!outputDirectory) {
+      await chooseOutputDirectory();
+    }
+    for (const [name, text] of files) {
+      await writeFolderFile(outputDirectory, name, text);
+      saved++;
+    }
+    saveAllStatus.textContent = 'Saved ' + saved + ' files in ' + outputDirectory.name + '.';
+  } catch (error) {
+    if (error.name !== 'AbortError' || saved) {
+      saveAllStatus.textContent = 'Saved ' + saved + ' of ' + files.length + '. ' + error.message;
+    }
+  } finally {
+    savingAll = false;
+    updateControls();
+  }
+};
+
+saveTraces.addEventListener('click', async () => {
+  if (typeof window.showDirectoryPicker !== 'function') {
+    traceFileStatus.textContent = 'Edge cannot open a folder picker here.';
+    return;
+  }
+  const files = getJsonTraces();
+  if (!files.length) {
+    return;
+  }
+
+  const path = traceFolder.value.trim();
+  savingTraces = true;
+  traceFolder.disabled = true;
+  updateControls();
+  const saved = [];
+  try {
+    if (!traceDirectory || confirmedTraceFolderHint !== path) {
+      traceDirectory = await window.showDirectoryPicker({
+        id: 'ascod-trace-folder',
+        mode: 'readwrite'
+      });
+      confirmedTraceFolderHint = path;
+    }
+    await chrome.storage.local.set({
+      preferredTraceFolder: path
+    });
+    for (const [filename, value] of files) {
+      await writeFolderFile(traceDirectory, filename, JSON.stringify(value, null, 2) + '\n');
+      saved.push(filename);
+    }
+    traceFileStatus.textContent = 'Saved in ' + traceDirectory.name + ': ' + saved.join(', ');
+  } catch (error) {
+    if (error.name !== 'AbortError' || saved.length) {
+      traceFileStatus.textContent = 'Saved ' + saved.length + ' of ' + files.length + '. ' + error.message;
+    }
+  } finally {
+    savingTraces = false;
+    traceFolder.disabled = false;
+    updateControls();
+  }
+});
+
+copyLog.addEventListener('click', () => {
+  const text = downloadLogText();
+  if (!text) {
+    logFileStatus.textContent = 'The download log is empty.';
+    return;
+  }
+  return saveAndCopyLink(text, 'AscodExtension.log', 'text/plain;charset=utf-8', logFileStatus);
+});
 
 function readServerAddress() {
   const address = serverOrigin.value.trim();
@@ -31,6 +340,132 @@ function requestServerPermission(url) {
     origins: [url.protocol + '//' + url.hostname + '/*']
   });
 }
+
+filterPayloadForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  captureFilterPayload.disabled = true;
+  try {
+    const url = readServerAddress();
+    const tab = await getRegistryTab(url);
+    const result = await chrome.runtime.sendMessage({
+      command: 'captureFilter',
+      origin: url.origin,
+      date: filterPayloadDate.value,
+      tabId: tab.id
+    });
+    if (!result?.ok) {
+      throw new Error(result?.error ?? 'Could not arm the filter capture.');
+    }
+  } catch (error) {
+    filterPayloadStatus.textContent = error.message;
+  } finally {
+    captureFilterPayload.disabled = false;
+  }
+});
+
+clearFilterPayloads.onclick = async () => {
+  try {
+    const result = await chrome.runtime.sendMessage({
+      command: 'clearFilters'
+    });
+    if (!result?.ok) {
+      throw new Error(result?.error ?? 'Could not clear the filter samples.');
+    }
+  } catch (error) {
+    filterPayloadStatus.textContent = error.message;
+  }
+};
+
+async function getRegistryTab(url) {
+  if (!await requestServerPermission(url)) {
+    throw new Error('Site permission was not granted.');
+  }
+  const [tab] = await chrome.tabs.query({
+    active: true,
+    currentWindow: true
+  });
+  if (tab?.id === undefined || !tab.url || new URL(tab.url).origin !== url.origin) {
+    throw new Error('Open the registry on the selected server in the active tab.');
+  }
+  return tab;
+}
+
+async function waitForDownloads(count) {
+  const deadline = Date.now() + 10000;
+  let observed = 0;
+  while (Date.now() < deadline) {
+    const saved = await chrome.storage.session.get('monitor');
+    observed = saved.monitor?.downloadBatch?.observed ?? 0;
+    if (observed >= count) {
+      break;
+    }
+    await new Promise(resolve => setTimeout(resolve, 250));
+  }
+  return observed;
+}
+
+downloadForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  const count = downloadCount.valueAsNumber;
+  downloadFirst.disabled = true;
+  downloadCount.disabled = true;
+  applyDate.disabled = true;
+  downloadResult.textContent = 'Opening documents and requesting ZIP downloads…';
+  let trace = [];
+  let requested = 0;
+  let prepared = false;
+  try {
+    const url = readServerAddress();
+    const tab = await getRegistryTab(url);
+    const configuration = await chrome.runtime.sendMessage({
+      command: 'prepareDownload',
+      origin: url.origin,
+      count
+    });
+    if (!configuration?.ok) {
+      throw new Error(configuration?.error ?? 'Could not prepare the download.');
+    }
+    prepared = true;
+    const [execution] = await chrome.scripting.executeScript({
+      target: {
+        tabId: tab.id
+      },
+      world: 'MAIN',
+      func: downloadRegistryCards,
+      args: [url.origin, count]
+    });
+    const result = execution?.result;
+    if (!result) {
+      throw new Error('Could not start the download.');
+    }
+    requested = result.requested ?? 0;
+    trace = result.trace ?? [];
+    const observed = requested > 0 ? await waitForDownloads(requested) : 0;
+    downloadResult.textContent = 'ZIP commands sent: ' + requested + ' of ' + count +
+      '. Downloads detected by Edge: ' + observed + '.';
+    if (result.error) {
+      downloadResult.textContent += ' ' + result.error;
+    } else if (observed > 0) {
+      downloadResult.textContent += ' Check Edge Downloads or its save dialogs.';
+    } else {
+      downloadResult.textContent += ' No download event was received.';
+    }
+  } catch (error) {
+    downloadResult.textContent = error.message;
+  } finally {
+    chrome.runtime.sendMessage({
+      command: 'downloadResult',
+      text: downloadResult.textContent,
+      trace,
+      requested: prepared ? requested : undefined
+    }).catch(error => {
+      console.error('Ascod API:', error);
+    });
+    downloadFirst.disabled = false;
+    downloadCount.disabled = false;
+    applyDate.disabled = false;
+  }
+});
 
 function applyRegistrationDate(origin, dateValue) {
   if (location.origin !== origin) {
@@ -76,20 +511,12 @@ function applyRegistrationDate(origin, dateValue) {
 dateFilter.addEventListener('submit', async event => {
   event.preventDefault();
   applyDate.disabled = true;
+  downloadFirst.disabled = true;
   dateResult.textContent = '';
   try {
     const url = readServerAddress();
     const dateValue = registrationDate.value;
-    if (!await requestServerPermission(url)) {
-      throw new Error('Site permission was not granted.');
-    }
-    const [tab] = await chrome.tabs.query({
-      active: true,
-      currentWindow: true
-    });
-    if (tab?.id === undefined || !tab.url || new URL(tab.url).origin !== url.origin) {
-      throw new Error('Open the registry on the selected server in the active tab.');
-    }
+    const tab = await getRegistryTab(url);
     const [execution] = await chrome.scripting.executeScript({
       target: {
         tabId: tab.id
@@ -106,14 +533,33 @@ dateFilter.addEventListener('submit', async event => {
     dateResult.textContent = error.message;
   } finally {
     applyDate.disabled = false;
+    downloadFirst.disabled = false;
   }
 });
 
 function updateControls() {
   toggle.disabled = busy;
   clear.disabled = busy;
-  exportButton.disabled = busy || monitor.entries.length === 0;
+  const hasTraces = monitor.entries.length > 0 || !!monitor.zipCapture?.archive || !!monitor.filterCapture?.samples?.length;
+  saveAll.disabled = busy || savingAll || (!hasTraces && !monitor.downloadLog?.length);
+  changeOutputFolder.disabled = savingAll;
+  exportButton.disabled = busy || savingExport || savingTraces || !hasTraces;
   reloadButton.disabled = busy;
+  captureZip.disabled = busy;
+  exportZip.disabled = savingExport || !monitor.zipCapture?.archive;
+  copyLog.disabled = savingExport;
+  saveTraces.disabled = busy || savingTraces || savingExport || !hasTraces;
+  const capturing = monitor.zipCapture?.active && monitor.zipCapture.deadline > Date.now();
+  captureZip.textContent = capturing ? 'Cancel ZIP capture' : 'Record one manual ZIP';
+  if (monitor.zipCapture?.archive) {
+    captureStatus.textContent = 'ZIP request captured. Save the trace to view masked parameters.';
+  } else if (capturing) {
+    captureStatus.textContent = 'Use the site’s Download all files command within two minutes.';
+  } else if (monitor.zipCapture) {
+    captureStatus.textContent = 'Capture expired. Start a new capture to try again.';
+  } else {
+    captureStatus.textContent = '';
+  }
   serverOrigin.disabled = busy || monitor.recording;
   toggle.textContent = monitor.recording ? 'Stop recording' : 'Start recording';
   status.textContent = (monitor.recording ? 'Recording' : 'Stopped') + ' \u00b7 ' + monitor.entries.length;
@@ -204,6 +650,14 @@ function render(value) {
     fragment.append(row);
   }
   rows.replaceChildren(fragment);
+  filterPayloadStatus.textContent = monitor.filterCapture?.status ?? '';
+  const log = document.createDocumentFragment();
+  for (const entry of monitor.downloadLog ?? []) {
+    const line = document.createElement('li');
+    line.textContent = new Date(entry.time).toLocaleTimeString() + ' · ' + entry.message;
+    log.append(line);
+  }
+  downloadLog.replaceChildren(log);
   renderEndpoints(monitor.entries);
   updateControls();
 }
@@ -254,17 +708,97 @@ reloadButton.onclick = () => {
   }
   chrome.runtime.reload();
 };
-exportButton.onclick = () => {
-  const data = new Blob([JSON.stringify(monitor.entries, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(data);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'ascod-requests.json';
-  link.click();
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-  }, 1000);
+captureZip.onclick = async () => {
+  busy = true;
+  updateControls();
+  let errorMessage;
+  try {
+    let origin;
+    const active = monitor.zipCapture?.active && monitor.zipCapture.deadline > Date.now();
+    const command = active ? 'cancelZip' : 'captureZip';
+    if (command === 'captureZip') {
+      const url = readServerAddress();
+      if (!await requestServerPermission(url)) {
+        throw new Error('Site permission was not granted.');
+      }
+      origin = url.origin;
+    }
+    const result = await chrome.runtime.sendMessage({
+      command,
+      origin
+    });
+    if (!result?.ok) {
+      throw new Error(result?.error ?? 'Could not start ZIP capture.');
+    }
+  } catch (error) {
+    errorMessage = error.message;
+  } finally {
+    busy = false;
+    updateControls();
+    if (errorMessage) {
+      captureStatus.textContent = errorMessage;
+    }
+  }
 };
+exportZip.onclick = () => {
+  const trace = getZipTrace();
+  if (trace) {
+    return saveJsonAndCopyLinks([['ascod-zip-trace.json', trace]]);
+  }
+};
+exportButton.onclick = () => {
+  return saveJsonAndCopyLinks(getJsonTraces());
+};
+
+function saveJsonAndCopyLinks(traces) {
+  const files = traces.map(([filename, value]) => ({
+    filename,
+    text: JSON.stringify(value, null, 2) + '\n',
+    type: 'application/json'
+  }));
+  return saveFilesAndCopyLinks(files, traceFileStatus);
+}
+
+function saveAndCopyLink(text, filename, type, feedback) {
+  return saveFilesAndCopyLinks([{ text, filename, type }], feedback);
+}
+
+async function saveFilesAndCopyLinks(files, feedback) {
+  if (savingExport || !files.length) {
+    return;
+  }
+  savingExport = true;
+  updateControls();
+  const links = [];
+  let saveError;
+  try {
+    for (const { text, filename, type } of files) {
+      feedback.textContent = 'Choose where to save ' + filename + '.';
+      try {
+        links.push(await saveTextAndGetFileUrl(text, filename, type));
+      } catch (error) {
+        saveError = error.message;
+        break;
+      }
+    }
+    if (!links.length) {
+      feedback.textContent = 'Could not save: ' + saveError;
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(links.join('\n'));
+      feedback.textContent = 'Saved and copied ' + links.length + ' of ' + files.length + ' file links.';
+    } catch {
+      feedback.textContent = 'Saved, but could not copy: ' + links.join(' ');
+    }
+    if (saveError) {
+      feedback.textContent += ' ' + saveError;
+    }
+  } finally {
+    savingExport = false;
+    updateControls();
+  }
+}
 
 let receivedUpdate = false;
 chrome.storage.onChanged.addListener((changes, area) => {
@@ -277,9 +811,12 @@ chrome.storage.onChanged.addListener((changes, area) => {
 
 Promise.all([
   chrome.storage.session.get('monitor'),
-  chrome.storage.local.get('serverOrigin')
+  chrome.storage.local.get(['serverOrigin', 'preferredLogFolder', 'preferredTraceFolder', 'operationMode'])
 ]).then(([saved, settings]) => {
+  showOperationMode(settings.operationMode);
   serverOrigin.value = monitor.origin ?? saved.monitor?.origin ?? settings.serverOrigin ?? serverOrigin.value;
+  logFolder.value = settings.preferredLogFolder ?? logFolder.value;
+  traceFolder.value = settings.preferredTraceFolder ?? traceFolder.value;
   busy = false;
   if (receivedUpdate) {
     updateControls();
@@ -289,3 +826,10 @@ Promise.all([
 }).catch(error => {
   status.textContent = error.message;
 });
+
+setInterval(() => {
+  if (monitor.zipCapture?.active && monitor.zipCapture.deadline <= Date.now() &&
+      captureZip.textContent === 'Cancel ZIP capture') {
+    updateControls();
+  }
+}, 1000);

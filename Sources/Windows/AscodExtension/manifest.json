@@ -3,7 +3,10 @@
   "name": "AscodExtension",
   "version": "0.2.0",
   "description": "Records requests to a selected AscodSite server across Microsoft Edge tabs.",
+  "devtools_page": "filter-devtools.html",
   "permissions": [
+    "clipboardWrite",
+    "downloads",
     "scripting",
     "sidePanel",
     "storage",

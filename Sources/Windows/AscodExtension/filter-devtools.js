@@ -1,0 +1,1 @@
+chrome.devtools.panels.create('Ascod Filter Trace', '', 'filter-trace.html');
