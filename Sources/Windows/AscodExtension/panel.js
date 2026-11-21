@@ -7,11 +7,107 @@ const exportButton = document.getElementById('export');
 const reloadButton = document.getElementById('reload');
 const status = document.getElementById('status');
 const serverOrigin = document.getElementById('server-origin');
+const dateFilter = document.getElementById('date-filter');
+const registrationDate = document.getElementById('registration-date');
+const applyDate = document.getElementById('apply-date');
+const dateResult = document.getElementById('date-result');
 let monitor = {
   recording: false,
   entries: []
 };
 let busy = true;
+
+function readServerAddress() {
+  const address = serverOrigin.value.trim();
+  const url = URL.canParse(address) ? new URL(address) : null;
+  if (!url || !['http:', 'https:'].includes(url.protocol) || url.username || url.password) {
+    throw new Error('Enter an HTTP or HTTPS server address.');
+  }
+  return url;
+}
+
+function requestServerPermission(url) {
+  return chrome.permissions.request({
+    origins: [url.protocol + '//' + url.hostname + '/*']
+  });
+}
+
+function applyRegistrationDate(origin, dateValue) {
+  if (location.origin !== origin) {
+    return 'Open the registry on the selected server.';
+  }
+  if (location.pathname === '/' || location.pathname === '/page1') {
+    const from = document.getElementById('from');
+    const to = document.getElementById('to');
+    const button = document.getElementById('apply-dates');
+    if (!from || !to || !button || !button.getClientRects().length) {
+      return 'Open the document registry first.';
+    }
+    from.value = dateValue;
+    to.value = dateValue;
+    button.click();
+    return '';
+  }
+  if (!/\/Defaultv4\.aspx$/i.test(location.pathname)) {
+    return 'Open the document registry first.';
+  }
+
+  const fromInput = document.querySelector('input[id*="_AskodGridCards_CommonGrid_"][id$="_regDateFrom_dateInput"]');
+  if (!fromInput?.getClientRects().length) {
+    return 'The registration date filter is not visible.';
+  }
+  const prefix = fromInput.id.slice(0, -'regDateFrom_dateInput'.length);
+  const toInput = document.getElementById(prefix + 'regDateTill_dateInput');
+  const button = document.getElementById(prefix + 'img1');
+  const fromPicker = window.$find?.(prefix + 'regDateFrom');
+  const toPicker = window.$find?.(prefix + 'regDateTill');
+  if (!toInput?.getClientRects().length || !button?.getClientRects().length ||
+      typeof fromPicker?.set_selectedDate !== 'function' || typeof toPicker?.set_selectedDate !== 'function') {
+    return 'Could not find the registration date controls.';
+  }
+
+  const [year, month, day] = dateValue.split('-').map(Number);
+  fromPicker.set_selectedDate(new Date(year, month - 1, day));
+  toPicker.set_selectedDate(new Date(year, month - 1, day));
+  button.click();
+  return '';
+}
+
+dateFilter.addEventListener('submit', async event => {
+  event.preventDefault();
+  applyDate.disabled = true;
+  dateResult.textContent = '';
+  try {
+    const url = readServerAddress();
+    const dateValue = registrationDate.value;
+    if (!await requestServerPermission(url)) {
+      throw new Error('Site permission was not granted.');
+    }
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true
+    });
+    if (tab?.id === undefined || !tab.url || new URL(tab.url).origin !== url.origin) {
+      throw new Error('Open the registry on the selected server in the active tab.');
+    }
+    const [execution] = await chrome.scripting.executeScript({
+      target: {
+        tabId: tab.id
+      },
+      world: 'MAIN',
+      func: applyRegistrationDate,
+      args: [url.origin, dateValue]
+    });
+    if (!execution || execution.result) {
+      throw new Error(execution?.result || 'Could not run the date filter.');
+    }
+    dateResult.textContent = 'Date filter submitted: ' + dateValue;
+  } catch (error) {
+    dateResult.textContent = error.message;
+  } finally {
+    applyDate.disabled = false;
+  }
+});
 
 function updateControls() {
   toggle.disabled = busy;
@@ -119,15 +215,9 @@ async function sendCommand(command) {
   try {
     let origin;
     if (command === 'start') {
-      const address = serverOrigin.value.trim();
-      const url = URL.canParse(address) ? new URL(address) : null;
-      if (!url || !['http:', 'https:'].includes(url.protocol) || url.username || url.password) {
-        throw new Error('Enter an HTTP or HTTPS server address.');
-      }
+      const url = readServerAddress();
       origin = url.origin;
-      const granted = await chrome.permissions.request({
-        origins: [url.protocol + '//' + url.hostname + '/*']
-      });
+      const granted = await requestServerPermission(url);
       if (!granted) {
         throw new Error('Site permission was not granted.');
       }

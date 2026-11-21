@@ -51,6 +51,12 @@
     <input id="server-origin" type="url" value="http://127.0.0.1:8091" disabled>
   </p>
   <p>Monitors the selected server across all tabs. Up to 1,000 requests per browser session.</p>
+  <form id="date-filter">
+    <label for="registration-date">Registration date</label>
+    <input id="registration-date" type="date" required>
+    <button id="apply-date" type="submit">Apply date filter</button>
+    <p id="date-result" role="status"></p>
+  </form>
   <h2>Endpoints</h2>
   <p id="endpoint-summary" role="status">No endpoints recorded yet.</p>
   <div class="table-scroll">
