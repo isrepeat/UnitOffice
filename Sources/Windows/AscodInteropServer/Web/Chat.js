@@ -6,6 +6,8 @@ let role = 'local';
 let pendingFiles = [];
 let readingFiles = false;
 let sending = false;
+let pollController;
+let pollTimer;
 
 const $ = id => document.getElementById(id);
 const fixedRole = {
@@ -281,6 +283,67 @@ function makeDownloadAllButton(attachments, id) {
 	return button;
 }
 
+function makeSaveToFolderButton(attachments, feedback) {
+	const button = document.createElement('button');
+	button.type = 'button';
+	button.className = 'image-action image-action--folder';
+	button.title = 'Скачать вложения в папку без архива';
+	button.setAttribute('aria-label', button.title);
+	button.disabled = typeof window.showDirectoryPicker !== 'function';
+	if (button.disabled) {
+		button.title = 'Сохранение в папку доступно в Edge через HTTPS или localhost';
+	}
+	button.addEventListener('click', async () => {
+		button.disabled = true;
+		feedback.hidden = true;
+		let saved = 0;
+		try {
+			const folder = await window.showDirectoryPicker({
+				mode: 'readwrite',
+				startIn: 'downloads'
+			});
+			const usedNames = new Set();
+			for await (const name of folder.keys()) {
+				usedNames.add(name.toLowerCase());
+			}
+			for (const attachment of attachments) {
+				const cleanName = attachment.name.replace(/[\\/:*?"<>|\x00-\x1f]/g, '_').replace(/[. ]+$/, '') || 'attachment';
+				const reservedName = /^(?:con|prn|aux|nul|com[1-9\u00b9\u00b2\u00b3]|lpt[1-9\u00b9\u00b2\u00b3])(?:\.|$)/i;
+				const baseName = reservedName.test(cleanName) ? '_' + cleanName : cleanName;
+				const extensionStart = baseName.lastIndexOf('.');
+				const stem = extensionStart > 0 ? baseName.slice(0, extensionStart) : baseName;
+				const extension = extensionStart > 0 ? baseName.slice(extensionStart) : '';
+				let name = baseName;
+				for (let suffix = 2; usedNames.has(name.toLowerCase()); suffix++) {
+					name = stem + ' (' + suffix + ')' + extension;
+				}
+				usedNames.add(name.toLowerCase());
+				const bytes = Uint8Array.from(atob(attachment.data), character => character.charCodeAt(0));
+				const file = await folder.getFileHandle(name, {create: true});
+				const stream = await file.createWritable();
+				try {
+					await stream.write(bytes);
+					await stream.close();
+				} catch (error) {
+					await stream.abort().catch(() => {});
+					throw error;
+				}
+				saved++;
+			}
+			feedback.textContent = 'Сохранено файлов: ' + saved;
+			feedback.hidden = false;
+		} catch (error) {
+			if (error.name !== 'AbortError' || saved > 0) {
+				feedback.textContent = 'Не удалось сохранить все вложения. Сохранено файлов: ' + saved;
+				feedback.hidden = false;
+			}
+		} finally {
+			button.disabled = false;
+		}
+	});
+	return button;
+}
+
 function updateMessageTextToggle(text) {
 	const toggle = text.nextElementSibling;
 	if (toggle.getAttribute('aria-expanded') === 'true') {
@@ -297,7 +360,7 @@ const messageTextObserver = new ResizeObserver(entries => {
 	}
 });
 
-function appendMessage(message) {
+function appendMessage(message, peerAcknowledged = null) {
 	const item = document.createElement('article');
 	item.className = 'message';
 	item.classList.toggle('message--own', message.sender === role);
@@ -359,8 +422,23 @@ function appendMessage(message) {
 		});
 		item.append(text, toggle);
 	}
-	if (attachments.length > 1) {
+	if (attachments.length > 0) {
+		const feedback = document.createElement('p');
+		feedback.className = 'message-meta';
+		feedback.setAttribute('role', 'status');
+		feedback.hidden = true;
 		header.append(makeDownloadAllButton(attachments, message.id));
+		header.append(makeSaveToFolderButton(attachments, feedback));
+		item.append(feedback);
+	}
+	if (message.sender === role && Number.isSafeInteger(peerAcknowledged) && message.id > peerAcknowledged) {
+		const queued = document.createElement('span');
+		queued.className = 'message-spinner';
+		queued.dataset.queuedMessage = message.id;
+		queued.title = 'Ожидает подтверждения получения второй стороной';
+		queued.setAttribute('role', 'img');
+		queued.setAttribute('aria-label', queued.title);
+		header.append(queued);
 	}
 	$('messages').append(item);
 	if (message.text) {
@@ -386,16 +464,24 @@ async function request(url, options = {}) {
 	});
 
 	if (!response.ok) {
+		if (response.status === 507) {
+			throw new Error('Delivery queue is full.');
+		}
 		throw new Error('HTTP ' + response.status);
 	}
 
 	return response;
 }
 
-async function poll() {
+async function poll(signal) {
 	try {
-		const response = await request('/messages?after=' + cursor, {signal: AbortSignal.timeout(120000)});
+		const response = await request('/messages?after=' + cursor, {
+			signal: AbortSignal.any([signal, AbortSignal.timeout(120000)])
+		});
 		const data = await response.json();
+		if (signal.aborted) {
+			return;
+		}
 
 		const history = $('messages').parentElement;
 		const followLatest = history.scrollHeight - history.scrollTop - history.clientHeight < 48;
@@ -411,7 +497,7 @@ async function poll() {
 		}
 
 		for (const message of data.messages) {
-			appendMessage(message);
+			appendMessage(message, data.peerAcknowledged);
 			cursor = message.id;
 
 			while ($('messages').children.length > 200) {
@@ -423,6 +509,13 @@ async function poll() {
 				oldest.remove();
 			}
 		}
+		if (Number.isSafeInteger(data.peerAcknowledged)) {
+			for (const queued of $('messages').querySelectorAll('[data-queued-message]')) {
+				if (Number(queued.dataset.queuedMessage) <= data.peerAcknowledged) {
+					queued.remove();
+				}
+			}
+		}
 
 		$('empty').hidden = $('messages').children.length > 0;
 		if (followLatest && data.messages.length > 0) {
@@ -431,7 +524,9 @@ async function poll() {
 
 		setStatus('online', historyGap ? 'Подключено · часть истории недоступна' : 'Подключено');
 	} catch {
-		setStatus('error', 'Нет связи · повторяем подключение');
+		if (!signal.aborted) {
+			setStatus('error', 'Нет связи · повторяем подключение');
+		}
 	}
 }
 
@@ -496,17 +591,42 @@ async function connect(accessKey) {
 	rememberSession({token, role});
 	$('key').value = '';
 	$('connect').hidden = true;
+	$('disconnect').hidden = false;
 	$('text').disabled = false;
 	$('submit').disabled = false;
 	$('text').focus();
 	setStatus('online', 'Подключено');
 
+	pollController = new AbortController();
+	const signal = pollController.signal;
 	async function loop() {
-		await poll();
-		setTimeout(loop, 1000);
+		await poll(signal);
+		if (!signal.aborted) {
+			pollTimer = setTimeout(loop, 1000);
+		}
 	}
 	loop();
 }
+
+$('disconnect').onclick = () => {
+	running = false;
+	pollController.abort();
+	clearTimeout(pollTimer);
+	rememberSession(null);
+	token = '';
+	cursor = 0;
+	messageTextObserver.disconnect();
+	$('messages').replaceChildren();
+	$('empty').hidden = false;
+	$('send-error').hidden = true;
+	$('disconnect').hidden = true;
+	$('connect').hidden = false;
+	$('connect').querySelector('button').disabled = false;
+	$('text').disabled = true;
+	$('submit').disabled = true;
+	setStatus('idle', 'Отключено');
+	$('key').focus();
+};
 
 $('connect').onsubmit = event => {
 	event.preventDefault();
@@ -651,6 +771,8 @@ $('send').onsubmit = async event => {
 
 	$('submit').disabled = true;
 	sending = true;
+	$('disconnect').disabled = true;
+	$('submit').textContent = '⏳ Отправка…';
 	$('remove-image').disabled = true;
 	$('send-error').hidden = true;
 	const draft = $('text').value;
@@ -676,11 +798,15 @@ $('send').onsubmit = async event => {
 			$('text').value = '';
 		}
 		clearAttachment();
-	} catch {
-		$('send-error').textContent = 'Не удалось отправить. Попробуй ещё раз.';
+	} catch (error) {
+		$('send-error').textContent = error.message === 'Delivery queue is full.'
+			? 'Очередь заполнена. Дождись подключения получателя и попробуй снова.'
+			: 'Не удалось отправить. Попробуй ещё раз.';
 		$('send-error').hidden = false;
 	} finally {
 		sending = false;
+		$('disconnect').disabled = false;
+		$('submit').textContent = 'Отправить';
 		$('remove-image').disabled = false;
 		$('submit').disabled = false;
 	}

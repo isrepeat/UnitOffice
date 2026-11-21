@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AscodExtension",
   "version": "0.2.0",
-  "description": "Records local AscodSite requests across Microsoft Edge tabs.",
+  "description": "Records requests to a selected AscodSite server across Microsoft Edge tabs.",
   "permissions": [
     "sidePanel",
     "storage",
@@ -10,6 +10,10 @@
   ],
   "host_permissions": [
     "http://127.0.0.1/*"
+  ],
+  "optional_host_permissions": [
+    "http://*/*",
+    "https://*/*"
   ],
   "background": {
     "service_worker": "background.js"

@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <string_view>
 #include <cstdint>
 #include <utility>
@@ -43,10 +44,28 @@ namespace unitoffice::windows::httppingserver {
 
 	class ChatService {
 	public:
-		void Add(std::string_view sender, std::string text, std::string image, std::vector<Attachment> attachments) {
+		bool Add(std::string_view sender, std::string text, std::string image, std::vector<Attachment> attachments) {
 			std::size_t bytes = text.size() + image.size();
 			for (const auto& attachment : attachments) {
 				bytes += sizeof(Attachment) + attachment.name.size() + attachment.data.size();
+			}
+			std::size_t pendingCount = 0;
+			std::size_t pendingBytes = 0;
+			for (const auto& message : messages) {
+				if (this->IsPending(message)) {
+					++pendingCount;
+					pendingBytes += message.bytes;
+				}
+			}
+			if (pendingCount >= maxMessages || bytes > maxStoredBytes - pendingBytes) {
+				return false;
+			}
+			while (messages.size() >= maxMessages || bytes > maxStoredBytes - storedBytes) {
+				const auto oldest = std::find_if(messages.begin(), messages.end(), [this](const Message& message) {
+					return !this->IsPending(message);
+				});
+				storedBytes -= oldest->bytes;
+				messages.erase(oldest);
 			}
 			messages.push_back({
 				nextId++,
@@ -57,15 +76,21 @@ namespace unitoffice::windows::httppingserver {
 				bytes
 			});
 			storedBytes += bytes;
-			while (messages.size() > 200 || storedBytes > 96 * 1024 * 1024) {
-				const auto& oldest = messages.front();
-				storedBytes -= oldest.bytes;
-				messages.pop_front();
-			}
+			return true;
 		}
 
-		std::string ReadAfter(std::uint64_t after) const {
-			std::string body = "{\"latest\":" + std::to_string(nextId - 1) + ",\"messages\":[";
+		void Acknowledge(std::string_view recipient, std::uint64_t after) {
+			if (after >= nextId) {
+				return;
+			}
+			auto& acknowledged = recipient == "local" ? localAcknowledged : sedoAcknowledged;
+			acknowledged = (std::max)(acknowledged, after);
+		}
+
+		std::string ReadAfter(std::uint64_t after, std::string_view recipient) const {
+			const auto peerAcknowledged = recipient == "local" ? sedoAcknowledged : localAcknowledged;
+			std::string body = "{\"latest\":" + std::to_string(nextId - 1) +
+				",\"peerAcknowledged\":" + std::to_string(peerAcknowledged) + ",\"messages\":[";
 			bool first = true;
 			for (const auto& message : messages) {
 				if (message.id <= after) {
@@ -94,8 +119,17 @@ namespace unitoffice::windows::httppingserver {
 		}
 
 	private:
+		bool IsPending(const Message& message) const {
+			const auto acknowledged = message.sender == "local" ? sedoAcknowledged : localAcknowledged;
+			return message.id > acknowledged;
+		}
+
+		static constexpr std::size_t maxMessages = 200;
+		static constexpr std::size_t maxStoredBytes = 96 * 1024 * 1024;
 		std::deque<Message> messages;
 		std::uint64_t nextId = 1;
+		std::uint64_t localAcknowledged = 0;
+		std::uint64_t sedoAcknowledged = 0;
 		std::size_t storedBytes = 0;
 	};
 }

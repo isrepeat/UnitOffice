@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.12.12412.261 stable
+VisualStudioVersion = 18.12.12412.261
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "!Repository", "!Repository", "{893C5E75-E59B-42F1-8BF2-FF6581A6031A}"
 	ProjectSection(SolutionItems) = preProject
@@ -18,17 +18,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MsBuild", "MsBuild", "{9681
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{2CADED90-D69B-555C-A418-2479148AF202}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AscodInteropServer", "AscodInteropServer", "{0820D5DE-2253-13D8-501E-5E896F62DFA9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitOffice.AscodInteropServer", "Projects\!Generated\MsBuild\Application\AscodInteropServer\UnitOffice.AscodInteropServer.vcxproj", "{B582509A-99A0-484D-82ED-D9DC1A4342BF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitOffice.AscodInteropServer.Shared", "Projects\!Generated\MsBuild\Application\AscodInteropServer\UnitOffice.AscodInteropServer.Shared.vcxitems", "{926BDA50-C062-8E35-E30D-E7837B3ACB5A}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AscodSite", "AscodSite", "{6B485A76-61CE-EC96-7D07-432EEB42B694}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitOffice.AscodSite", "Projects\!Generated\MsBuild\Application\AscodSite\UnitOffice.AscodSite.vcxproj", "{47FC5A4E-AC67-458B-A158-95518B88E8B9}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitOffice.AscodSite.Shared", "Projects\!Generated\MsBuild\Application\AscodSite\UnitOffice.AscodSite.Shared.vcxitems", "{C7126B91-444C-7D84-5B96-36BD9A3204CE}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HttpPingServer", "HttpPingServer", "{7C5F12B1-6FBF-110B-BD02-5EF411BE59B9}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitOffice.HttpPingServer", "Projects\!Generated\MsBuild\Application\HttpPingServer\UnitOffice.HttpPingServer.vcxproj", "{B582509A-99A0-484D-82ED-D9DC1A4342BF}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitOffice.HttpPingServer.Shared", "Projects\!Generated\MsBuild\Application\HttpPingServer\UnitOffice.HttpPingServer.Shared.vcxitems", "{926BDA50-C062-8E35-E30D-E7837B3ACB5A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PersonalEventsBuilder", "PersonalEventsBuilder", "{04234C74-FA8E-5E89-6F5B-97897AF1C37A}"
 EndProject
@@ -68,8 +68,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Components", "Components", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{A08695BC-E4C7-4E9B-8D7B-DF86C239446F}"
 	ProjectSection(SolutionItems) = preProject
+		Projects\Components\Application\AscodInteropServer.xml = Projects\Components\Application\AscodInteropServer.xml
 		Projects\Components\Application\AscodSite.xml = Projects\Components\Application\AscodSite.xml
-		Projects\Components\Application\HttpPingServer.xml = Projects\Components\Application\HttpPingServer.xml
 		Projects\Components\Application\PersonalEventsBuilder.xml = Projects\Components\Application\PersonalEventsBuilder.xml
 	EndProjectSection
 EndProject
@@ -87,14 +87,14 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{47FC5A4E-AC67-458B-A158-95518B88E8B9}.Debug|x64.ActiveCfg = Debug|x64
-		{47FC5A4E-AC67-458B-A158-95518B88E8B9}.Debug|x64.Build.0 = Debug|x64
-		{47FC5A4E-AC67-458B-A158-95518B88E8B9}.Release|x64.ActiveCfg = Release|x64
-		{47FC5A4E-AC67-458B-A158-95518B88E8B9}.Release|x64.Build.0 = Release|x64
 		{B582509A-99A0-484D-82ED-D9DC1A4342BF}.Debug|x64.ActiveCfg = Debug|x64
 		{B582509A-99A0-484D-82ED-D9DC1A4342BF}.Debug|x64.Build.0 = Debug|x64
 		{B582509A-99A0-484D-82ED-D9DC1A4342BF}.Release|x64.ActiveCfg = Release|x64
 		{B582509A-99A0-484D-82ED-D9DC1A4342BF}.Release|x64.Build.0 = Release|x64
+		{47FC5A4E-AC67-458B-A158-95518B88E8B9}.Debug|x64.ActiveCfg = Debug|x64
+		{47FC5A4E-AC67-458B-A158-95518B88E8B9}.Debug|x64.Build.0 = Debug|x64
+		{47FC5A4E-AC67-458B-A158-95518B88E8B9}.Release|x64.ActiveCfg = Release|x64
+		{47FC5A4E-AC67-458B-A158-95518B88E8B9}.Release|x64.Build.0 = Release|x64
 		{E297DA24-DFCD-433B-84B5-AC3D76CD6579}.Debug|x64.ActiveCfg = Debug|x64
 		{E297DA24-DFCD-433B-84B5-AC3D76CD6579}.Debug|x64.Build.0 = Debug|x64
 		{E297DA24-DFCD-433B-84B5-AC3D76CD6579}.Release|x64.ActiveCfg = Release|x64
@@ -131,12 +131,12 @@ Global
 		{3EEC5DF9-747D-C036-910A-45CDF486927A} = {6DB38FB4-DBFA-4A89-A802-E221B5D5C077}
 		{96813775-82ED-B2F5-3C1D-E809CD2D37E3} = {3EEC5DF9-747D-C036-910A-45CDF486927A}
 		{2CADED90-D69B-555C-A418-2479148AF202} = {96813775-82ED-B2F5-3C1D-E809CD2D37E3}
+		{0820D5DE-2253-13D8-501E-5E896F62DFA9} = {2CADED90-D69B-555C-A418-2479148AF202}
+		{B582509A-99A0-484D-82ED-D9DC1A4342BF} = {0820D5DE-2253-13D8-501E-5E896F62DFA9}
+		{926BDA50-C062-8E35-E30D-E7837B3ACB5A} = {0820D5DE-2253-13D8-501E-5E896F62DFA9}
 		{6B485A76-61CE-EC96-7D07-432EEB42B694} = {2CADED90-D69B-555C-A418-2479148AF202}
 		{47FC5A4E-AC67-458B-A158-95518B88E8B9} = {6B485A76-61CE-EC96-7D07-432EEB42B694}
 		{C7126B91-444C-7D84-5B96-36BD9A3204CE} = {6B485A76-61CE-EC96-7D07-432EEB42B694}
-		{7C5F12B1-6FBF-110B-BD02-5EF411BE59B9} = {2CADED90-D69B-555C-A418-2479148AF202}
-		{B582509A-99A0-484D-82ED-D9DC1A4342BF} = {7C5F12B1-6FBF-110B-BD02-5EF411BE59B9}
-		{926BDA50-C062-8E35-E30D-E7837B3ACB5A} = {7C5F12B1-6FBF-110B-BD02-5EF411BE59B9}
 		{04234C74-FA8E-5E89-6F5B-97897AF1C37A} = {2CADED90-D69B-555C-A418-2479148AF202}
 		{E297DA24-DFCD-433B-84B5-AC3D76CD6579} = {04234C74-FA8E-5E89-6F5B-97897AF1C37A}
 		{45A79D61-B350-ADD1-84A4-451378B578DD} = {96813775-82ED-B2F5-3C1D-E809CD2D37E3}
@@ -172,8 +172,8 @@ Global
 		Projects\!Generated\MsBuild\Library\PersonalEventsBuilder.WinRt\UnitOffice.PersonalEventsBuilder.WinRt.Shared.vcxitems*{7cc47d89-e084-ee51-cec1-18917a8a6dee}*SharedItemsImports = 4
 		Projects\!Generated\MsBuild\Library\PersonalEventsBuilder.WinRt\UnitOffice.PersonalEventsBuilder.WinRt.Shared.vcxitems*{8279947c-c996-fa9d-965a-c901369c1391}*SharedItemsImports = 9
 		Projects\!Generated\MsBuild\Library\HttpHosting\UnitOffice.HttpHosting.Shared.vcxitems*{91651791-87af-49d5-b4d5-533383f584f5}*SharedItemsImports = 9
-		Projects\!Generated\MsBuild\Application\HttpPingServer\UnitOffice.HttpPingServer.Shared.vcxitems*{926bda50-c062-8e35-e30d-e7837b3acb5a}*SharedItemsImports = 9
-		Projects\!Generated\MsBuild\Application\HttpPingServer\UnitOffice.HttpPingServer.Shared.vcxitems*{b582509a-99a0-484d-82ed-d9dc1a4342bf}*SharedItemsImports = 4
+		Projects\!Generated\MsBuild\Application\AscodInteropServer\UnitOffice.AscodInteropServer.Shared.vcxitems*{926bda50-c062-8e35-e30d-e7837b3acb5a}*SharedItemsImports = 9
+		Projects\!Generated\MsBuild\Application\AscodInteropServer\UnitOffice.AscodInteropServer.Shared.vcxitems*{b582509a-99a0-484d-82ed-d9dc1a4342bf}*SharedItemsImports = 4
 		Projects\!Generated\MsBuild\Application\AscodSite\UnitOffice.AscodSite.Shared.vcxitems*{c7126b91-444c-7d84-5b96-36bd9a3204ce}*SharedItemsImports = 9
 	EndGlobalSection
 	GlobalSection(SolutionInjectorProjectOwnership) = preSolution
@@ -187,9 +187,9 @@ Global
 		{7CC47D89-E084-EE51-CEC1-18917A8A6DEE} = ProjectTools|{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}|Projects\!Generated\MsBuild\Library\PersonalEventsBuilder.WinRt\PersonalEventsBuilder.WinRt.vcxproj
 		{8279947C-C996-FA9D-965A-C901369C1391} = ProjectTools|{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}|Projects\!Generated\MsBuild\Library\PersonalEventsBuilder.WinRt\UnitOffice.PersonalEventsBuilder.WinRt.Shared.vcxitems
 		{91651791-87AF-49D5-B4D5-533383F584F5} = ProjectTools|{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}|Projects\!Generated\MsBuild\Library\HttpHosting\UnitOffice.HttpHosting.Shared.vcxitems
-		{926BDA50-C062-8E35-E30D-E7837B3ACB5A} = ProjectTools|{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}|Projects\!Generated\MsBuild\Application\HttpPingServer\UnitOffice.HttpPingServer.Shared.vcxitems
+		{926BDA50-C062-8E35-E30D-E7837B3ACB5A} = ProjectTools|{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}|Projects\!Generated\MsBuild\Application\AscodInteropServer\UnitOffice.AscodInteropServer.Shared.vcxitems
 		{A9FEC4C5-22B7-BC25-B544-984BC555B877} = ProjectTools|{9A19103F-16F7-4668-BE54-9A1E7A4F7556}|Projects\!Generated\MsBuild\Library\PersonalEventsBuilder.WinRt\UnitOffice.PersonalEventsBuilder.WinRt.Projection.csproj
-		{B582509A-99A0-484D-82ED-D9DC1A4342BF} = ProjectTools|{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}|Projects\!Generated\MsBuild\Application\HttpPingServer\UnitOffice.HttpPingServer.vcxproj
+		{B582509A-99A0-484D-82ED-D9DC1A4342BF} = ProjectTools|{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}|Projects\!Generated\MsBuild\Application\AscodInteropServer\UnitOffice.AscodInteropServer.vcxproj
 		{C7126B91-444C-7D84-5B96-36BD9A3204CE} = ProjectTools|{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}|Projects\!Generated\MsBuild\Application\AscodSite\UnitOffice.AscodSite.Shared.vcxitems
 		{E297DA24-DFCD-433B-84B5-AC3D76CD6579} = ProjectTools|{9A19103F-16F7-4668-BE54-9A1E7A4F7556}|Projects\!Generated\MsBuild\Application\PersonalEventsBuilder\UnitOffice.PersonalEventsBuilder.csproj
 	EndGlobalSection

@@ -46,7 +46,11 @@
   <button id="export" disabled>Export JSON</button>
   <button id="reload" disabled>Reload extension</button>
   <span id="status" role="status">Stopped</span>
-  <p>Monitoring http://127.0.0.1:8091 across all tabs. Up to 1,000 requests per browser session.</p>
+  <p>
+    <label for="server-origin">Server address</label>
+    <input id="server-origin" type="url" value="http://127.0.0.1:8091" disabled>
+  </p>
+  <p>Monitors the selected server across all tabs. Up to 1,000 requests per browser session.</p>
   <h2>Endpoints</h2>
   <p id="endpoint-summary" role="status">No endpoints recorded yet.</p>
   <div class="table-scroll">

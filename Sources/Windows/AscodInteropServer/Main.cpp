@@ -16,7 +16,7 @@
 namespace unitoffice::windows::httppingserver {
 	void InitializeLogging() {
 		universaldevkit::diagnostic::LoggerOptions loggerOptions;
-		loggerOptions.filePath = std::filesystem::temp_directory_path() / L"UnitOffice.HttpPingServer.log";
+		loggerOptions.filePath = std::filesystem::temp_directory_path() / L"UnitOffice.AscodInteropServer.log";
 		loggerOptions.enableConsole = true;
 		const auto result = universaldevkit::diagnostic::Logger::Initialize(loggerOptions);
 		if (!result) {
@@ -33,7 +33,7 @@ namespace unitoffice::windows::httppingserver {
 		const int addressCount = argc - (hasProtocolOption ? 1 : 0);
 		const std::wstring_view address = addressCount == 2 ? argv[1] : defaultAddress;
 		if (addressCount > 2 || address.empty() || address.find_first_not_of(L"0123456789.") != std::wstring_view::npos) {
-			throw std::runtime_error("Usage: UnitOffice.HttpPingServer.exe [IPv4-address] [--https|--http]");
+			throw std::runtime_error("Usage: UnitOffice.AscodInteropServer.exe [IPv4-address] [--https|--http]");
 		}
 
 		std::string accessKey;

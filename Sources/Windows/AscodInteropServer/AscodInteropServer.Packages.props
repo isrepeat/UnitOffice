@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="Exists('C:\!PackagesFeed\Windows')">
-    <RestorePackagesPath Condition="'$(RestorePackagesPath)' == ''">$(MSBuildThisFileDirectory)..\..\..\!artifacts\nuget\HttpPingServer</RestorePackagesPath>
+    <RestorePackagesPath Condition="'$(RestorePackagesPath)' == ''">$(MSBuildThisFileDirectory)..\..\..\!artifacts\nuget\AscodInteropServer</RestorePackagesPath>
   </PropertyGroup>
   <PropertyGroup>
     <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
@@ -12,12 +12,17 @@
     <PackageReference Include="UniversalDevKit.Helpers" Version="[0.1.0]" />
     <PackageReference Include="UniversalDevKit.Diagnostic" Version="[0.1.0]" />
   </ItemGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)' == 'Debug'">
+    <ClCompile>
+      <AdditionalOptions>/FC %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup>
-    <HttpPingServerWebAsset Include="$(MSBuildThisFileDirectory)Web\**\*" />
+    <AscodInteropServerWebAsset Include="$(MSBuildThisFileDirectory)Web\**\*" />
   </ItemGroup>
-  <Target Name="CopyHttpPingServerWebAssets" AfterTargets="Build">
-    <Copy SourceFiles="@(HttpPingServerWebAsset)"
-          DestinationFiles="@(HttpPingServerWebAsset->'$(TargetDir)Web\%(RecursiveDir)%(Filename)%(Extension)')"
+  <Target Name="CopyAscodInteropServerWebAssets" AfterTargets="Build">
+    <Copy SourceFiles="@(AscodInteropServerWebAsset)"
+          DestinationFiles="@(AscodInteropServerWebAsset->'$(TargetDir)Web\%(RecursiveDir)%(Filename)%(Extension)')"
           SkipUnchangedFiles="false" />
   </Target>
 </Project>

@@ -28,7 +28,7 @@ Content script грузится в страницу на `document_start` — р
    должны совпадать.
 3. (Необязательно, для видимого сигнала в чате) в `background.js` в
    `config.chat.accessKey` вписать ключ, с которым запущен
-   `UnitOffice.HttpPingServer.exe`. Пусто — heartbeat в чат не отправляется.
+   `UnitOffice.AscodInteropServer.exe`. Пусто — heartbeat в чат не отправляется.
 
 ## Установка на машине СЕДО
 
@@ -48,12 +48,12 @@ DevTools на вкладке СЕДО при этом открывать не н
 
 ### Шаг 0. Запусти сервер и смотри его лог
 
-1. Запусти `UnitOffice.HttpPingServer.exe <IP> --https` на своей машине.
+1. Запусти `UnitOffice.AscodInteropServer.exe <IP> --https` на своей машине.
    В консоли он печатает путь к логу и строку `Listening on https://...:8443/`.
 2. Держи открытой консоль сервера либо следи за файлом лога:
 
    ```powershell
-   Get-Content -Wait "$env:TEMP\UnitOffice.HttpPingServer.log"
+   Get-Content -Wait "$env:TEMP\UnitOffice.AscodInteropServer.log"
    ```
 
 ### Сигнал 1. Запрос долетел до сервера (главное доказательство)

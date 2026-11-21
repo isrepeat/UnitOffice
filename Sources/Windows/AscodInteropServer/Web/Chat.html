@@ -13,7 +13,10 @@
 				<p class="brand">UnitOffice</p>
 				<h1>Локальный ↔ СЕДО</h1>
 			</div>
-			<p id="status" class="status" data-state="idle" role="status">Ожидает подключения</p>
+			<div class="connection-actions">
+				<p id="status" class="status" data-state="idle" role="status">Ожидает подключения</p>
+				<button id="disconnect" type="button" hidden>Отключиться</button>
+			</div>
 		</header>
 		<form id="connect" class="connect">
 			<label>

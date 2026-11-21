@@ -1,6 +1,7 @@
 const storageKey = 'monitor';
+const defaultOrigin = 'http://127.0.0.1:8091';
 const requestFilter = {
-  urls: ['http://127.0.0.1/*']
+  urls: ['http://*/*', 'https://*/*']
 };
 const maximumEntries = 1000;
 const maximumBodyBytes = 4096;
@@ -36,11 +37,6 @@ function updateMonitor(update) {
     console.error('Ascod API:', error);
   });
   return operation;
-}
-
-function localUrl(value) {
-  const url = new URL(value);
-  return url.origin === 'http://127.0.0.1:8091' ? url : null;
 }
 
 function selectHeaders(headers = []) {
@@ -82,12 +78,9 @@ function describeBody(body) {
 }
 
 function startRequest(details) {
-  const url = localUrl(details.url);
-  if (!url) {
-    return;
-  }
+  const url = new URL(details.url);
   updateMonitor(monitor => {
-    if (monitor.recording) {
+    if (monitor.recording && url.origin === (monitor.origin ?? defaultOrigin)) {
       if (requestDetails.size >= maximumEntries && !requestDetails.has(details.requestId)) {
         requestDetails.delete(requestDetails.keys().next().value);
       }
@@ -104,21 +97,19 @@ function startRequest(details) {
 
 function recordRequest(details, redirect = false) {
   const url = new URL(details.url);
-  if (url.origin !== 'http://127.0.0.1:8091') {
-    return;
-  }
   updateMonitor(monitor => {
+    if (!monitor.recording || url.origin !== (monitor.origin ?? defaultOrigin)) {
+      return false;
+    }
     const request = requestDetails.get(details.requestId);
     if (redirect && request && request.redirects.length < 10) {
+      const target = new URL(details.redirectUrl);
       request.redirects.push({
         status: details.statusCode,
-        path: localUrl(details.redirectUrl)?.pathname ?? '[external]'
+        path: target.origin === url.origin ? target.pathname : '[external]'
       });
     } else if (!redirect) {
       requestDetails.delete(details.requestId);
-    }
-    if (!monitor.recording) {
-      return false;
     }
     const headers = details.responseHeaders ?? [];
     const contentType = headers.find(header => header.name.toLowerCase() === 'content-type')?.value;
@@ -127,6 +118,7 @@ function recordRequest(details, redirect = false) {
       time: new Date(details.timeStamp).toISOString(),
       tabId: details.tabId,
       method: details.method,
+      origin: url.origin,
       path: url.pathname,
       resourceType: details.type,
       queryKeys: [...new Set(url.searchParams.keys())].slice(0, 32),
@@ -151,10 +143,11 @@ function recordRequest(details, redirect = false) {
 
 chrome.webRequest.onBeforeRequest.addListener(startRequest, requestFilter, ['requestBody']);
 chrome.webRequest.onSendHeaders.addListener(details => {
-  if (!localUrl(details.url)) {
-    return;
-  }
-  updateMonitor(() => {
+  const url = new URL(details.url);
+  updateMonitor(monitor => {
+    if (url.origin !== (monitor.origin ?? defaultOrigin)) {
+      return false;
+    }
     const request = requestDetails.get(details.requestId);
     if (request) {
       request.headers = selectHeaders(details.requestHeaders);
@@ -175,20 +168,33 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (!['start', 'stop', 'clear'].includes(command)) {
     return false;
   }
+  let origin;
+  if (command === 'start') {
+    const url = URL.canParse(message.origin) ? new URL(message.origin) : null;
+    if (!url || !['http:', 'https:'].includes(url.protocol) || url.origin !== message.origin) {
+      sendResponse({ ok: false, error: 'Enter a valid HTTP or HTTPS server address.' });
+      return false;
+    }
+    origin = url.origin;
+  }
   updateMonitor(monitor => {
     if (command === 'clear') {
       monitor.entries = [];
       requestDetails.clear();
     } else {
       monitor.recording = command === 'start';
-      if (!monitor.recording) {
-        requestDetails.clear();
+      requestDetails.clear();
+      if (monitor.recording) {
+        monitor.origin = origin;
       }
     }
     return true;
-  }).then(() => {
+  }).then(async () => {
+    if (origin) {
+      await chrome.storage.local.set({ serverOrigin: origin });
+    }
     sendResponse({ ok: true });
-  }, error => {
+  }).catch(error => {
     sendResponse({
       ok: false,
       error: error.message

@@ -7,7 +7,7 @@
 const config = {
 	server: 'https://192.168.202.46:8443',
 	// Optional visible heartbeat posted into the chat page. Fill accessKey with the
-	// value passed to UnitOffice.HttpPingServer.exe to enable it; leave empty to skip.
+	// value passed to UnitOffice.AscodInteropServer.exe to enable it; leave empty to skip.
 	chat: {
 		accessKey: '',
 		sender: 'sedo',

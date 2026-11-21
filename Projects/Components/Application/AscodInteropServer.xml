@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Component name="AscodInteropServer">
+  <Projects>
+    <Project id="native"
+             kind="application"
+             projectType="native"
+             projectGuid="{B582509A-99A0-484D-82ED-D9DC1A4342BF}">
+      <Files>
+        <Input role="source">Sources/Windows/AscodInteropServer/**/*.cpp</Input>
+        <Input role="header">Sources/Windows/AscodInteropServer/**/*.h</Input>
+        <Input role="header">Sources/Windows/AscodInteropServer/Web/**/*.html</Input>
+        <Input role="header">Sources/Windows/AscodInteropServer/Web/**/*.css</Input>
+        <Input role="header">Sources/Windows/AscodInteropServer/Web/**/*.js</Input>
+        <Group id="SolutionFiles">
+          <File>Sources/Windows/AscodInteropServer/*</File>
+        </Group>
+      </Files>
+      <Filters>
+        <Filter filter="{Tree:Project}">
+          <Match>Sources/Windows/AscodInteropServer/**/*</Match>
+        </Filter>
+        <Filter filter="{Tree:Project}/Web">
+          <Match>Sources/Windows/AscodInteropServer/Web/**/*</Match>
+        </Filter>
+				<Filter filter="{Tree:Project}/Build">
+					<Match>Sources/Windows/AscodInteropServer/**/*.props</Match>
+					<Match>Sources/Windows/AscodInteropServer/**/*.targets</Match>
+				</Filter>
+      </Filters>
+      <Requirements cxxStandard="20" />
+      <Extension buildSystem="MSBuild">
+        <Files.Input role="msbuild-props">Sources/Windows/AscodInteropServer/AscodInteropServer.Packages.props</Files.Input>
+        <Properties>
+          <EnableNativePackageReferenceSupport>true</EnableNativePackageReferenceSupport>
+          <UniversalDevKitComponents>Helpers;Diagnostic</UniversalDevKitComponents>
+        </Properties>
+      </Extension>
+    </Project>
+  </Projects>
+</Component>

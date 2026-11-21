@@ -6,6 +6,7 @@ const clear = document.getElementById('clear');
 const exportButton = document.getElementById('export');
 const reloadButton = document.getElementById('reload');
 const status = document.getElementById('status');
+const serverOrigin = document.getElementById('server-origin');
 let monitor = {
   recording: false,
   entries: []
@@ -17,6 +18,7 @@ function updateControls() {
   clear.disabled = busy;
   exportButton.disabled = busy || monitor.entries.length === 0;
   reloadButton.disabled = busy;
+  serverOrigin.disabled = busy || monitor.recording;
   toggle.textContent = monitor.recording ? 'Stop recording' : 'Start recording';
   status.textContent = (monitor.recording ? 'Recording' : 'Stopped') + ' \u00b7 ' + monitor.entries.length;
 }
@@ -24,11 +26,12 @@ function updateControls() {
 function renderEndpoints(entries) {
   const endpoints = new Map();
   for (const entry of entries) {
-    const key = entry.method + ' ' + entry.path;
+    const origin = entry.origin ?? 'http://127.0.0.1:8091';
+    const key = entry.method + ' ' + origin + entry.path;
     const previous = endpoints.get(key);
     endpoints.set(key, {
       method: entry.method,
-      path: entry.path,
+      path: origin === monitor.origin ? entry.path : origin + entry.path,
       calls: (previous?.calls ?? 0) + 1,
       result: entry.error ?? entry.status,
       contentType: entry.contentType
@@ -80,6 +83,7 @@ function render(value) {
     details.append(summary);
     const fields = [
       ['Resource', entry.resourceType],
+      ['Origin', entry.origin],
       ['Content-Type', entry.contentType],
       ['Content-Length', entry.contentLength],
       ['From cache', entry.fromCache],
@@ -113,7 +117,26 @@ async function sendCommand(command) {
   updateControls();
   let errorMessage;
   try {
-    const result = await chrome.runtime.sendMessage({ command });
+    let origin;
+    if (command === 'start') {
+      const address = serverOrigin.value.trim();
+      const url = URL.canParse(address) ? new URL(address) : null;
+      if (!url || !['http:', 'https:'].includes(url.protocol) || url.username || url.password) {
+        throw new Error('Enter an HTTP or HTTPS server address.');
+      }
+      origin = url.origin;
+      const granted = await chrome.permissions.request({
+        origins: [url.protocol + '//' + url.hostname + '/*']
+      });
+      if (!granted) {
+        throw new Error('Site permission was not granted.');
+      }
+      serverOrigin.value = origin;
+    }
+    const result = await chrome.runtime.sendMessage({
+      command,
+      origin
+    });
     if (!result?.ok) {
       throw new Error(result?.error ?? 'Monitor did not respond.');
     }
@@ -162,7 +185,11 @@ chrome.storage.onChanged.addListener((changes, area) => {
   render(changes.monitor.newValue);
 });
 
-chrome.storage.session.get('monitor').then(saved => {
+Promise.all([
+  chrome.storage.session.get('monitor'),
+  chrome.storage.local.get('serverOrigin')
+]).then(([saved, settings]) => {
+  serverOrigin.value = monitor.origin ?? saved.monitor?.origin ?? settings.serverOrigin ?? serverOrigin.value;
   busy = false;
   if (receivedUpdate) {
     updateControls();

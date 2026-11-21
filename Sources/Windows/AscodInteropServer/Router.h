@@ -84,10 +84,17 @@ namespace unitoffice::windows::httppingserver {
 		};
 
 		static std::filesystem::path GetWebDirectory() {
+#if defined(_DEBUG)
+			const auto sourceWeb = std::filesystem::path(__FILE__).parent_path() / L"Web";
+			std::error_code status;
+			if (sourceWeb.is_absolute() && std::filesystem::is_directory(sourceWeb, status)) {
+				return sourceWeb;
+			}
+#endif
 			std::wstring executable(32768, L'\0');
 			const auto length = ::GetModuleFileNameW(nullptr, executable.data(), static_cast<DWORD>(executable.size()));
 			if (length == 0 || length >= executable.size()) {
-				throw std::runtime_error("Could not find the HttpPingServer executable directory.");
+				throw std::runtime_error("Could not find the AscodInteropServer executable directory.");
 			}
 			executable.resize(length);
 			return std::filesystem::path(executable).parent_path() / L"Web";
@@ -126,7 +133,11 @@ namespace unitoffice::windows::httppingserver {
 				if (!after) {
 					return HttpResponse::Error(400);
 				}
-				return {200, this->chatService.ReadAfter(*after), "application/json; charset=utf-8"};
+				const auto recipient = details::Header(request, "X-Chat-Sender");
+				if (recipient == "local" || recipient == "sedo") {
+					this->chatService.Acknowledge(recipient, *after);
+				}
+				return {200, this->chatService.ReadAfter(*after, recipient), "application/json; charset=utf-8"};
 			}
 			if (request.Verb != HttpVerbPOST) {
 				return HttpResponse::Error(405);
@@ -202,7 +213,9 @@ namespace unitoffice::windows::httppingserver {
 				}
 				text.erase(0, text.size() - remaining.size());
 			}
-			this->chatService.Add(sender, std::move(text), std::move(image), std::move(attachments));
+			if (!this->chatService.Add(sender, std::move(text), std::move(image), std::move(attachments))) {
+				return HttpResponse::Error(507);
+			}
 			return {200, "accepted"};
 		}
 

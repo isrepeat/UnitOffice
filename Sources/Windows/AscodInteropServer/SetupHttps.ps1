@@ -53,4 +53,4 @@ if (!(Get-NetFirewallRule -Name $ruleName -ErrorAction SilentlyContinue)) {
 Write-Output "HTTPS configured: $url"
 Write-Output "Public certificate for the second computer: $certificateFile"
 Write-Output "SHA256: $((Get-FileHash -LiteralPath $certificateFile -Algorithm SHA256).Hash)"
-Write-Output 'Start the server with: UnitOffice.HttpPingServer.exe'
+Write-Output 'Start the server with: UnitOffice.AscodInteropServer.exe'
