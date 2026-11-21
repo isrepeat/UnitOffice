@@ -2,6 +2,7 @@ importScripts('filter-redaction.js');
 
 const storageKey = 'monitor';
 const directContextKey = 'directFilterContext';
+const directRequests = new Set();
 const defaultOrigin = 'http://127.0.0.1:8091';
 const requestFilter = {
   urls: ['http://*/*', 'https://*/*']
@@ -207,8 +208,10 @@ function describeBody(body) {
 
 function startRequest(details) {
   const url = new URL(details.url);
+  const directRequest = directRequests.has(details.tabId);
   updateMonitor(async monitor => {
-    const capturedFilter = await captureFilterPayload(monitor, details, url);
+    const capturedFilter = !directRequest && await captureFilterPayload(monitor, details, url);
+    const capturedContext = !directRequest && !capturedFilter && await captureRegistryContext(monitor, details, url);
     if ((monitor.recording && url.origin === (monitor.origin ?? defaultOrigin)) ||
         (monitor.zipCapture?.active && url.origin === monitor.zipCapture.origin)) {
       if (requestDetails.size >= maximumEntries && !requestDetails.has(details.requestId)) {
@@ -221,8 +224,66 @@ function startRequest(details) {
         body: describeBody(details.requestBody)
       });
     }
-    return capturedFilter;
+    return capturedFilter || capturedContext;
   });
+}
+
+function readGetDataPayload(details) {
+  const chunks = details.requestBody?.raw ?? [];
+  const size = chunks.reduce((sum, chunk) => sum + (chunk.bytes?.byteLength ?? 0), 0);
+  if (!size || size > 65536 || chunks.some(chunk => !chunk.bytes)) {
+    throw new Error('GetData body is unavailable or too large.');
+  }
+  const data = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    const bytes = new Uint8Array(chunk.bytes);
+    data.set(bytes, offset);
+    offset += bytes.length;
+  }
+  return JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(data));
+}
+
+async function rememberRegistryContext(monitor, details, url, payload, dateIndex) {
+  await chrome.storage.session.set({
+    [directContextKey]: {
+      origin: url.origin,
+      tabId: details.tabId,
+      documentId: details.documentId,
+      path: url.pathname,
+      dateIndex,
+      payload
+    }
+  });
+  monitor.directContextOrigin = url.origin;
+}
+
+async function captureRegistryContext(monitor, details, url) {
+  if (details.method !== 'POST' || details.tabId < 0 || details.frameId !== 0 ||
+      !/^\/askod-ssl\/services\/CardsServiceSub\.svc\/GetData$/i.test(url.pathname)) {
+    return false;
+  }
+  const settings = await chrome.storage.local.get('serverOrigin');
+  if (url.origin !== (settings.serverOrigin ?? monitor.origin ?? defaultOrigin)) {
+    return false;
+  }
+  let payload;
+  try {
+    payload = readGetDataPayload(details);
+  } catch {
+    return false;
+  }
+  if (!Array.isArray(payload?.filterExpression) || !payload.userSettings?.GridParameters) {
+    return false;
+  }
+  const dateFilters = payload.filterExpression.filter(item =>
+    item?.FieldName === 'RegDate' || item?._fieldName === 'RegDate' || item?.ColumnUniqueName === 'RegDate');
+  if (dateFilters.length > 1 || (dateFilters.length === 1 &&
+      (dateFilters[0].FilterFunction !== 5 || dateFilters[0]._filterFunction !== 5))) {
+    return false;
+  }
+  await rememberRegistryContext(monitor, details, url, payload, payload.filterExpression.indexOf(dateFilters[0]));
+  return true;
 }
 
 async function captureFilterPayload(monitor, details, url) {
@@ -238,19 +299,7 @@ async function captureFilterPayload(monitor, details, url) {
     return true;
   }
   try {
-    const chunks = details.requestBody?.raw ?? [];
-    const size = chunks.reduce((sum, chunk) => sum + (chunk.bytes?.byteLength ?? 0), 0);
-    if (!size || size > 65536 || chunks.some(chunk => !chunk.bytes)) {
-      throw new Error('GetData body is unavailable or too large.');
-    }
-    const data = new Uint8Array(size);
-    let offset = 0;
-    for (const chunk of chunks) {
-      const bytes = new Uint8Array(chunk.bytes);
-      data.set(bytes, offset);
-      offset += bytes.length;
-    }
-    const payload = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(data));
+    const payload = readGetDataPayload(details);
     if (!payload || !Object.hasOwn(payload, 'filterExpression')) {
       throw new Error('GetData body does not contain filterExpression.');
     }
@@ -261,16 +310,7 @@ async function captureFilterPayload(monitor, details, url) {
     if (matching.length === 1 && matching[0].FieldValue === expectedDate &&
         matching[0]._fieldValue === expectedDate && matching[0].FilterFunction === 5 &&
         matching[0]._filterFunction === 5 && payload.userSettings && typeof payload.userSettings === 'object') {
-      await chrome.storage.session.set({
-        [directContextKey]: {
-          origin: url.origin,
-          tabId: details.tabId,
-          documentId: details.documentId,
-          path: url.pathname,
-          dateIndex: payload.filterExpression.indexOf(matching[0]),
-          payload
-        }
-      });
+      await rememberRegistryContext(monitor, details, url, payload, payload.filterExpression.indexOf(matching[0]));
     } else {
       throw new Error('Apply exactly the selected registration date in the registry and recapture.');
     }
@@ -295,7 +335,7 @@ async function captureFilterPayload(monitor, details, url) {
 
 async function getAscodRows(origin, path, payload) {
   if (location.origin !== origin || !/\/Defaultv4\.aspx$/i.test(location.pathname)) {
-    return { error: 'Open the Ascod registry and capture its filter again.' };
+    return { error: 'Reopen the Ascod registry to refresh userSettings.' };
   }
   try {
     const response = await fetch(path, {
@@ -335,23 +375,43 @@ async function runDirectFilter(message) {
   const saved = await chrome.storage.session.get([directContextKey, storageKey]);
   const context = saved[directContextKey];
   if (!context || context.origin !== message.origin) {
-    throw new Error('Record one manual date filter on this server first.');
+    throw new Error('Open or refresh the Ascod registry and wait for the green userSettings indicator.');
   }
   const capture = saved[storageKey]?.filterCapture;
   if (capture?.date && capture.deadline > Date.now()) {
     throw new Error('Finish or clear the active manual capture first.');
   }
   const payload = structuredClone(context.payload);
-  const filter = payload.filterExpression[context.dateIndex];
   const date = message.date.split('-').reverse().join('.');
-  filter.FieldValue = date;
-  filter._fieldValue = date;
+  if (context.dateIndex < 0) {
+    payload.filterExpression.push({
+      ColumnUniqueName: 'RegDate',
+      DataTypeName: 'System.DateTime',
+      FieldName: 'RegDate',
+      FieldValue: date,
+      FilterFunction: 5,
+      FilterName: 'RegDate',
+      _columnUniqueName: 'RegDate',
+      _dataTypeName: 'System.DateTime',
+      _fieldName: 'RegDate',
+      _fieldValue: date,
+      _filterFunction: 5
+    });
+  } else {
+    const filter = payload.filterExpression[context.dateIndex];
+    filter.FieldValue = date;
+    filter._fieldValue = date;
+  }
   payload.startRowIndex = 0;
   const target = { tabId: context.tabId };
   if (context.documentId) {
     target.documentIds = [context.documentId];
   }
   let execution;
+  if (directRequests.has(context.tabId)) {
+    throw new Error('A direct filter is already running in this tab.');
+  }
+  directRequests.add(context.tabId);
   try {
     [execution] = await chrome.scripting.executeScript({
       target,
@@ -360,7 +420,9 @@ async function runDirectFilter(message) {
       args: [context.origin, context.path, payload]
     });
   } catch {
-    throw new Error('The captured registry tab changed or closed. Record one manual filter again.');
+    throw new Error('The registry tab changed or closed. Reopen the registry to refresh userSettings.');
+  } finally {
+    directRequests.delete(context.tabId);
   }
   if (!execution?.result || execution.result.error) {
     throw new Error(execution?.result?.error ?? 'GetData did not return a result.');
@@ -369,10 +431,12 @@ async function runDirectFilter(message) {
 }
 
 function clearClosedContext(tabId) {
-  updateMonitor(async () => {
+  updateMonitor(async monitor => {
     const saved = await chrome.storage.session.get(directContextKey);
     if (saved[directContextKey]?.tabId === tabId) {
       await chrome.storage.session.remove(directContextKey);
+      delete monitor.directContextOrigin;
+      return true;
     }
     return false;
   });
@@ -465,12 +529,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
     return true;
   }
-  if (!['start', 'stop', 'clear', 'prepareDownload', 'downloadResult', 'captureZip', 'cancelZip',
+  if (!['start', 'autoStart', 'stop', 'clear', 'prepareDownload', 'downloadResult', 'captureZip', 'cancelZip',
         'captureFilter', 'clearFilters'].includes(command)) {
     return false;
   }
   let origin;
-  if (command === 'start') {
+  if (command === 'start' || command === 'autoStart') {
     const url = URL.canParse(message.origin) ? new URL(message.origin) : null;
     if (!url || !['http:', 'https:'].includes(url.protocol) || url.origin !== message.origin) {
       sendResponse({ ok: false, error: 'Enter a valid HTTP or HTTPS server address.' });
@@ -479,6 +543,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     origin = url.origin;
   }
   updateMonitor(async monitor => {
+    if (command === 'autoStart') {
+      const settings = await chrome.storage.local.get('serverOrigin');
+      if (monitor.recording || monitor.paused || origin !== (settings.serverOrigin ?? defaultOrigin)) {
+        return false;
+      }
+    }
     if (command === 'captureFilter') {
       const url = URL.canParse(message.origin) ? new URL(message.origin) : null;
       if (!url || !['http:', 'https:'].includes(url.protocol) || url.origin !== message.origin ||
@@ -501,6 +571,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       };
     } else if (command === 'clearFilters') {
       delete monitor.filterCapture;
+      delete monitor.directContextOrigin;
       await chrome.storage.session.remove(directContextKey);
     } else if (command === 'captureZip') {
       const url = URL.canParse(message.origin) ? new URL(message.origin) : null;
@@ -545,15 +616,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       monitor.entries = [];
       requestDetails.clear();
     } else {
-      monitor.recording = command === 'start';
+      monitor.recording = command !== 'stop';
+      monitor.paused = !monitor.recording;
       requestDetails.clear();
       if (monitor.recording) {
         monitor.origin = origin;
       }
+      addDownloadLog(monitor, monitor.recording ? 'Recording started for ' + origin : 'Recording stopped.');
     }
     return true;
   }).then(async () => {
-    if (origin) {
+    if (command === 'start') {
       await chrome.storage.local.set({ serverOrigin: origin });
     }
     sendResponse({ ok: true });

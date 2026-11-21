@@ -7,6 +7,8 @@ const exportButton = document.getElementById('export');
 const reloadButton = document.getElementById('reload');
 const status = document.getElementById('status');
 const serverOrigin = document.getElementById('server-origin');
+const contextIndicator = document.getElementById('context-indicator');
+const contextStatus = document.getElementById('context-status');
 const dateFilter = document.getElementById('date-filter');
 const registrationDate = document.getElementById('registration-date');
 const applyDate = document.getElementById('apply-date');
@@ -88,6 +90,12 @@ directFilter.addEventListener('submit', async event => {
     const server = readServerAddress();
     const date = directDate.value;
     if (server.origin !== 'http://127.0.0.1:8091') {
+      if (!await requestServerPermission(server)) {
+        throw new Error('Site permission was not granted.');
+      }
+      await chrome.storage.local.set({
+        serverOrigin: server.origin
+      });
       const result = await chrome.runtime.sendMessage({
         command: 'directFilter',
         origin: server.origin,
@@ -537,7 +545,29 @@ dateFilter.addEventListener('submit', async event => {
   }
 });
 
+function updateContextIndicator() {
+  const address = serverOrigin.value.trim();
+  const origin = URL.canParse(address) ? new URL(address).origin : null;
+  const ready = origin !== null && monitor.directContextOrigin === origin;
+  contextIndicator.dataset.ready = String(ready);
+  contextIndicator.title = ready ? 'userSettings ready for direct requests' : 'userSettings not captured';
+  contextStatus.textContent = ready ? 'ready for direct requests' : 'not captured';
+}
+
+serverOrigin.addEventListener('input', updateContextIndicator);
+serverOrigin.addEventListener('change', () => {
+  try {
+    const url = readServerAddress();
+    chrome.storage.local.set({ serverOrigin: url.origin }).then(startRecordingOnSelectedSite).catch(error => {
+      console.error('Ascod API:', error);
+    });
+  } catch {
+    updateContextIndicator();
+  }
+});
+
 function updateControls() {
+  updateContextIndicator();
   toggle.disabled = busy;
   clear.disabled = busy;
   const hasTraces = monitor.entries.length > 0 || !!monitor.zipCapture?.archive || !!monitor.filterCapture?.samples?.length;
@@ -809,12 +839,45 @@ chrome.storage.onChanged.addListener((changes, area) => {
   render(changes.monitor.newValue);
 });
 
+async function startRecordingOnSelectedSite() {
+  if (busy || monitor.recording || monitor.paused) {
+    return;
+  }
+  try {
+    const url = readServerAddress();
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true
+    });
+    if (!URL.canParse(tab?.url) || new URL(tab.url).origin !== url.origin) {
+      return;
+    }
+    const result = await chrome.runtime.sendMessage({
+      command: 'autoStart',
+      origin: url.origin
+    });
+    if (!result?.ok) {
+      throw new Error(result?.error ?? 'Monitor did not respond.');
+    }
+  } catch (error) {
+    status.textContent = error.message;
+  }
+}
+
+chrome.tabs.onActivated.addListener(startRecordingOnSelectedSite);
+chrome.tabs.onUpdated.addListener((tabId, change, tab) => {
+  if (tab.active && change.status === 'loading') {
+    void startRecordingOnSelectedSite();
+  }
+});
+chrome.permissions.onAdded.addListener(startRecordingOnSelectedSite);
+
 Promise.all([
   chrome.storage.session.get('monitor'),
   chrome.storage.local.get(['serverOrigin', 'preferredLogFolder', 'preferredTraceFolder', 'operationMode'])
 ]).then(([saved, settings]) => {
   showOperationMode(settings.operationMode);
-  serverOrigin.value = monitor.origin ?? saved.monitor?.origin ?? settings.serverOrigin ?? serverOrigin.value;
+  serverOrigin.value = settings.serverOrigin ?? saved.monitor?.origin ?? serverOrigin.value;
   logFolder.value = settings.preferredLogFolder ?? logFolder.value;
   traceFolder.value = settings.preferredTraceFolder ?? traceFolder.value;
   busy = false;
@@ -823,6 +886,7 @@ Promise.all([
   } else {
     render(saved.monitor);
   }
+  return startRecordingOnSelectedSite();
 }).catch(error => {
   status.textContent = error.message;
 });

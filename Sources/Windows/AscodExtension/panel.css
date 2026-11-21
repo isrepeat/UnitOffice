@@ -187,6 +187,48 @@ fieldset {
   margin-top: 4px;
 }
 
+.server-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+  line-height: 1.35;
+}
+
+.server-label label {
+  flex-basis: auto;
+}
+
+.context-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: inherit;
+}
+
+.context-dot {
+  flex: 0 0 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #66615c;
+  transform: translateY(1px);
+}
+
+.context-indicator[data-ready="true"] .context-dot {
+  background: #63c779;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .direct-settings {
   padding: 8px 10px;
   font-size: 0.85rem;

@@ -21,7 +21,14 @@
   </header>
   <section class="surface connection-settings" aria-label="Server and mode">
     <p>
-      <label for="server-origin">Server address</label>
+      <span class="server-label">
+        <label for="server-origin">Server address</label>
+        <span id="context-indicator" class="context-indicator" role="status" title="userSettings not captured">
+          <span class="context-dot" aria-hidden="true"></span>
+          userSettings
+          <span id="context-status" class="visually-hidden">not captured</span>
+        </span>
+      </span>
       <input id="server-origin" type="url" value="http://127.0.0.1:8091" disabled>
     </p>
     <fieldset id="operation-modes">
@@ -104,7 +111,7 @@
       <button id="clear" disabled>Clear</button>
     </div>
     <details>
-      <summary>Download log</summary>
+      <summary>Activity log</summary>
       <ol id="download-log"></ol>
     </details>
     <h2>Endpoints</h2>
