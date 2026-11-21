@@ -7,6 +7,7 @@
   <script src="download-first.js" defer></script>
   <script src="save-file.js" defer></script>
   <script src="panel.js" defer></script>
+  <script src="save-card-scripts.js" defer></script>
 </head>
 <body>
   <header class="panel-heading">
@@ -62,6 +63,17 @@
       <button id="capture-zip" type="button" disabled>Record one manual ZIP</button>
       <button id="export-zip" type="button" disabled>Save ZIP trace &amp; copy link</button>
       <p id="capture-status" role="status"></p>
+      <button id="capture-attachment" type="button" disabled>Record download workflow</button>
+      <button id="collect-card-scripts" type="button">Save card scripts</button>
+      <button id="write-card-scripts" type="button" disabled>Save to folder</button>
+      <p id="card-scripts-status" role="status"></p>
+      <p id="attachment-status" role="status"></p>
+      <ul id="workflow-evidence" aria-label="Download evidence">
+        <li data-evidence="zip">ZIP response</li>
+        <li data-evidence="caller">Download caller</li>
+        <li data-evidence="argument">Source of t</li>
+        <li data-evidence="counter">Assignment of counter</li>
+      </ul>
     </details>
   </section>
   <section class="surface" id="interface-mode" aria-label="Website interface">

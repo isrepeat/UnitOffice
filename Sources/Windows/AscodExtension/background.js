@@ -53,7 +53,8 @@ async function captureZipRequest(monitor, details, url) {
     delete capture.salt;
     return true;
   }
-  if (!/\.(?:ashx|aspx|svc)(?:\/|$)/i.test(url.pathname)) {
+  if (!/\.(?:ashx|aspx|svc)(?:\/|$)/i.test(url.pathname) &&
+      !(capture.workflowId && ['main_frame', 'sub_frame', 'xmlhttprequest'].includes(details.type))) {
     return false;
   }
   const headers = details.responseHeaders ?? [];
@@ -64,7 +65,30 @@ async function captureZipRequest(monitor, details, url) {
   const declaredZip = ['application/zip', 'application/x-zip-compressed'].includes(contentType) || zipDisposition;
   const archiveCandidate = contentType === 'application/octet-stream' && !disposition &&
     /\/Handlers\/FileHandler\.ashx$/i.test(url.pathname);
-  const isArchive = details.statusCode >= 200 && details.statusCode < 300 && (declaredZip || archiveCandidate);
+  const isArchive = details.statusCode >= 200 && details.statusCode < 300 &&
+    (declaredZip || !capture.workflowId && archiveCandidate);
+  if (capture.workflowId) {
+    const staticPath = /^\/askod-ssl\/(?:[a-z]+\/)*[a-z][a-z0-9]*\.(?:ashx|aspx|svc)(?:\/[a-z][a-z0-9]*)?$/i;
+    const entry = {
+      time: new Date(details.timeStamp).toISOString(),
+      method: details.method,
+      path: staticPath.test(url.pathname) && !/\d{5,}/.test(url.pathname) ? url.pathname : '[masked path]',
+      status: details.statusCode,
+      contentType,
+      parameters: [...new Set(url.searchParams.keys())]
+        .filter(name => /^[A-Za-z][A-Za-z0-9_-]{0,23}$/.test(name)).slice(0, 32)
+    };
+    if (isArchive) {
+      capture.archive = entry;
+      capture.active = false;
+    } else {
+      capture.preceding.push(entry);
+      if (capture.preceding.length > 200) {
+        capture.preceding.shift();
+      }
+    }
+    return true;
+  }
   const parameters = [];
   for (const [name, value] of url.searchParams) {
     if (parameters.length >= 32) {
@@ -581,12 +605,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       monitor.zipCapture = {
         active: true,
         origin: url.origin,
+        workflowId: typeof message.workflowId === 'string' ? message.workflowId : undefined,
         deadline: Date.now() + 120000,
         salt: crypto.randomUUID(),
         preceding: []
       };
     } else if (command === 'cancelZip') {
-      delete monitor.zipCapture;
+      if (!message.workflowId || monitor.zipCapture?.workflowId === message.workflowId) {
+        delete monitor.zipCapture;
+      }
     } else if (command === 'prepareDownload') {
       const url = URL.canParse(message.origin) ? new URL(message.origin) : null;
       if (!url || !['http:', 'https:'].includes(url.protocol) || url.origin !== message.origin ||

@@ -26,6 +26,14 @@ const traceFolder = document.getElementById('trace-folder');
 const saveTraces = document.getElementById('save-traces');
 const traceFileStatus = document.getElementById('trace-file-status');
 const captureZip = document.getElementById('capture-zip');
+const captureAttachment = document.getElementById('capture-attachment');
+const attachmentStatus = document.getElementById('attachment-status');
+const workflowEvidence = document.querySelectorAll('#workflow-evidence [data-evidence]');
+const attachmentScriptIds = ['attachment-response', 'attachment-response-bridge'];
+const attachmentFilename = 'ascod-download-workflow.json';
+let attachmentCapture;
+let attachmentTrace;
+let attachmentBusy = false;
 const exportZip = document.getElementById('export-zip');
 const captureStatus = document.getElementById('capture-status');
 const filterPayloadForm = document.getElementById('filter-payload-form');
@@ -196,6 +204,9 @@ saveLog.addEventListener('click', async () => {
 
 function getZipTrace() {
   const capture = monitor.zipCapture;
+  if (capture?.workflowId) {
+    return null;
+  }
   if (capture?.archive) {
     return {
       origin: capture.origin,
@@ -208,6 +219,9 @@ function getZipTrace() {
 
 function getJsonTraces() {
   const files = [];
+  if (attachmentTrace) {
+    files.push([attachmentFilename, attachmentTrace]);
+  }
   if (monitor.entries.length > 0) {
     files.push(['ascod-requests.json', monitor.entries]);
   }
@@ -566,26 +580,59 @@ serverOrigin.addEventListener('change', () => {
   }
 });
 
+function updateWorkflowEvidence() {
+  const entries = attachmentCapture?.responses ?? attachmentTrace?.timeline ?? [];
+  const hits = entries.flatMap(entry => entry.hits ?? []);
+  const sources = hits.flatMap(hit => hit.parameterSources ?? []);
+  const tSources = sources.filter(source => source.parameter === 't');
+  const commandIndex = entries.findIndex(entry => entry.kind === 'download command');
+  const launch = commandIndex >= 0 && entries.slice(commandIndex + 1).some(entry =>
+    entry.kind === 'download launch' && entry.functions?.length &&
+    ['t', 'l', 'counter'].every(name => entry.parameters?.includes(name)));
+  const hasCallerCandidate = tSources.some(source => source.origin?.callerCandidates?.length) ||
+    entries.some(entry => entry.kind === 'click listener');
+  const states = {
+    zip: attachmentTrace?.zipDetected ||
+      (attachmentCapture && monitor.zipCapture?.workflowId === attachmentCapture.id && monitor.zipCapture.archive) ?
+      'observed' : 'missing',
+    caller: launch ? 'observed' : hasCallerCandidate ? 'candidate' : 'missing',
+    argument: tSources.some(source => source.origin?.callerInputs?.some(input => input !== 'unknown') ||
+      (source.origin?.input && source.origin.input !== 'unknown')) ? 'candidate' : 'missing',
+    counter: sources.some(source => source.parameter === 'counter' &&
+      ['local assignment', 'assignment candidate'].includes(source.origin?.kind)) ? 'candidate' : 'missing'
+  };
+  for (const item of workflowEvidence) {
+    const state = states[item.dataset.evidence];
+    item.dataset.state = state;
+    item.title = { observed: 'Observed in this run', candidate: 'Candidate from script analysis', missing: 'Not found' }[state];
+  }
+}
+
 function updateControls() {
   updateContextIndicator();
+  updateWorkflowEvidence();
   toggle.disabled = busy;
   clear.disabled = busy;
-  const hasTraces = monitor.entries.length > 0 || !!monitor.zipCapture?.archive || !!monitor.filterCapture?.samples?.length;
+  const hasTraces = monitor.entries.length > 0 || !!monitor.zipCapture?.archive ||
+    !!monitor.filterCapture?.samples?.length || !!attachmentTrace;
   saveAll.disabled = busy || savingAll || (!hasTraces && !monitor.downloadLog?.length);
   changeOutputFolder.disabled = savingAll;
   exportButton.disabled = busy || savingExport || savingTraces || !hasTraces;
   reloadButton.disabled = busy;
-  captureZip.disabled = busy;
+  captureZip.disabled = busy || attachmentBusy || !!attachmentCapture;
+  captureAttachment.disabled = busy || attachmentBusy;
+  captureAttachment.textContent = attachmentCapture ? 'Stop workflow recording' : 'Record download workflow';
   exportZip.disabled = savingExport || !monitor.zipCapture?.archive;
   copyLog.disabled = savingExport;
   saveTraces.disabled = busy || savingTraces || savingExport || !hasTraces;
-  const capturing = monitor.zipCapture?.active && monitor.zipCapture.deadline > Date.now();
+  const zipCapture = monitor.zipCapture?.workflowId ? undefined : monitor.zipCapture;
+  const capturing = zipCapture?.active && zipCapture.deadline > Date.now();
   captureZip.textContent = capturing ? 'Cancel ZIP capture' : 'Record one manual ZIP';
-  if (monitor.zipCapture?.archive) {
+  if (zipCapture?.archive) {
     captureStatus.textContent = 'ZIP request captured. Save the trace to view masked parameters.';
   } else if (capturing) {
     captureStatus.textContent = 'Use the site’s Download all files command within two minutes.';
-  } else if (monitor.zipCapture) {
+  } else if (zipCapture) {
     captureStatus.textContent = 'Capture expired. Start a new capture to try again.';
   } else {
     captureStatus.textContent = '';
@@ -636,6 +683,9 @@ function render(value) {
     recording: false,
     entries: []
   };
+  if (attachmentCapture && monitor.zipCapture?.workflowId === attachmentCapture.id && monitor.zipCapture.archive) {
+    void finishAttachmentCapture('ZIP detected. Save the workflow JSON.');
+  }
   const fragment = document.createDocumentFragment();
   for (const entry of monitor.entries) {
     const row = document.createElement('tr');
@@ -770,6 +820,123 @@ captureZip.onclick = async () => {
     }
   }
 };
+async function unregisterAttachmentScripts() {
+  const scripts = await chrome.scripting.getRegisteredContentScripts({ ids: attachmentScriptIds });
+  if (scripts.length > 0) {
+    await chrome.scripting.unregisterContentScripts({ ids: scripts.map(script => script.id) });
+  }
+}
+
+async function finishAttachmentCapture(message) {
+  const capture = attachmentCapture;
+  clearTimeout(capture.timer);
+  attachmentCapture = undefined;
+  attachmentBusy = true;
+  attachmentStatus.textContent = message;
+  updateControls();
+  try {
+    const saved = await chrome.storage.session.get('monitor');
+    const network = saved.monitor?.zipCapture;
+    const matched = network?.workflowId === capture.id;
+    attachmentTrace = {
+      startedAt: capture.startedAt,
+      zipDetected: matched && !!network.archive,
+      timeline: [
+        ...capture.responses,
+        ...(matched ? network.preceding : []),
+        ...(matched && network.archive ? [{ ...network.archive, zip: true }] : [])
+      ].sort((left, right) => left.time.localeCompare(right.time))
+    };
+    if (matched && network.active) {
+      await chrome.runtime.sendMessage({ command: 'cancelZip', workflowId: capture.id });
+    }
+  } catch (error) {
+    attachmentStatus.textContent += ' ' + error.message;
+  }
+  try {
+    await unregisterAttachmentScripts();
+  } catch (error) {
+    attachmentStatus.textContent += ' ' + error.message;
+  } finally {
+    attachmentBusy = false;
+    updateControls();
+  }
+}
+
+captureAttachment.onclick = async () => {
+  if (attachmentCapture) {
+    await finishAttachmentCapture('Recording stopped. Save the partial workflow JSON.');
+    return;
+  }
+  attachmentBusy = true;
+  updateControls();
+  try {
+    const url = readServerAddress();
+    if (!await requestServerPermission(url)) {
+      throw new Error('Site permission was not granted.');
+    }
+    await unregisterAttachmentScripts();
+    const matches = [url.protocol + '//' + url.hostname + '/*'];
+    await chrome.scripting.registerContentScripts(attachmentScriptIds.map((id, index) => ({
+      id,
+      matches,
+      js: index === 0 ? ['acorn.js', id + '.js'] : [id + '.js'],
+      allFrames: true,
+      runAt: 'document_start',
+      world: index === 0 ? 'MAIN' : 'ISOLATED',
+      persistAcrossSessions: false
+    })));
+    const id = crypto.randomUUID();
+    const result = await chrome.runtime.sendMessage({ command: 'captureZip', origin: url.origin, workflowId: id });
+    if (!result?.ok) {
+      throw new Error(result?.error ?? 'Could not start workflow recording.');
+    }
+    attachmentTrace = undefined;
+    attachmentCapture = {
+      id,
+      origin: url.origin,
+      startedAt: new Date().toISOString(),
+      responses: [],
+      timer: setTimeout(() => {
+        void finishAttachmentCapture('Recording expired. Save the partial workflow JSON.');
+      }, 120000)
+    };
+    attachmentStatus.textContent = 'Open a card and use Download all files within two minutes.';
+  } catch (error) {
+    attachmentStatus.textContent = error.message;
+    await unregisterAttachmentScripts().catch(console.error);
+  } finally {
+    attachmentBusy = false;
+    updateControls();
+  }
+};
+
+chrome.runtime.onMessage.addListener((message, sender) => {
+  if (message?.command !== 'attachmentResponseSchema' || !attachmentCapture ||
+      sender.id !== chrome.runtime.id || sender.origin !== attachmentCapture.origin ||
+      !sender.tab || !message.schema) {
+    return;
+  }
+  const scriptCandidate = message.schema.kind === 'script candidates';
+  const matchingCount = attachmentCapture.responses.filter(entry =>
+    (entry.kind === 'script candidates') === scriptCandidate).length;
+  if (matchingCount < 30) {
+    attachmentCapture.responses.push({
+      time: new Date().toISOString(),
+      source: scriptCandidate ? 'script inspection' :
+        message.schema.kind ? 'download action' : 'response inspection',
+      ...message.schema
+    });
+    updateWorkflowEvidence();
+  }
+});
+
+window.addEventListener('pagehide', () => {
+  if (attachmentCapture) {
+    void unregisterAttachmentScripts().catch(console.error);
+  }
+});
+
 exportZip.onclick = () => {
   const trace = getZipTrace();
   if (trace) {

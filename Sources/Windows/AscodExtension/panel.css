@@ -220,6 +220,29 @@ fieldset {
   background: #63c779;
 }
 
+#workflow-evidence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin: 6px 0;
+  padding: 0;
+  list-style: none;
+}
+
+#workflow-evidence li::before {
+  content: "●";
+  color: #888;
+  margin-right: 5px;
+}
+
+#workflow-evidence li[data-state="candidate"]::before {
+  color: #e6b878;
+}
+
+#workflow-evidence li[data-state="observed"]::before {
+  color: #82c790;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
