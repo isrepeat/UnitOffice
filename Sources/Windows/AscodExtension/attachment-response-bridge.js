@@ -73,6 +73,25 @@ window.addEventListener('ascod-attachment-response-schema', event => {
   }
   try {
     const result = JSON.parse(event.detail);
+    if (result.kind === 'card comparisons') {
+      const comparisons = {};
+      for (const field of [
+        'getDataCounterMatchesCheckAccess',
+        'getDataTokenMatchesCheckAccess',
+        'checkAccessTokenMatchesFillEcd'
+      ]) {
+        if (typeof result[field] === 'boolean') {
+          comparisons[field] = result[field];
+        }
+      }
+      if (Object.keys(comparisons).length) {
+        void chrome.runtime.sendMessage({
+          command: 'attachmentResponseSchema',
+          schema: { kind: result.kind, ...comparisons }
+        }).catch(() => {});
+      }
+      return;
+    }
     if (result.kind === 'click listener') {
       const name = result.functionName;
       const functionName = typeof name === 'string' && /^[A-Za-z_$][\w$]{0,47}$/.test(name) &&
@@ -143,8 +162,11 @@ window.addEventListener('ascod-attachment-response-schema', event => {
     }
     const isViewer = result.path === '/askod-ssl/pdfviewerframe.aspx' &&
       ['GET', 'POST', 'NAVIGATION'].includes(result.method);
-    const isService = result.path === '/askod-ssl/services/pdfviewerservice.svc/fillecdtreeviewandselect' &&
-      result.method === 'POST';
+    const isService = result.method === 'POST' && [
+      '/askod-ssl/services/pdfviewerservice.svc/fillecdtreeviewandselect',
+      '/askod-ssl/services/cardsservicesub.svc/getdata',
+      '/askod-ssl/services/cardsservice.svc/checkaccesstocard'
+    ].includes(result.path);
     const goodStatus = Number.isInteger(result.status) && result.status >= 200 && result.status < 300;
     if ((!isViewer && !isService) || (!goodStatus && result.method !== 'NAVIGATION')) {
       return;

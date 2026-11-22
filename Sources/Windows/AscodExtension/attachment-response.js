@@ -1,5 +1,8 @@
 (() => {
   const endpoint = '/askod-ssl/services/pdfviewerservice.svc/fillecdtreeviewandselect';
+  const registryPath = '/askod-ssl/services/cardsservicesub.svc/getdata';
+  const accessPath = '/askod-ssl/services/cardsservice.svc/checkaccesstocard';
+  const cardDataPaths = new Set([registryPath, accessPath]);
   const viewerPath = '/askod-ssl/pdfviewerframe.aspx';
   const eventName = 'ascod-attachment-response-schema';
   const deadline = Date.now() + 120000;
@@ -10,6 +13,113 @@
 
   function emit(result) {
     window.dispatchEvent(new CustomEvent(eventName, { detail: JSON.stringify(result) }));
+  }
+
+  function parseJson(value) {
+    if (typeof value !== 'string') {
+      return value;
+    }
+    if (value.length > maximumBody) {
+      return undefined;
+    }
+    try {
+      return JSON.parse(value);
+    } catch {
+      return undefined;
+    }
+  }
+
+  function counterKey(value) {
+    if (typeof value === 'number' && Number.isSafeInteger(value) || typeof value === 'string' && /^\d{1,20}$/.test(value)) {
+      return String(value);
+    }
+    return undefined;
+  }
+
+  function createCardComparison() {
+    let rows;
+    const checks = new Map();
+    setTimeout(() => {
+      rows = undefined;
+      checks.clear();
+    }, 120000);
+    return {
+      deadline,
+      registry(response) {
+        const list = parseJson(response?.d);
+        if (Date.now() <= deadline && Array.isArray(list) && list.length) {
+          rows = list.slice(0, 1000).flatMap(row => {
+            const counter = counterKey(row?.Counter);
+            return counter === undefined ? [] : [{ counter, token: typeof row.Token === 'string' ? row.Token : undefined }];
+          });
+        }
+      },
+      accessRequest(counter, token) {
+        if (Date.now() > deadline || counter === undefined || checks.size >= 100 && !checks.has(counter)) {
+          return;
+        }
+        const check = { listeners: [] };
+        checks.set(counter, check);
+        if (rows?.length) {
+          const matches = rows.filter(row => row.counter === counter);
+          const result = { getDataCounterMatchesCheckAccess: matches.length > 0 };
+          if (matches.some(row => row.token) && typeof token === 'string' && token) {
+            result.getDataTokenMatchesCheckAccess = matches.some(row => row.token === token);
+          }
+          emit({ kind: 'card comparisons', ...result });
+        }
+        return check;
+      },
+      accessResponse(counter, check, response) {
+        const token = parseJson(response?.d)?.Token;
+        if (Date.now() > deadline || !check || checks.get(counter) !== check || typeof token !== 'string' || !token) {
+          return;
+        }
+        check.token = token;
+        for (const listener of check.listeners) {
+          listener(token);
+        }
+        check.listeners = [];
+      },
+      attachmentRequest(counter, token, reportMatch) {
+        const check = checks.get(counter);
+        if (Date.now() > deadline || !check || typeof token !== 'string' || !token) {
+          return;
+        }
+        if (check.token) {
+          reportMatch(check.token === token);
+        } else if (check.listeners.length < 10) {
+          check.listeners.push(accessToken => reportMatch(accessToken === token));
+        }
+      }
+    };
+  }
+
+  const comparisonKey = Symbol.for('unitoffice.ascod.card-comparison');
+  let comparisonWindow = window;
+  try {
+    if (window.top?.location.origin === location.origin) {
+      comparisonWindow = window.top;
+    }
+  } catch {
+    // Между разными источниками состояние не передаём.
+  }
+  if (!comparisonWindow[comparisonKey] || comparisonWindow[comparisonKey].deadline < Date.now()) {
+    Object.defineProperty(comparisonWindow, comparisonKey, { value: createCardComparison(), configurable: true });
+  }
+  const cardComparison = comparisonWindow[comparisonKey];
+
+  function compareCardRequest(target, body) {
+    const request = parseJson(body);
+    const counter = counterKey(request?.cardCounter);
+    if (target.path === accessPath) {
+      target.counter = counter;
+      target.check = cardComparison.accessRequest(counter, request?.token);
+    } else if (target.path === endpoint) {
+      cardComparison.attachmentRequest(counter, request?.token, matches => {
+        emit({ kind: 'card comparisons', checkAccessTokenMatchesFillEcd: matches });
+      });
+    }
   }
 
   const inspectedScripts = new Set();
@@ -421,7 +531,7 @@
       const url = new URL(address, location.href);
       const path = url.pathname.toLowerCase();
       const verb = method?.toUpperCase();
-      if (url.origin === location.origin && (verb === 'POST' && path === endpoint ||
+      if (url.origin === location.origin && (verb === 'POST' && (path === endpoint || cardDataPaths.has(path)) ||
           (verb === 'GET' || verb === 'POST') && path === viewerPath)) {
         return { path, method: verb };
       }
@@ -431,7 +541,7 @@
     }
   }
 
-  function schema(value, depth = 0) {
+  function schema(value, depth = 0, prioritizeCardFields = false) {
     if (remaining-- <= 0 || depth >= 10) {
       return { type: 'truncated' };
     }
@@ -439,17 +549,21 @@
       return { type: 'null' };
     }
     if (Array.isArray(value)) {
-      const samples = value.slice(0, 3).map(item => schema(item, depth + 1));
+      const samples = value.slice(0, prioritizeCardFields ? 1 : 3).map(item => schema(item, depth + 1, prioritizeCardFields));
       return { type: 'array', samples };
     }
     if (typeof value === 'object') {
-      const fields = Object.entries(value).slice(0, 80).map(([key, item]) => {
+      const entries = Object.entries(value);
+      if (prioritizeCardFields) {
+        entries.sort(([left], [right]) => Number(cardFieldPriority(right)) - Number(cardFieldPriority(left)));
+      }
+      const fields = entries.slice(0, 80).map(([key, item]) => {
         const name = /^[A-Za-z_$][A-Za-z0-9_$]{0,47}$/.test(key) &&
           !/\d{5,}|[A-Za-z0-9]{30,}/.test(key) ? key : '[dynamic key]';
         const sensitive = /token|secret|password|cookie|authorization|session|credential/i.test(key);
         return {
           name,
-          schema: sensitive ? { type: 'redacted' } : schema(item, depth + 1)
+          schema: sensitive ? { type: 'redacted' } : schema(item, depth + 1, prioritizeCardFields)
         };
       });
       return { type: 'object', fields };
@@ -457,16 +571,43 @@
     return { type: typeof value };
   }
 
+  function cardFieldPriority(name) {
+    return /counter|token|(?:card|entity|document|doc|row|file)id|^id$|^d$/i.test(name);
+  }
+
+  function embeddedCardSchema(value) {
+    if (typeof value !== 'string' || !/^\s*[\[{]/.test(value)) {
+      return undefined;
+    }
+    try {
+      const parsed = JSON.parse(value);
+      remaining = 500;
+      return { format: 'json', schema: schema(parsed, 0, true) };
+    } catch {
+      return undefined;
+    }
+  }
+
   function report(target, status, value) {
     if (Date.now() > deadline || status && (status < 200 || status >= 300) || value?.length > maximumBody) {
       return;
     }
     try {
-      if (target.path === endpoint && typeof value === 'string') {
+      const cardData = cardDataPaths.has(target.path);
+      if ((target.path === endpoint || cardData) && typeof value === 'string') {
         value = JSON.parse(value);
       }
-      const result = { ...target, status };
-      if (value && typeof value === 'object') {
+      if (target.path === registryPath) {
+        cardComparison.registry(value);
+      } else if (target.path === accessPath) {
+        cardComparison.accessResponse(target.counter, target.check, value);
+      }
+      const result = { path: target.path, method: target.method, status };
+      if (cardData) {
+        remaining = 500;
+        result.schema = schema(value, 0, true);
+        result.embedded = embeddedCardSchema(value?.d ?? value);
+      } else if (value && typeof value === 'object') {
         remaining = 500;
         result.schema = schema(value);
         result.embedded = describeEmbeddedResponse(value.d);
@@ -543,9 +684,12 @@
     }
     return result;
   };
-  XMLHttpRequest.prototype.send = function () {
+  XMLHttpRequest.prototype.send = function (body) {
     const target = observed.get(this);
     if (observed.delete(this)) {
+      if (target.path === accessPath || target.path === endpoint) {
+        compareCardRequest(target, body);
+      }
       this.addEventListener('load', () => {
         if (this.responseType === 'json' || this.responseType === 'text' || !this.responseType) {
           report(target, this.status, this.response);
@@ -557,13 +701,27 @@
 
   const originalFetch = window.fetch;
   window.fetch = function (input, options) {
-    const response = Reflect.apply(originalFetch, this, arguments);
-    const address = input instanceof Request ? input.url : input;
+    const isRequest = input instanceof Request;
+    const address = isRequest ? input.url : input;
     traceDownloadLaunch('fetch', address);
     const target = matches(options?.method ?? input?.method ?? 'GET', address);
+    let requestBody;
+    if (target && (target.path === accessPath || target.path === endpoint)) {
+      if (options?.body === undefined && isRequest) {
+        try {
+          requestBody = readLimitedText(input.clone()).then(body => compareCardRequest(target, body)).catch(() => {});
+        } catch {
+          // Схема ответа по-прежнему доступна для запроса с использованным телом.
+        }
+      } else {
+        compareCardRequest(target, options?.body);
+      }
+    }
+    const response = Reflect.apply(originalFetch, this, arguments);
     if (target) {
       void response.then(async result => {
         if (result.ok && Number(result.headers.get('content-length')) <= maximumBody) {
+          await requestBody;
           await readFetchResponse(target, result);
         }
       }).catch(() => {});

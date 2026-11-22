@@ -47,6 +47,10 @@ const interfaceMode = document.getElementById('interface-mode');
 const directFilter = document.getElementById('direct-filter');
 const directDate = document.getElementById('direct-date');
 const directResult = document.getElementById('direct-result');
+const directDownloadZip = document.getElementById('direct-download-zip');
+const directDownloadStatus = document.getElementById('direct-download-status');
+let directSelection;
+let downloadingZip = false;
 const directDocuments = document.getElementById('direct-documents');
 const directJson = document.getElementById('direct-json');
 const directJsonDetails = document.getElementById('direct-json-details');
@@ -87,8 +91,15 @@ operationModes.addEventListener('change', event => {
 
 directFilter.addEventListener('submit', async event => {
   event.preventDefault();
+  if (downloadingZip) {
+    return;
+  }
   const button = directFilter.querySelector('button');
   button.disabled = true;
+  directSelection = undefined;
+  directDownloadZip.hidden = true;
+  directDownloadZip.disabled = true;
+  directDownloadStatus.hidden = true;
   directDocuments.replaceChildren();
   directJson.textContent = '';
   directJsonDetails.hidden = true;
@@ -114,7 +125,22 @@ directFilter.addEventListener('submit', async event => {
       }
       directJson.textContent = JSON.stringify(result.data, null, 2);
       directJsonDetails.hidden = false;
-      directResult.textContent = 'Response received for ' + date + '. Open Response JSON to view it.';
+      const documents = result.documents ?? [];
+      for (const record of documents) {
+        const item = document.createElement('li');
+        const label = document.createElement('label');
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'direct-document';
+        radio.value = record.key;
+        radio.disabled = !record.downloadable;
+        label.append(radio, [record.number, record.subject].filter(Boolean).join(' — ') || 'Document');
+        item.append(label);
+        directDocuments.append(item);
+      }
+      directSelection = { origin: server.origin, resultId: result.resultId };
+      directDownloadZip.hidden = !documents.some(record => record.downloadable);
+      directResult.textContent = 'Documents on ' + date + ': ' + documents.length + '.';
       return;
     }
     const response = await fetch(new URL('/api/v1/documents', server.origin), {
@@ -142,6 +168,44 @@ directFilter.addEventListener('submit', async event => {
     button.disabled = false;
   }
 });
+
+directDocuments.addEventListener('change', () => {
+  directDownloadZip.disabled = downloadingZip || !directDocuments.querySelector('input:checked');
+});
+
+directDownloadZip.onclick = async () => {
+  const selection = directSelection;
+  const row = directDocuments.querySelector('input:checked');
+  if (downloadingZip || !selection || !row || row.disabled) {
+    return;
+  }
+  downloadingZip = true;
+  const loadButton = directFilter.querySelector('button');
+  loadButton.disabled = true;
+  directDownloadZip.disabled = true;
+  directDownloadStatus.hidden = false;
+  directDownloadStatus.textContent = 'Preparing ZIP…';
+  try {
+    if (readServerAddress().origin !== selection.origin) {
+      throw new Error('Load documents again for the selected server.');
+    }
+    const result = await chrome.runtime.sendMessage({
+      command: 'directDownload',
+      ...selection,
+      rowKey: row.value
+    });
+    if (!result?.ok) {
+      throw new Error(result?.error ?? 'ZIP download did not start.');
+    }
+    directDownloadStatus.textContent = 'ZIP sent to Edge Downloads.';
+  } catch (error) {
+    directDownloadStatus.textContent = error.message;
+  } finally {
+    downloadingZip = false;
+    directDownloadZip.disabled = false;
+    loadButton.disabled = false;
+  }
+};
 
 function downloadLogText() {
   const entries = [...(monitor.downloadLog ?? [])];
@@ -713,6 +777,7 @@ function render(value) {
       ['Frame', entry.frameId],
       ['Duration (ms)', entry.durationMs?.toFixed(1)],
       ['Query keys', entry.queryKeys?.join(', ')],
+      ['Direct and manual ZIP counter match', entry.matchesDirectZipCounter],
       ['Request headers', entry.requestHeaders],
       ['Request body summary', entry.requestBody],
       ['Response headers', entry.responseHeaders],
@@ -901,7 +966,7 @@ captureAttachment.onclick = async () => {
         void finishAttachmentCapture('Recording expired. Save the partial workflow JSON.');
       }, 120000)
     };
-    attachmentStatus.textContent = 'Open a card and use Download all files within two minutes.';
+    attachmentStatus.textContent = 'Refresh the registry, open a card, and use Download all files within two minutes.';
   } catch (error) {
     attachmentStatus.textContent = error.message;
     await unregisterAttachmentScripts().catch(console.error);
@@ -924,7 +989,8 @@ chrome.runtime.onMessage.addListener((message, sender) => {
     attachmentCapture.responses.push({
       time: new Date().toISOString(),
       source: scriptCandidate ? 'script inspection' :
-        message.schema.kind ? 'download action' : 'response inspection',
+        message.schema.kind === 'card comparisons' ? 'field comparison' :
+          message.schema.kind ? 'download action' : 'response inspection',
       ...message.schema
     });
     updateWorkflowEvidence();

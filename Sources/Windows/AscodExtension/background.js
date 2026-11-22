@@ -10,6 +10,8 @@ const requestFilter = {
 const maximumEntries = 1000;
 const maximumBodyBytes = 4096;
 const requestDetails = new Map();
+const activeDirectDownloads = new Set();
+const zipCountersToCompare = new Map();
 const safeHeaders = new Set([
   'accept', 'accept-encoding', 'accept-language', 'cache-control', 'content-encoding',
   'content-language', 'content-length', 'content-type', 'date', 'etag', 'expires',
@@ -233,6 +235,7 @@ function describeBody(body) {
 function startRequest(details) {
   const url = new URL(details.url);
   const directRequest = directRequests.has(details.tabId);
+  const directDownload = details.frameId === 0 && activeDirectDownloads.has(details.tabId);
   updateMonitor(async monitor => {
     const capturedFilter = !directRequest && await captureFilterPayload(monitor, details, url);
     const capturedContext = !directRequest && !capturedFilter && await captureRegistryContext(monitor, details, url);
@@ -245,7 +248,8 @@ function startRequest(details) {
       requestDetails.set(details.requestId, {
         startedAt: previous?.startedAt ?? details.timeStamp,
         redirects: previous?.redirects ?? [],
-        body: describeBody(details.requestBody)
+        body: describeBody(details.requestBody),
+        directDownload
       });
     }
     return capturedFilter || capturedContext;
@@ -382,12 +386,181 @@ async function getAscodRows(origin, path, payload) {
       return { error: 'GetData response is too large to display.' };
     }
     try {
-      return { data: JSON.parse(text) };
+      const data = JSON.parse(text);
+      const rows = Array.isArray(data?.d) ? data.d : [];
+      const resultId = crypto.randomUUID();
+      const selectionKey = Symbol.for('unitoffice.ascod.direct-download');
+      const cards = new Map();
+      const documents = rows.map((row, index) => {
+        const key = String(index);
+        if (Number.isSafeInteger(row?.Counter) && row.Counter > 0 && typeof row.Token === 'string' && row.Token) {
+          cards.set(key, { counter: row.Counter, token: row.Token });
+        }
+        return {
+          key,
+          number: row?.FullIndex ?? row?.RegIndex ?? row?.Counter,
+          subject: typeof row?.Content === 'string' ? row.Content : '',
+          downloadable: cards.has(key)
+        };
+      });
+      const readCard = (id, key) => id === resultId ? cards.get(key) : undefined;
+      window[selectionKey] = readCard;
+      setTimeout(() => {
+        if (window[selectionKey] === readCard) {
+          delete window[selectionKey];
+        }
+      }, 300000);
+      const redacted = JSON.parse(JSON.stringify(data, (key, value) =>
+        /token|secret|password|cookie|authorization|session|credential/i.test(key) ? '[redacted]' : value));
+      return { data: redacted, documents, resultId };
     } catch {
       return { error: 'GetData did not return JSON. Check that the registry session is still signed in.' };
     }
   } catch {
     return { error: 'GetData request failed. Check the connection and the current registry session.' };
+  }
+}
+
+async function downloadAscodZip(origin, resultId, rowKey) {
+  if (location.origin !== origin || !/\/Defaultv4\.aspx$/i.test(location.pathname)) {
+    return { error: 'Reopen the Ascod registry and load the documents again.' };
+  }
+  const readCard = window[Symbol.for('unitoffice.ascod.direct-download')];
+  const card = typeof readCard === 'function' ? readCard(resultId, rowKey) : undefined;
+  if (!card) {
+    return { error: 'Load the documents again to refresh the selection.' };
+  }
+  async function post(servicePath, payload, name) {
+    const response = await fetch('/askod-ssl/Services/' + servicePath, {
+      method: 'POST',
+      credentials: 'same-origin',
+      redirect: 'error',
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(15000)
+    });
+    if (!response.ok) {
+      throw new Error(name + ' returned HTTP ' + response.status + '.');
+    }
+    try {
+      return (await response.json()).d;
+    } catch {
+      throw new Error(name + ' did not return the expected JSON.');
+    }
+  }
+
+  let step = 'Checking card access';
+  try {
+    const accessResult = await post('CardsService.svc/CheckAccessToCard', {
+      cardCounter: card.counter,
+      token: card.token
+    }, 'CheckAccessToCard');
+    const access = typeof accessResult === 'string' ? JSON.parse(accessResult) : accessResult;
+    if (typeof access?.Token !== 'string' || !access.Token) {
+      return { error: 'The access check did not return a card token.' };
+    }
+    step = 'Loading attachments';
+    const attachments = await post('PdfViewerService.svc/FillEcdTreeViewAndSelect', {
+      defTypeFrame: 1,
+      cardCounter: card.counter,
+      strParentCounter: '',
+      isManResolExec: false,
+      isLoadFirstFile: false,
+      execCounter: null,
+      accessToAddFiles: true,
+      isRemovedCard: false,
+      selectCounter: null,
+      selectedName: null,
+      token: access.Token,
+      isHistoricalData: false
+    }, 'FillEcdTreeViewAndSelect');
+    const [selectedId, tree] = typeof attachments === 'string' ? attachments.split('#sep#') : [];
+    const list = JSON.parse(tree ?? 'null');
+    const files = Array.isArray(list) ? list.filter(item =>
+      item?.IsFolder === false && item.IsAccess !== false &&
+      typeof item.GuidClientId === 'string' && item.GuidClientId.trim()) : [];
+    const file = files.find(item => String(item.Id) === selectedId) ?? files[0];
+    if (!file) {
+      return { error: 'No downloadable file was found in the root of the attachment tree.' };
+    }
+    step = 'Downloading ZIP';
+    const url = new URL('/askod-ssl/Handlers/FileHandler.ashx', origin);
+    url.search = new URLSearchParams({ t: 'files', l: 'yes', counter: file.GuidClientId });
+    const response = await fetch(url, {
+      credentials: 'same-origin',
+      redirect: 'error',
+      cache: 'no-store',
+      signal: AbortSignal.timeout(120000)
+    });
+    if (!response.ok) {
+      return { error: 'ZIP request returned HTTP ' + response.status + '.' };
+    }
+    const archive = await response.blob();
+    const prefix = new Uint8Array(await archive.slice(0, 4).arrayBuffer());
+    if (prefix[0] !== 0x50 || prefix[1] !== 0x4b ||
+        !((prefix[2] === 3 && prefix[3] === 4) || (prefix[2] === 5 && prefix[3] === 6))) {
+      if (/^text\/html(?:;|$)/i.test(response.headers.get('content-type') ?? '')) {
+        const html = await archive.slice(0, 65536).text();
+        // Проверяем признаки страницы в памяти. Текст и ссылки не экспортируем.
+        if (/<input\b[^>]*\btype\s*=\s*(?:"password"|'password'|password(?=[\s/>]))/i.test(html)) {
+          return { error: 'The file handler returned a sign-in page (HTTP 200).' };
+        }
+        const text = html.replace(/<[^>]*>/g, ' ');
+        if (/access denied|forbidden|доступ заборонено|доступ заборонений|відмовлено в доступі|доступ запрещ[её]н/i.test(text)) {
+          return { error: 'The file handler returned an access-denied page (HTTP 200).' };
+        }
+        if (/file not found|файл не знайдено|файл не найден/i.test(text)) {
+          return { error: 'The file handler returned a file-not-found page (HTTP 200).' };
+        }
+        return { error: 'The file handler returned an unrecognized HTML page (HTTP 200) instead of ZIP.' };
+      }
+      return { error: 'The file handler did not return a ZIP archive.' };
+    }
+    const objectUrl = URL.createObjectURL(archive);
+    const link = document.createElement('a');
+    link.href = objectUrl;
+    link.download = 'ascod-card-files.zip';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+    return { ok: true };
+  } catch {
+    return { error: step + ' failed. Check the registry session and try again.' };
+  }
+}
+
+async function runDirectDownload(message) {
+  const saved = await chrome.storage.session.get(directContextKey);
+  const context = saved[directContextKey];
+  if (!context || context.origin !== message.origin ||
+      typeof message.resultId !== 'string' || typeof message.rowKey !== 'string') {
+    throw new Error('Load the documents again before downloading.');
+  }
+  const target = { tabId: context.tabId };
+  if (context.documentId) {
+    target.documentIds = [context.documentId];
+  }
+  if (activeDirectDownloads.has(context.tabId)) {
+    throw new Error('A ZIP request is already running in this tab.');
+  }
+  zipCountersToCompare.delete(context.tabId);
+  activeDirectDownloads.add(context.tabId);
+  let execution;
+  try {
+    [execution] = await chrome.scripting.executeScript({
+      target,
+      world: 'MAIN',
+      func: downloadAscodZip,
+      args: [context.origin, message.resultId, message.rowKey]
+    });
+  } finally {
+    activeDirectDownloads.delete(context.tabId);
+  }
+  if (!execution?.result?.ok) {
+    throw new Error(execution?.result?.error ?? 'ZIP download did not start.');
   }
 }
 
@@ -451,7 +624,7 @@ async function runDirectFilter(message) {
   if (!execution?.result || execution.result.error) {
     throw new Error(execution?.result?.error ?? 'GetData did not return a result.');
   }
-  return execution.result.data;
+  return execution.result;
 }
 
 function clearClosedContext(tabId) {
@@ -472,6 +645,38 @@ chrome.tabs.onUpdated.addListener((tabId, change) => {
     clearClosedContext(tabId);
   }
 });
+
+function compareZipCounter(details, url, request, contentType) {
+  if (details.method !== 'GET' || details.tabId < 0 || details.statusCode < 200 || details.statusCode >= 300 ||
+      !/\/Handlers\/FileHandler\.ashx$/i.test(url.pathname) ||
+      url.searchParams.get('t') !== 'files' || url.searchParams.get('l') !== 'yes') {
+    return undefined;
+  }
+  const counter = url.searchParams.get('counter');
+  if (!counter) {
+    return undefined;
+  }
+  if (request?.directDownload && details.type === 'xmlhttprequest') {
+    const previous = { origin: url.origin, counter, deadline: Date.now() + 120000 };
+    zipCountersToCompare.set(details.tabId, previous);
+    setTimeout(() => {
+      if (zipCountersToCompare.get(details.tabId) === previous) {
+        zipCountersToCompare.delete(details.tabId);
+      }
+    }, 120000);
+    return undefined;
+  }
+  const previous = zipCountersToCompare.get(details.tabId);
+  const isZip = /^application\/(?:zip|x-zip-compressed)(?:;|$)/i.test(contentType ?? '') ||
+    (details.responseHeaders ?? []).some(header =>
+      header.name.toLowerCase() === 'content-disposition' && /\.zip(?:["';\s]|$)/i.test(header.value ?? ''));
+  if (details.frameId <= 0 || details.type === 'xmlhttprequest' || !isZip ||
+      previous?.origin !== url.origin || previous.deadline < Date.now()) {
+    return undefined;
+  }
+  zipCountersToCompare.delete(details.tabId);
+  return previous.counter === counter;
+}
 
 function recordRequest(details, redirect = false) {
   const url = new URL(details.url);
@@ -494,6 +699,10 @@ function recordRequest(details, redirect = false) {
     const headers = details.responseHeaders ?? [];
     const contentType = headers.find(header => header.name.toLowerCase() === 'content-type')?.value;
     const contentLength = headers.find(header => header.name.toLowerCase() === 'content-length')?.value;
+    const matchesDirectZipCounter = !redirect && !details.error ? compareZipCounter(details, url, request, contentType) : undefined;
+    if (matchesDirectZipCounter !== undefined) {
+      addDownloadLog(monitor, 'Direct and manual ZIP counter match: ' + matchesDirectZipCounter, details.timeStamp);
+    }
     monitor.entries.push({
       time: new Date(details.timeStamp).toISOString(),
       tabId: details.tabId,
@@ -511,6 +720,7 @@ function recordRequest(details, redirect = false) {
       redirects: request?.redirects.slice(),
       contentType,
       contentLength,
+      matchesDirectZipCounter,
       fromCache: details.fromCache,
       ...(details.error ? { error: details.error } : { status: details.statusCode })
     });
@@ -546,8 +756,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   const command = message?.command;
   if (command === 'directFilter') {
-    runDirectFilter(message).then(data => {
-      sendResponse({ ok: true, data });
+    runDirectFilter(message).then(result => {
+      sendResponse({ ok: true, ...result });
+    }).catch(error => {
+      sendResponse({ ok: false, error: error.message });
+    });
+    return true;
+  }
+  if (command === 'directDownload') {
+    runDirectDownload(message).then(() => {
+      sendResponse({ ok: true });
     }).catch(error => {
       sendResponse({ ok: false, error: error.message });
     });
@@ -642,10 +860,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     } else if (command === 'clear') {
       monitor.entries = [];
       requestDetails.clear();
+      zipCountersToCompare.clear();
     } else {
       monitor.recording = command !== 'stop';
       monitor.paused = !monitor.recording;
       requestDetails.clear();
+      zipCountersToCompare.clear();
       if (monitor.recording) {
         monitor.origin = origin;
       }
