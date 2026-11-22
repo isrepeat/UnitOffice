@@ -28,6 +28,7 @@
     <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
     <AssemblyName>PersonalEventsBuilder</AssemblyName>
     <RootNamespace>PersonalEventsBuilder</RootNamespace>
+    <DefaultLanguage>uk-UA</DefaultLanguage>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260921001" />
@@ -35,8 +36,21 @@
   <ItemGroup>
     <ApplicationDefinition Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\App.xaml" Link="App.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\App.xaml.cs" Link="App.xaml.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\CandidateRowView.cs" Link="Controls\CandidateRowView.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\EqualWidthColumnsPanel.cs" Link="Controls\EqualWidthColumnsPanel.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\EventFormView.cs" Link="Controls\EventFormView.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WindowTitleBar.cs" Link="Controls\WindowTitleBar.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\UiLanguage.cs" Link="Localization\UiLanguage.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\UiStrings.cs" Link="Localization\UiStrings.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\MainWindow.xaml" Link="MainWindow.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\MainWindow.xaml.cs" Link="MainWindow.xaml.cs" />
+    <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Strings\ru-RU\Resources.resw" Link="Strings\ru-RU\Resources.resw" />
+    <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Strings\uk-UA\Resources.resw" Link="Strings\uk-UA\Resources.resw" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\ViewModels\WorkspaceViewModel.cs" Link="ViewModels\WorkspaceViewModel.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\WorkspaceView.xaml" Link="Views\WorkspaceView.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\WorkspaceView.xaml.cs" Link="Views\WorkspaceView.xaml.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Workspace\DemoWorkspaceSource.cs" Link="Workspace\DemoWorkspaceSource.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Workspace\WorkspaceContract.cs" Link="Workspace\WorkspaceContract.cs" />
   </ItemGroup>
 
 

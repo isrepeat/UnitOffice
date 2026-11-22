@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <data name="Tr_ModeArrivalTreatment" xml:space="preserve"><value>З лікування</value></data>
+  <data name="Tr_ModeArrivalBusinessTrip" xml:space="preserve"><value>З відрядження</value></data>
+  <data name="Tr_ModeArrivalAnnualLeave" xml:space="preserve"><value>З щорічної відпустки</value></data>
+  <data name="Tr_ModeArrivalFamilyLeave" xml:space="preserve"><value>З відпустки за сімейними обставинами</value></data>
+  <data name="Tr_ModeArrivalMedicalBoard" xml:space="preserve"><value>З амбулаторного ВЛК</value></data>
+  <data name="Tr_ModeDepartureTreatment" xml:space="preserve"><value>На лікування</value></data>
+  <data name="Tr_ModeDepartureBusinessTrip" xml:space="preserve"><value>У відрядження</value></data>
+  <data name="Tr_ModeDepartureAnnualLeave" xml:space="preserve"><value>У щорічну відпустку</value></data>
+  <data name="Tr_ModeDepartureFamilyLeave" xml:space="preserve"><value>У відпустку за сімейними обставинами</value></data>
+  <data name="Tr_ModeDepartureMedicalBoard" xml:space="preserve"><value>На амбулаторне ВЛК</value></data>
+  <data name="Tr_ModeStatusTreatmentToLeave" xml:space="preserve"><value>Лікування → відпустка</value></data>
+  <data name="Tr_ModeStatusLeaveToTreatment" xml:space="preserve"><value>Відпустка → лікування</value></data>
+  <data name="Tr_ModeStatusTreatmentLocation" xml:space="preserve"><value>Зміна місця лікування</value></data>
+  <data name="Tr_ModeStatusExtendLeave" xml:space="preserve"><value>Продовження відпустки</value></data>
+  <data name="Tr_ModeStatusOther" xml:space="preserve"><value>Інша зміна</value></data>
+  <data name="Tr_DemoAnnualLeavePreview" xml:space="preserve"><value>З 20 листопада 2026 року:
+Коваля Олексія — після щорічної відпустки.
+Підстава: рапорт № 42 від 20.11.2026.</value></data>
+  <data name="Tr_PreviewPending" xml:space="preserve"><value>Попередній перегляд з’явиться після підключення шаблонів.</value></data>
+  <data name="Tr_DemoOrder" xml:space="preserve"><value>Наказ</value></data>
+  <data name="Tr_DemoReport" xml:space="preserve"><value>Рапорт</value></data>
+  <data name="Tr_FieldDestination" xml:space="preserve"><value>Місце</value></data>
+  <data name="Tr_FieldReturnDate" xml:space="preserve"><value>Дата повернення</value></data>
+  <data name="Tr_FieldTripPurpose" xml:space="preserve"><value>Мета відрядження</value></data>
+  <data name="Tr_LoadDatabase" xml:space="preserve"><value>Завантажити базу</value></data>
+  <data name="Tr_ReloadConfiguration" xml:space="preserve"><value>Оновити конфіг</value></data>
+  <data name="Tr_SaveEvent" xml:space="preserve"><value>Зберегти подію</value></data>
+  <data name="Tr_FieldPerson" xml:space="preserve"><value>ПІБ</value></data>
+  <data name="Tr_FieldRank" xml:space="preserve"><value>Звання</value></data>
+  <data name="Tr_FieldRole" xml:space="preserve"><value>Посада</value></data>
+  <data name="Tr_FieldDocument" xml:space="preserve"><value>Документ</value></data>
+  <data name="Tr_FieldDocumentNumber" xml:space="preserve"><value>№ документа</value></data>
+  <data name="Tr_FieldDocumentDate" xml:space="preserve"><value>Дата документа</value></data>
+  <data name="Tr_DemoPerson" xml:space="preserve"><value>Коваль Олексій</value></data>
+  <data name="Tr_DemoRank" xml:space="preserve"><value>солдат</value></data>
+  <data name="Tr_DemoRole" xml:space="preserve"><value>Водій</value></data>
+  <data name="Tr_ActionPending" xml:space="preserve"><value>Команда ще не підключена.</value></data>
+  <data name="Tr_FieldReporter" xml:space="preserve"><value>Рапортуючий</value></data>
+  <data name="Tr_FieldIncomingNumber" xml:space="preserve"><value>Вх. №</value></data>
+  <data name="Tr_FieldIncomingDate" xml:space="preserve"><value>Вх. дата</value></data>
+  <data name="Tr_FieldEventDate" xml:space="preserve"><value>Дата події</value></data>
+  <data name="Tr_ChooseDate" xml:space="preserve"><value>Оберіть дату</value></data>
+  <data name="Tr_CategoryArrival" xml:space="preserve"><value>Прибуття</value></data>
+  <data name="Tr_CategoryDeparture" xml:space="preserve"><value>Вибуття</value></data>
+  <data name="Tr_CategoryStatusChange" xml:space="preserve"><value>Зміна статусу</value></data>
+  <data name="Tr_ChooseMode" xml:space="preserve"><value>Оберіть режим події.</value></data>
+  <data name="Tr_Ready" xml:space="preserve"><value>Готово</value></data>
+  <data name="Tr_NoCandidates" xml:space="preserve"><value>Кандидатів немає</value></data>
+  <data name="Tr_AppTitle" xml:space="preserve"><value>PersonalEventsBuilder</value></data>
+  <data name="Tr_FileMenu.Title" xml:space="preserve"><value>Файл</value></data>
+  <data name="Tr_LoadDatabaseMenu.Text" xml:space="preserve"><value>Завантажити базу</value></data>
+  <data name="Tr_SaveEventMenu.Text" xml:space="preserve"><value>Зберегти подію</value></data>
+  <data name="Tr_CloseWindowMenu.Text" xml:space="preserve"><value>Закрити вікно</value></data>
+  <data name="Tr_ToolsMenu.Title" xml:space="preserve"><value>Інструменти</value></data>
+  <data name="Tr_ReloadConfigurationMenu.Text" xml:space="preserve"><value>Оновити конфіг</value></data>
+  <data name="Tr_WordPreviewHeading.Text" xml:space="preserve"><value>Прев’ю Word</value></data>
+  <data name="Tr_EventDetailsHeading.Text" xml:space="preserve"><value>Дані події</value></data>
+  <data name="Tr_CandidatesHeading.Text" xml:space="preserve"><value>Кандидати</value></data>
+  <data name="Tr_ActionsHeading.Text" xml:space="preserve"><value>Дії</value></data>
+  <data name="Tr_LanguageMenu.Title" xml:space="preserve"><value>Мова</value></data>
+  <data name="Tr_UkrainianLanguage.Text" xml:space="preserve"><value>Українська</value></data>
+  <data name="Tr_RussianLanguage.Text" xml:space="preserve"><value>Русский</value></data>
+  <data name="Tr_LanguageRestartTitle" xml:space="preserve"><value>Змінити мову?</value></data>
+  <data name="Tr_LanguageRestartMessage" xml:space="preserve"><value>Застосунок перезапуститься. Незбережені дані форми буде втрачено.</value></data>
+  <data name="Tr_LanguageRestart" xml:space="preserve"><value>Перезапустити</value></data>
+  <data name="Tr_LanguageCancel" xml:space="preserve"><value>Скасувати</value></data>
+  <data name="Tr_LanguageErrorTitle" xml:space="preserve"><value>Не вдалося змінити мову</value></data>
+  <data name="Tr_LanguageErrorMessage" xml:space="preserve"><value>Не вдалося зберегти налаштування мови або перезапустити застосунок.</value></data>
+  <data name="Tr_LanguageDismiss" xml:space="preserve"><value>Закрити</value></data>
+</root>

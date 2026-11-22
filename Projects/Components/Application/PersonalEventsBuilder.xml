@@ -8,6 +8,7 @@
       <Files>
         <Input role="source">Sources/Windows/PersonalEventsBuilder/**/*.cs</Input>
         <Input role="source">Sources/Windows/PersonalEventsBuilder/**/*.xaml</Input>
+        <Input role="source">Sources/Windows/PersonalEventsBuilder/Strings/**/*.resw</Input>
       </Files>
       <Filters>
         <Filter filter="{Tree:Project}"
@@ -20,6 +21,7 @@
           <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
           <AssemblyName>PersonalEventsBuilder</AssemblyName>
           <RootNamespace>PersonalEventsBuilder</RootNamespace>
+          <DefaultLanguage>uk-UA</DefaultLanguage>
         </Properties>
       </Extension>
       <Dependencies>

@@ -5,6 +5,7 @@ namespace PersonalEventsBuilder {
         private Window? window;
 
         public App() {
+            Localization.UiLanguage.Initialize();
             InitializeComponent();
         }
 
