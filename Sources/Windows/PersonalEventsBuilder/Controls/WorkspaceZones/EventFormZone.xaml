@@ -2,16 +2,22 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:PersonalEventsBuilder.Controls">
-    <Border Style="{StaticResource PanelBorder}">
+    <Border x:Name="FormBorder"
+            Style="{StaticResource PanelBorder}">
         <StackPanel Spacing="3">
-            <TextBlock x:Uid="Tr_EventDetailsHeading"
+            <TextBlock x:Name="FormHeading"
+                       x:Uid="Tr_EventDetailsHeading"
                        Style="{StaticResource PanelHeading}" />
             <controls:NavigationMatrix x:Name="FormMatrix">
-                <Grid ColumnSpacing="6">
+                <Grid x:Name="FieldColumns"
+                      ColumnSpacing="6">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="106" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="106" />
+                        <ColumnDefinition x:Name="LeftColumn"
+                                          Width="Auto"
+                                          MinWidth="106" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto"
+                                          MinWidth="106" />
                     </Grid.ColumnDefinitions>
                     <Border BorderBrush="#9B703D"
                             BorderThickness="1"

@@ -30,6 +30,7 @@ namespace PersonalEventsBuilder.Workspace {
         Left,
         Right,
         Below,
+        Inline,
     }
 
     public sealed record EventMode(string Id, string Title, bool IsDefault = false);
@@ -39,16 +40,17 @@ namespace PersonalEventsBuilder.Workspace {
     public sealed record FieldValue(string? Text = null, DateTimeOffset? Date = null, bool? Checked = null);
 
     public sealed record FormField(string Id, string Title, FieldKind Kind, CoreField? CoreField = null,
-        double Width = 1, bool IsEnabled = true, FieldValue? InitialValue = null, IReadOnlyList<string>? Options = null);
+        double Width = 98, bool IsEnabled = true, FieldValue? InitialValue = null, IReadOnlyList<string>? Options = null, CoreField? Anchor = null);
 
-    public sealed record CoreFieldState(CoreField Field, bool IsEnabled = true, FieldValue? InitialValue = null, IReadOnlyList<string>? Options = null);
+    public sealed record CoreFieldState(CoreField Field, bool IsEnabled = true, FieldValue? InitialValue = null,
+        IReadOnlyList<string>? Options = null, string? Title = null);
 
     public sealed record ExtensionField(string Id, string Title, FieldKind Kind, FieldPlacement Placement,
-        CoreField? Anchor = null, bool IsEnabled = true, FieldValue? InitialValue = null, IReadOnlyList<string>? Options = null);
+        CoreField? Anchor = null, bool IsEnabled = true, FieldValue? InitialValue = null, IReadOnlyList<string>? Options = null, double Width = 98);
 
     public sealed record WorkspaceAction(string Id, string Title, bool IsEnabled = true);
 
-    public sealed record CandidateColumn(string Id, string Title);
+    public sealed record CandidateColumn(string Id, string Title, CoreField? TargetField = null, string? TargetExtensionId = null);
 
     public sealed record CandidateRow(string Id, IReadOnlyDictionary<string, string> Cells);
 
@@ -57,7 +59,8 @@ namespace PersonalEventsBuilder.Workspace {
     public sealed record FormValues(IReadOnlyDictionary<CoreField, FieldValue> Core, IReadOnlyDictionary<string, FieldValue> Extensions);
 
     public sealed record ModeWorkspace(string Preview, IReadOnlyList<CoreFieldState> CoreFields,
-        IReadOnlyList<ExtensionField> Extensions, IReadOnlyList<WorkspaceAction> Actions, CandidateTable Candidates);
+        IReadOnlyList<ExtensionField> Extensions, IReadOnlyList<WorkspaceAction> Actions, CandidateTable Candidates,
+        IReadOnlyList<string>? CenterFieldOrder = null);
 
     public interface IWorkspaceSource {
         IReadOnlyList<EventMode> GetModes(ModeCategory category);

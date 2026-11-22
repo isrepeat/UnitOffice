@@ -26,6 +26,12 @@
   <data name="Tr_FieldDestination" xml:space="preserve"><value>Місце</value></data>
   <data name="Tr_FieldReturnDate" xml:space="preserve"><value>Дата повернення</value></data>
   <data name="Tr_FieldTripPurpose" xml:space="preserve"><value>Мета відрядження</value></data>
+  <data name="Tr_FieldHostUnit" xml:space="preserve"><value>Підрозділ</value></data>
+  <data name="Tr_FieldTripContact" xml:space="preserve"><value>Контакт</value></data>
+  <data name="Tr_FieldDepartureDate" xml:space="preserve"><value>Дата виїзду</value></data>
+  <data name="Tr_FieldPreviousReturnDate" xml:space="preserve"><value>Попередня дата</value></data>
+  <data name="Tr_FieldExtraDays" xml:space="preserve"><value>Додаткові дні</value></data>
+  <data name="Tr_FieldExtensionBasis" xml:space="preserve"><value>Підстава</value></data>
   <data name="Tr_LoadDatabase" xml:space="preserve"><value>Завантажити базу</value></data>
   <data name="Tr_ReloadConfiguration" xml:space="preserve"><value>Оновити конфіг</value></data>
   <data name="Tr_SaveEvent" xml:space="preserve"><value>Зберегти подію</value></data>
@@ -38,6 +44,14 @@
   <data name="Tr_DemoPerson" xml:space="preserve"><value>Коваль Олексій</value></data>
   <data name="Tr_DemoRank" xml:space="preserve"><value>солдат</value></data>
   <data name="Tr_DemoRole" xml:space="preserve"><value>Водій</value></data>
+  <data name="Tr_DemoPerson2" xml:space="preserve"><value>Мельник Андрій</value></data>
+  <data name="Tr_DemoRank2" xml:space="preserve"><value>сержант</value></data>
+  <data name="Tr_DemoRole2" xml:space="preserve"><value>Командир відділення</value></data>
+  <data name="Tr_DemoPerson3" xml:space="preserve"><value>Шевченко Олена</value></data>
+  <data name="Tr_DemoRank3" xml:space="preserve"><value>старший солдат</value></data>
+  <data name="Tr_DemoRole3" xml:space="preserve"><value>Оператор</value></data>
+  <data name="Tr_DemoPerson4" xml:space="preserve"><value>Бондар Максим</value></data>
+  <data name="Tr_DemoRole4" xml:space="preserve"><value>Механік</value></data>
   <data name="Tr_ActionPending" xml:space="preserve"><value>Команда ще не підключена.</value></data>
   <data name="Tr_FieldReporter" xml:space="preserve"><value>Рапортуючий</value></data>
   <data name="Tr_FieldIncomingNumber" xml:space="preserve"><value>Вх. №</value></data>
@@ -76,4 +90,14 @@
   <data name="Tr_NewEventLabel.Text" xml:space="preserve"><value>Нова подія</value></data>
   <data name="Tr_ActiveFieldPreview" xml:space="preserve"><value>Текст активного поля</value></data>
   <data name="Tr_ResizeActiveFieldPreview" xml:space="preserve"><value>Змінити висоту перегляду активного поля</value></data>
+  <data name="Tr_ScrollFormLeft" xml:space="preserve"><value>Прокрутити форму вліво</value></data>
+  <data name="Tr_ScrollFormRight" xml:space="preserve"><value>Прокрутити форму вправо</value></data>
+  <data name="Tr_FieldHospital" xml:space="preserve"><value>Лікарня</value></data>
+  <data name="Tr_FieldHospitalShortName" xml:space="preserve"><value>Лікарня. Скорочена назва</value></data>
+  <data name="Tr_FieldTaxNumber" xml:space="preserve"><value>ІПН</value></data>
+  <data name="Tr_FieldRoleCode" xml:space="preserve"><value>Код посади</value></data>
+  <data name="Tr_FieldReporterRank" xml:space="preserve"><value>Рапорт. звання</value></data>
+  <data name="Tr_FieldReporterPerson" xml:space="preserve"><value>Рапорт. ПІБ</value></data>
+  <data name="Tr_FieldReporterRoleCode" xml:space="preserve"><value>Рапорт. код посади</value></data>
+  <data name="Tr_FieldTreatmentDepartureDate" xml:space="preserve"><value>Дата вибуття</value></data>
 </root>

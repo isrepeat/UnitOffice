@@ -7,6 +7,8 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace PersonalEventsBuilder.Controls {
     public sealed partial class Form : UserControl {
+        internal const double ColumnSpacing = 6;
+
         public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(
             nameof(ItemsSource),
             typeof(IEnumerable<Workspace.FormField>),
@@ -26,6 +28,7 @@ namespace PersonalEventsBuilder.Controls {
 
         public Form() {
             InitializeComponent();
+            this.FieldGrid.ColumnSpacing = ColumnSpacing;
         }
 
         public IEnumerable<Workspace.FormField>? ItemsSource {
@@ -43,12 +46,37 @@ namespace PersonalEventsBuilder.Controls {
             this.editors.Clear();
             this.FieldGrid.Children.Clear();
             this.FieldGrid.ColumnDefinitions.Clear();
+            this.FieldGrid.RowDefinitions.Clear();
+
+            var coreColumns = new Dictionary<Workspace.CoreField, int>();
+            var nextRowByColumn = new Dictionary<int, int>();
 
             foreach (var field in this.ItemsSource ?? Array.Empty<Workspace.FormField>()) {
+                var row = 0;
+                int column;
+                if (field.Anchor is { } anchor) {
+                    if (!coreColumns.TryGetValue(anchor, out column)) {
+                        continue;
+                    }
+
+                    row = nextRowByColumn[column]++;
+                } else {
+                    column = this.FieldGrid.ColumnDefinitions.Count;
+                    this.FieldGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(field.Width) });
+                    if (field.CoreField is { } coreField) {
+                        coreColumns.Add(coreField, column);
+                        nextRowByColumn.Add(column, 1);
+                    }
+                }
+
+                while (this.FieldGrid.RowDefinitions.Count <= row) {
+                    this.FieldGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
+                }
+
                 var control = new FormFieldEditor(field.Title);
                 var editor = new Editor(field, control);
-                Grid.SetColumn(control, this.FieldGrid.ColumnDefinitions.Count);
-                this.FieldGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(field.Width, GridUnitType.Star) });
+                Grid.SetRow(control, row);
+                Grid.SetColumn(control, column);
                 this.FieldGrid.Children.Add(control);
                 this.editors.Add(editor);
                 Configure(editor, field.IsEnabled, field.InitialValue, field.Options);

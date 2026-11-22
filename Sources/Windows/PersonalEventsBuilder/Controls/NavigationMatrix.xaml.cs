@@ -94,12 +94,14 @@ namespace PersonalEventsBuilder.Controls {
         }
 
         private IEnumerable<Cell> GetCells() => this.forms
-            .SelectMany(form => form.Editors.Select((editor, index) => new Cell(
+            .SelectMany(form => form.Editors.Select(editor => new Cell(
                 editor,
                 new Navigation.CellPosition(
-                    Grid.GetRow(form),
+                    Grid.GetRow(form) + Grid.GetRow(editor.Control),
                     Grid.GetColumn(form),
-                    form.FlowDirection == FlowDirection.RightToLeft ? form.Editors.Count - 1 - index : index
+                    form.FlowDirection == FlowDirection.RightToLeft
+                        ? form.Editors.Count - 1 - Grid.GetColumn(editor.Control)
+                        : Grid.GetColumn(editor.Control)
                 )
             )));
 

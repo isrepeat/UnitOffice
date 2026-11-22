@@ -6,5 +6,5 @@
                          Color="#707070" />
     </UserControl.Resources>
     <Grid x:Name="FieldGrid"
-          ColumnSpacing="6" />
+          RowSpacing="4" />
 </UserControl>

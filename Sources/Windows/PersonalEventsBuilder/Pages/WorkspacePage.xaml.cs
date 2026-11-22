@@ -12,8 +12,12 @@ using Windows.System;
 namespace PersonalEventsBuilder.Pages {
     public sealed partial class WorkspacePage : Page {
         private const double MaximumPreviewHeight = 240;
+        private const double FormScrollStep = 104;
+        private const double ScrollTolerance = 0.1;
         private readonly InputSystemCursor previewResizeCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeNorthSouth);
         private double fieldPreviewHeight;
+        private double defaultFormOffset;
+        private bool resetFormOffset = true;
         private ViewModels.WorkspacePageViewModel ViewModel { get; }
 
         public WorkspacePage() : this(new Workspace.DemoWorkspaceSource()) {
@@ -30,14 +34,12 @@ namespace PersonalEventsBuilder.Pages {
             this.WorkspaceActions.ActionRequested += this.ExecuteAction;
             AutomationProperties.SetName(this.ActiveFieldPreview, Localization.UiStrings.Get("Tr_ActiveFieldPreview"));
             AutomationProperties.SetName(this.PreviewResizeHandle, Localization.UiStrings.Get("Tr_ResizeActiveFieldPreview"));
+            AutomationProperties.SetName(this.ScrollFormLeft, Localization.UiStrings.Get("Tr_ScrollFormLeft"));
+            AutomationProperties.SetName(this.ScrollFormRight, Localization.UiStrings.Get("Tr_ScrollFormRight"));
         }
 
         internal void ExecuteAction(string actionId) {
             this.ViewModel.ExecuteAction(actionId, this.EventForm.Matrix.ReadValues());
-        }
-
-        private void OnWorkspaceSizeChanged(object sender, SizeChangedEventArgs args) {
-            this.WorkspaceSurface.Width = Math.Max(this.WorkspaceSurface.MinWidth, args.NewSize.Width);
         }
 
         private void OnPreviewDragDelta(object sender, DragDeltaEventArgs args) {
@@ -66,7 +68,61 @@ namespace PersonalEventsBuilder.Pages {
         }
 
         private void OnModeSelected(Workspace.EventMode mode) {
-            this.ViewModel.SelectMode(mode);
+            if (this.ViewModel.SelectMode(mode)) {
+                this.resetFormOffset = true;
+            }
+        }
+
+        private void OnFormLayoutUpdated(object sender, object args) {
+            this.Candidates.SetColumnInset(this.EventForm.CenterInset);
+            var viewportWidth = this.FormScrollViewer.ActualWidth;
+            var inset = this.EventForm.RequiredWidth > viewportWidth + ScrollTolerance
+                ? this.EventForm.LeftOverflow
+                : 0;
+            if (this.defaultFormOffset != inset) {
+                this.defaultFormOffset = inset;
+                this.EventForm.SetHeadingInset(inset);
+                this.resetFormOffset = true;
+            }
+
+            var minimumWidth = viewportWidth + inset;
+            if (this.FormSurface.MinWidth != minimumWidth) {
+                this.FormSurface.MinWidth = minimumWidth;
+            }
+
+            if (this.resetFormOffset && this.FormScrollViewer.ScrollableWidth + ScrollTolerance >= inset) {
+                var scrollViewer = this.FormScrollViewer;
+                this.resetFormOffset = Math.Abs(scrollViewer.HorizontalOffset - inset) > ScrollTolerance
+                    && !scrollViewer.ChangeView(inset, null, null, disableAnimation: true);
+            }
+
+            this.UpdateFormScrollButtons();
+        }
+
+        private void OnFormViewChanged(object sender, ScrollViewerViewChangedEventArgs args) {
+            this.UpdateFormScrollButtons();
+        }
+
+        private void UpdateFormScrollButtons() {
+            var offset = this.FormScrollViewer.HorizontalOffset;
+            var maximum = this.FormScrollViewer.ScrollableWidth;
+            this.FormScrollButtons.Visibility = maximum > ScrollTolerance ? Visibility.Visible : Visibility.Collapsed;
+            this.ScrollFormLeft.IsEnabled = offset > ScrollTolerance;
+            this.ScrollFormRight.IsEnabled = maximum - offset > ScrollTolerance;
+        }
+
+        private void OnScrollFormLeft(object sender, RoutedEventArgs args) => this.ScrollForm(towardRight: false);
+
+        private void OnScrollFormRight(object sender, RoutedEventArgs args) => this.ScrollForm(towardRight: true);
+
+        private void ScrollForm(bool towardRight) {
+            var offset = this.FormScrollViewer.HorizontalOffset - this.defaultFormOffset;
+            var step = towardRight
+                ? Math.Floor((offset + ScrollTolerance) / FormScrollStep) + 1
+                : Math.Ceiling((offset - ScrollTolerance) / FormScrollStep) - 1;
+            var target = this.defaultFormOffset + step * FormScrollStep;
+            target = Math.Clamp(target, 0, this.FormScrollViewer.ScrollableWidth);
+            this.FormScrollViewer.ChangeView(target, null, null, disableAnimation: true);
         }
 
         private void OnCandidateSelected(string candidateId) {

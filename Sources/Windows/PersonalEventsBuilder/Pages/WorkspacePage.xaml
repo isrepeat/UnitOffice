@@ -25,47 +25,75 @@
                DragDelta="OnPreviewDragDelta"
                KeyDown="OnPreviewResizeKeyDown" />
 
-        <ScrollViewer Grid.Row="2"
-                      Background="#202020"
-                      HorizontalScrollBarVisibility="Auto"
-                      HorizontalScrollMode="Enabled"
-                      SizeChanged="OnWorkspaceSizeChanged">
-            <Grid x:Name="WorkspaceSurface"
-                  MinWidth="1100"
-                  Padding="6"
-                  RowSpacing="5"
-                  ColumnSpacing="5">
+        <Grid Grid.Row="2"
+              Padding="6"
+              RowSpacing="5"
+              ColumnSpacing="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="156" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid ColumnSpacing="4">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="156" />
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="92" />
+                    <ColumnDefinition Width="2.2*" />
                 </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
 
-                <Grid ColumnSpacing="4">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*" />
-                        <ColumnDefinition Width="92" />
-                        <ColumnDefinition Width="2.2*" />
-                    </Grid.ColumnDefinitions>
-
-                    <zones:ModeSelectorZone x:Name="ModeSelector" />
-                    <zones:NewEventZone x:Name="NewEvent"
-                                        Grid.Column="1" />
-                    <zones:WordPreviewZone Grid.Column="2" />
-                </Grid>
-
-                <zones:EventFormZone x:Name="EventForm"
-                                     Grid.Row="1" />
-                <zones:CandidatesZone x:Name="Candidates"
-                                      Grid.Row="2" />
-                <zones:WorkspaceActionsZone x:Name="WorkspaceActions"
-                                            Grid.Column="1"
-                                            Grid.RowSpan="3" />
+                <zones:ModeSelectorZone x:Name="ModeSelector" />
+                <zones:NewEventZone x:Name="NewEvent"
+                                    Grid.Column="1" />
+                <zones:WordPreviewZone Grid.Column="2" />
             </Grid>
-        </ScrollViewer>
+
+            <Grid Grid.Row="1"
+                  LayoutUpdated="OnFormLayoutUpdated">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <ScrollViewer x:Name="FormScrollViewer"
+                              HorizontalScrollBarVisibility="Hidden"
+                              HorizontalScrollMode="Enabled"
+                              VerticalScrollBarVisibility="Disabled"
+                              VerticalScrollMode="Disabled"
+                              ViewChanged="OnFormViewChanged">
+                    <Grid x:Name="FormSurface"
+                          RowSpacing="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <zones:EventFormZone x:Name="EventForm" />
+                        <zones:CandidatesZone x:Name="Candidates"
+                                              Grid.Row="1" />
+                    </Grid>
+                </ScrollViewer>
+                <StackPanel x:Name="FormScrollButtons"
+                            Grid.Row="1"
+                            Margin="0,4,0,0"
+                            HorizontalAlignment="Right"
+                            Orientation="Horizontal"
+                            Spacing="4"
+                            Visibility="Collapsed">
+                    <Button x:Name="ScrollFormLeft"
+                            Content="&#x2190;"
+                            AllowFocusOnInteraction="False"
+                            Click="OnScrollFormLeft" />
+                    <Button x:Name="ScrollFormRight"
+                            Content="&#x2192;"
+                            AllowFocusOnInteraction="False"
+                            Click="OnScrollFormRight" />
+                </StackPanel>
+            </Grid>
+            <zones:WorkspaceActionsZone x:Name="WorkspaceActions"
+                                        Grid.Column="1"
+                                        Grid.RowSpan="2" />
+        </Grid>
     </Grid>
 </Page>

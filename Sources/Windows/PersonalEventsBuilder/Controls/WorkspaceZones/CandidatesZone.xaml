@@ -3,13 +3,26 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:PersonalEventsBuilder.Controls">
     <Border Style="{StaticResource PanelBorder}">
-        <StackPanel Spacing="3">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             <TextBlock x:Uid="Tr_CandidatesHeading"
+                       Margin="0,0,0,4"
                        Style="{StaticResource PanelHeading}" />
-            <controls:CandidateRowView Background="{StaticResource InsetBrush}"
+            <controls:CandidateRowView x:Name="CandidateHeader"
+                                       Grid.Row="1"
+                                       Background="{StaticResource CandidateHeaderBrush}"
                                        DataContext="{Binding CandidateHeadings}" />
-            <ListView MaxHeight="260"
+            <ListView x:Name="CandidateList"
+                      Grid.Row="2"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      ScrollViewer.HorizontalScrollMode="Disabled"
                       ItemsSource="{Binding CandidateRows}"
+                      ContainerContentChanging="OnCandidateContainerContentChanging"
                       SelectionChanged="OnCandidateSelected">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
@@ -18,7 +31,7 @@
                         <Setter Property="Padding"
                                 Value="0" />
                         <Setter Property="MinHeight"
-                                Value="24" />
+                                Value="26" />
                     </Style>
                 </ListView.ItemContainerStyle>
                 <ListView.ItemTemplate>
@@ -27,10 +40,11 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <TextBlock Margin="6,4"
+            <TextBlock Grid.Row="3"
+                       Margin="6,4"
                        Opacity="0.75"
                        FontSize="12"
                        Text="{Binding CandidateStatus}" />
-        </StackPanel>
+        </Grid>
     </Border>
 </UserControl>
