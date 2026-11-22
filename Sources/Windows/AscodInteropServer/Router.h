@@ -139,6 +139,13 @@ namespace unitoffice::windows::httppingserver {
 				}
 				return {200, this->chatService.ReadAfter(*after, recipient), "application/json; charset=utf-8"};
 			}
+			if (request.Verb == HttpVerbDELETE) {
+				if (details::Header(request, "X-Chat-Sender") != "local") {
+					return HttpResponse::Error(403);
+				}
+				this->chatService.Clear();
+				return {200, "{}", "application/json; charset=utf-8"};
+			}
 			if (request.Verb != HttpVerbPOST) {
 				return HttpResponse::Error(405);
 			}

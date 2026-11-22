@@ -16,6 +16,7 @@
 			<div class="connection-actions">
 				<p id="status" class="status" data-state="idle" role="status">Ожидает подключения</p>
 				<button id="disconnect" type="button" hidden>Отключиться</button>
+				<button id="clear-chat" type="button" hidden disabled>Очистить чат</button>
 			</div>
 		</header>
 		<form id="connect" class="connect">
@@ -50,6 +51,16 @@
 			<p id="send-error" class="send-error" role="status" hidden></p>
 		</form>
 	</main>
+	<dialog id="viewer" aria-label="Просмотр изображений">
+		<div class="viewer-bar">
+			<button id="previous-image" aria-label="Предыдущее изображение">←</button>
+			<span id="viewer-caption" aria-live="polite"></span>
+			<button id="next-image" aria-label="Следующее изображение">→</button>
+			<button id="zoom-image">100%</button>
+			<button id="close-viewer" autofocus aria-label="Закрыть">×</button>
+		</div>
+		<div id="viewer-stage"><img id="viewer-image" alt=""></div>
+	</dialog>
 	<script src="Chat.js"></script>
 </body>
 </html>

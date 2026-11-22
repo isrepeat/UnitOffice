@@ -79,6 +79,14 @@ namespace unitoffice::windows::httppingserver {
 			return true;
 		}
 
+		void Clear() {
+			messages.clear();
+			storedBytes = 0;
+			localAcknowledged = 0;
+			sedoAcknowledged = 0;
+			clearedThrough = nextId++;
+		}
+
 		void Acknowledge(std::string_view recipient, std::uint64_t after) {
 			if (after >= nextId) {
 				return;
@@ -90,6 +98,7 @@ namespace unitoffice::windows::httppingserver {
 		std::string ReadAfter(std::uint64_t after, std::string_view recipient) const {
 			const auto peerAcknowledged = recipient == "local" ? sedoAcknowledged : localAcknowledged;
 			std::string body = "{\"latest\":" + std::to_string(nextId - 1) +
+				",\"clearedThrough\":" + std::to_string(clearedThrough) +
 				",\"peerAcknowledged\":" + std::to_string(peerAcknowledged) + ",\"messages\":[";
 			bool first = true;
 			for (const auto& message : messages) {
@@ -128,6 +137,7 @@ namespace unitoffice::windows::httppingserver {
 		static constexpr std::size_t maxStoredBytes = 96 * 1024 * 1024;
 		std::deque<Message> messages;
 		std::uint64_t nextId = 1;
+		std::uint64_t clearedThrough = 0;
 		std::uint64_t localAcknowledged = 0;
 		std::uint64_t sedoAcknowledged = 0;
 		std::size_t storedBytes = 0;

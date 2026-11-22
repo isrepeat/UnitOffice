@@ -196,11 +196,63 @@ function appendImageGallery(item, images) {
 		image.className = 'message-image';
 		image.alt = attachment.name;
 		image.src = 'data:' + attachment.mime + ';base64,' + attachment.data;
-		tile.append(image, makeImageActions(image, attachment));
+		const open = document.createElement('button');
+		open.type = 'button';
+		open.className = 'open-image';
+		open.setAttribute('aria-label', 'Открыть ' + attachment.name);
+		open.append(image);
+		open.onclick = () => {
+			viewerImages = Array.from($('messages').querySelectorAll('.message-image'));
+			showViewerImage(viewerImages.indexOf(image));
+			$('viewer').showModal();
+		};
+		tile.append(open, makeImageActions(image, attachment));
 		gallery.append(tile);
 	}
 	item.append(gallery);
 }
+
+let viewerImages = [];
+let viewerIndex = 0;
+
+function zoomImage(original) {
+	$('viewer-stage').classList.toggle('original-size', original);
+	$('zoom-image').textContent = original ? 'Вписать' : '100%';
+}
+
+function showViewerImage(index) {
+	if (index < 0 || index >= viewerImages.length) return;
+	viewerIndex = index;
+	const source = viewerImages[index];
+	$('viewer-image').src = source.src;
+	$('viewer-image').alt = source.alt;
+	$('viewer-caption').textContent = (index + 1) + ' / ' + viewerImages.length + ' · ' + source.alt;
+	$('previous-image').disabled = index === 0;
+	$('next-image').disabled = index === viewerImages.length - 1;
+	zoomImage(false);
+	$('viewer-stage').scrollTo(0, 0);
+}
+
+$('previous-image').onclick = () => showViewerImage(viewerIndex - 1);
+$('next-image').onclick = () => showViewerImage(viewerIndex + 1);
+$('close-viewer').onclick = () => $('viewer').close();
+$('zoom-image').onclick = () => zoomImage(!$('viewer-stage').classList.contains('original-size'));
+$('viewer-stage').addEventListener('wheel', event => {
+	if (event.ctrlKey || !event.deltaY) return;
+	const original = event.deltaY < 0;
+	if (original === $('viewer-stage').classList.contains('original-size')) return;
+	event.preventDefault();
+	zoomImage(original);
+}, {passive: false});
+$('viewer').addEventListener('keydown', event => {
+	if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+	event.preventDefault();
+	showViewerImage(viewerIndex + (event.key === 'ArrowLeft' ? -1 : 1));
+});
+$('viewer').addEventListener('close', () => {
+	viewerImages = [];
+	$('viewer-image').removeAttribute('src');
+});
 
 function makeAttachmentZip(attachments) {
 	const crcTable = Uint32Array.from({length: 256}, (_, value) => {
@@ -390,7 +442,7 @@ function appendMessage(message, peerAcknowledged = null) {
 			attachments.push(attachment);
 		}
 	}
-	const thumbnails = attachments.filter(attachment => attachment.mime).slice(0, 4);
+	const thumbnails = attachments.filter(attachment => attachment.mime);
 	if (thumbnails.length) {
 		appendImageGallery(item, thumbnails);
 	}
@@ -487,13 +539,16 @@ async function poll(signal) {
 		const followLatest = history.scrollHeight - history.scrollTop - history.clientHeight < 48;
 		const historyGap = cursor > 0 && data.messages.length > 0 && data.messages[0].id > cursor + 1;
 
-		if (data.latest < cursor) {
-			cursor = 0;
+		if (data.latest < cursor || data.clearedThrough > cursor) {
+			if ($('viewer').open) $('viewer').close();
+			const restarted = data.latest < cursor;
+			cursor = data.clearedThrough || 0;
 			messageTextObserver.disconnect();
 			$('messages').replaceChildren();
+			cancelClearCountdown();
 			$('empty').hidden = false;
 			setStatus('online', 'Подключено · история сброшена');
-			return;
+			if (restarted) return;
 		}
 
 		for (const message of data.messages) {
@@ -518,6 +573,7 @@ async function poll(signal) {
 		}
 
 		$('empty').hidden = $('messages').children.length > 0;
+		updateClearButton();
 		if (followLatest && data.messages.length > 0) {
 			history.scrollTop = history.scrollHeight;
 		}
@@ -592,6 +648,7 @@ async function connect(accessKey) {
 	$('key').value = '';
 	$('connect').hidden = true;
 	$('disconnect').hidden = false;
+	$('clear-chat').hidden = location.pathname !== '/local';
 	$('text').disabled = false;
 	$('submit').disabled = false;
 	$('text').focus();
@@ -617,9 +674,11 @@ $('disconnect').onclick = () => {
 	cursor = 0;
 	messageTextObserver.disconnect();
 	$('messages').replaceChildren();
+	cancelClearCountdown();
 	$('empty').hidden = false;
 	$('send-error').hidden = true;
 	$('disconnect').hidden = true;
+	$('clear-chat').hidden = true;
 	$('connect').hidden = false;
 	$('connect').querySelector('button').disabled = false;
 	$('text').disabled = true;
@@ -641,6 +700,53 @@ function clearAttachment() {
 }
 
 $('remove-image').onclick = clearAttachment;
+let clearTimer;
+let clearing = false;
+
+function updateClearButton() {
+	$('clear-chat').disabled = clearing || !$('messages').childElementCount;
+}
+
+function cancelClearCountdown() {
+	$('clear-chat').classList.remove('countdown');
+	clearTimeout(clearTimer);
+	clearTimer = undefined;
+	$('clear-chat').textContent = 'Очистить чат';
+	updateClearButton();
+}
+
+async function clearChat() {
+	clearing = true;
+	cancelClearCountdown();
+	try {
+		await request('/messages', {method: 'DELETE'});
+	} catch (error) {
+		$('send-error').textContent = 'Не удалось подтвердить очистку чата: ' + error.message;
+		$('send-error').hidden = false;
+	} finally {
+		clearing = false;
+		updateClearButton();
+	}
+}
+
+$('clear-chat').onclick = () => {
+	if (clearTimer !== undefined) {
+		cancelClearCountdown();
+		return;
+	}
+	const deadline = performance.now() + 2000;
+	$('clear-chat').classList.add('countdown');
+	function tick() {
+		const remaining = Math.ceil(deadline - performance.now());
+		if (remaining <= 0) {
+			void clearChat();
+			return;
+		}
+		$('clear-chat').textContent = 'Отмена · ' + remaining + ' мс';
+		clearTimer = setTimeout(tick, Math.min(50, remaining));
+	}
+	tick();
+};
 $('text').addEventListener('keydown', event => {
 	if (event.key !== 'Enter' || event.isComposing || event.keyCode === 229) {
 		return;
