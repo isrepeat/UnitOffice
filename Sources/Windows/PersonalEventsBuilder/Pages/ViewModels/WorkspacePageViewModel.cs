@@ -5,7 +5,7 @@ using System.ComponentModel;
 namespace PersonalEventsBuilder.Pages.ViewModels {
     public sealed record CandidateDisplayRow(string Id, string[] Cells);
 
-    internal sealed class WorkspacePageViewModel : INotifyPropertyChanged {
+    public sealed class WorkspacePageViewModel : INotifyPropertyChanged {
         private readonly Workspace.IWorkspaceSource workspaceSource;
         private Workspace.EventMode? eventMode;
 
@@ -32,6 +32,9 @@ namespace PersonalEventsBuilder.Pages.ViewModels {
         public Workspace.ModeGroup[] ModeGroups { get; }
         public Workspace.ModeWorkspace? Current { get; private set; }
         public bool CanStartNewEvent => this.eventMode is not null;
+        public Workspace.FormField[] LeftForm { get; private set; } = [];
+        public Workspace.FormField[] CenterForm { get; private set; } = [];
+        public Workspace.FormField[] RightForm { get; private set; } = [];
         public string Preview => this.Current?.Preview ?? Localization.UiStrings.Get("Tr_ChooseMode");
         public string Status { get; private set; } = Localization.UiStrings.Get("Tr_Ready");
         public IReadOnlyList<Workspace.WorkspaceAction>? Actions => this.Current?.Actions;
@@ -56,6 +59,9 @@ namespace PersonalEventsBuilder.Pages.ViewModels {
 
         private void LoadMode(Workspace.EventMode eventMode) {
             var modeWorkspace = this.workspaceSource.OpenMode(eventMode.Id);
+            this.LeftForm = CreateSideFields(modeWorkspace.Extensions, Workspace.FieldPlacement.Left);
+            this.CenterForm = CreateCenterFields(modeWorkspace.CoreFields);
+            this.RightForm = CreateSideFields(modeWorkspace.Extensions, Workspace.FieldPlacement.Right);
             var columns = modeWorkspace.Candidates.Columns;
             this.CandidateHeadings = columns.Select(column => column.Title).ToArray();
             this.CandidateRows = modeWorkspace.Candidates.Rows.Select(row => new CandidateDisplayRow(
@@ -66,6 +72,42 @@ namespace PersonalEventsBuilder.Pages.ViewModels {
             this.Status = Localization.UiStrings.Get("Tr_Ready");
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
         }
+
+        private static Workspace.FormField[] CreateCenterFields(IReadOnlyList<Workspace.CoreFieldState> states) {
+            var byField = states.ToDictionary(state => state.Field);
+            return [
+                Create(Workspace.CoreField.Person, "Tr_FieldPerson", Workspace.FieldKind.Text, 1.5),
+                Create(Workspace.CoreField.Reporter, "Tr_FieldReporter", Workspace.FieldKind.Text, 1.4),
+                Create(Workspace.CoreField.Rank, "Tr_FieldRank", Workspace.FieldKind.Text, 1),
+                Create(Workspace.CoreField.IncomingNumber, "Tr_FieldIncomingNumber", Workspace.FieldKind.Text, 0.7),
+                Create(Workspace.CoreField.IncomingDate, "Tr_FieldIncomingDate", Workspace.FieldKind.Date, 1.08),
+                Create(Workspace.CoreField.DocumentType, "Tr_FieldDocument", Workspace.FieldKind.Choice, 1),
+                Create(Workspace.CoreField.DocumentNumber, "Tr_FieldDocumentNumber", Workspace.FieldKind.Text, 1),
+                Create(Workspace.CoreField.EventDate, "Tr_FieldEventDate", Workspace.FieldKind.Date, 1.08),
+            ];
+
+            Workspace.FormField Create(Workspace.CoreField field, string titleKey, Workspace.FieldKind kind, double width) {
+                byField.TryGetValue(field, out var state);
+                return new Workspace.FormField(
+                    field.ToString(),
+                    Localization.UiStrings.Get(titleKey),
+                    kind,
+                    field,
+                    width,
+                    state?.IsEnabled ?? true,
+                    state?.InitialValue,
+                    state?.Options
+                );
+            }
+        }
+
+        private static Workspace.FormField[] CreateSideFields(
+            IReadOnlyList<Workspace.ExtensionField> extensions,
+            Workspace.FieldPlacement placement
+        ) => extensions.Where(field => field.Placement == placement)
+            .Select(field => new Workspace.FormField(
+                field.Id, field.Title, field.Kind, IsEnabled: field.IsEnabled, InitialValue: field.InitialValue, Options: field.Options
+            )).ToArray();
 
         public IReadOnlyDictionary<Workspace.CoreField, Workspace.FieldValue> ApplyCandidate(string candidateId, Workspace.FormValues values) =>
             this.eventMode is { } mode

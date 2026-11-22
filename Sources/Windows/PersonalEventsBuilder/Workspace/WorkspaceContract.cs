@@ -38,6 +38,9 @@ namespace PersonalEventsBuilder.Workspace {
 
     public sealed record FieldValue(string? Text = null, DateTimeOffset? Date = null, bool? Checked = null);
 
+    public sealed record FormField(string Id, string Title, FieldKind Kind, CoreField? CoreField = null,
+        double Width = 1, bool IsEnabled = true, FieldValue? InitialValue = null, IReadOnlyList<string>? Options = null);
+
     public sealed record CoreFieldState(CoreField Field, bool IsEnabled = true, FieldValue? InitialValue = null, IReadOnlyList<string>? Options = null);
 
     public sealed record ExtensionField(string Id, string Title, FieldKind Kind, FieldPlacement Placement,

@@ -1,7 +1,8 @@
 <Page x:Class="PersonalEventsBuilder.Pages.WorkspacePage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:controls="using:PersonalEventsBuilder.Controls"
+      xmlns:zones="using:PersonalEventsBuilder.Controls.WorkspaceZones"
+      DataContext="{x:Bind ViewModel}"
       NavigationCacheMode="Required">
     <Grid Background="#202020">
         <Grid.RowDefinitions>
@@ -10,126 +11,30 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <ScrollViewer x:Name="ActiveFieldPreview" Height="24" Margin="6,5,6,0"
-                      HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto"
-                      Background="#262626">
-            <TextBlock x:Name="ActiveFieldPreviewText" Margin="10,3" FontSize="12" TextWrapping="Wrap"
-                       IsTextSelectionEnabled="True" />
-        </ScrollViewer>
-        <Thumb x:Name="PreviewResizeHandle" Grid.Row="1" Height="8" Margin="6,0"
-               IsTabStop="True" UseSystemFocusVisuals="True"
-               PointerEntered="OnPreviewResizePointerEntered" PointerExited="OnPreviewResizePointerExited"
-               DragDelta="OnPreviewDragDelta" KeyDown="OnPreviewResizeKeyDown">
-            <Thumb.Template>
-                <ControlTemplate TargetType="Thumb">
-                    <Grid Background="Transparent">
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="CommonStates">
-                                <VisualState x:Name="Normal" />
-                                <VisualState x:Name="PointerOver">
-                                    <VisualState.Setters>
-                                        <Setter Target="ResizeLine.Background" Value="#909090" />
-                                        <Setter Target="ResizeLine.Height" Value="2" />
-                                    </VisualState.Setters>
-                                </VisualState>
-                                <VisualState x:Name="Pressed">
-                                    <VisualState.Setters>
-                                        <Setter Target="ResizeLine.Background" Value="#909090" />
-                                        <Setter Target="ResizeLine.Height" Value="2" />
-                                    </VisualState.Setters>
-                                </VisualState>
-                            </VisualStateGroup>
-                        </VisualStateManager.VisualStateGroups>
-                        <Border x:Name="ResizeLine" Height="1" Background="#515151" VerticalAlignment="Center" />
-                    </Grid>
-                </ControlTemplate>
-            </Thumb.Template>
-        </Thumb>
+        <zones:ActiveFieldPreviewZone x:Name="ActiveFieldPreview"
+                                      Height="24"
+                                      Margin="6,5,6,0" />
 
-        <ScrollViewer Grid.Row="2" SizeChanged="OnWorkspaceSizeChanged"
+        <Thumb x:Name="PreviewResizeHandle"
+               Grid.Row="1"
+               Height="8"
+               Margin="6,0"
+               Style="{StaticResource WorkspaceResizeHandle}"
+               PointerEntered="OnPreviewResizePointerEntered"
+               PointerExited="OnPreviewResizePointerExited"
+               DragDelta="OnPreviewDragDelta"
+               KeyDown="OnPreviewResizeKeyDown" />
+
+        <ScrollViewer Grid.Row="2"
+                      Background="#202020"
                       HorizontalScrollBarVisibility="Auto"
                       HorizontalScrollMode="Enabled"
-                      Background="#202020">
-            <Grid x:Name="WorkspaceSurface" MinWidth="1100" Padding="6" ColumnSpacing="5" RowSpacing="5">
-                <Grid.Resources>
-                    <SolidColorBrush x:Key="PanelBrush" Color="#282828" />
-                    <SolidColorBrush x:Key="OutlineBrush" Color="#515151" />
-                    <SolidColorBrush x:Key="InsetBrush" Color="#1D1D1D" />
-                    <SolidColorBrush x:Key="AmberBrush" Color="#F3AF61" />
-                    <Style x:Key="PanelBorder" TargetType="Border">
-                        <Setter Property="Background" Value="{StaticResource PanelBrush}" />
-                        <Setter Property="BorderBrush" Value="{StaticResource OutlineBrush}" />
-                        <Setter Property="BorderThickness" Value="1" />
-                        <Setter Property="Padding" Value="7" />
-                    </Style>
-                    <Style x:Key="PanelHeading" TargetType="TextBlock">
-                        <Setter Property="FontSize" Value="14" />
-                        <Setter Property="FontWeight" Value="SemiBold" />
-                        <Setter Property="Margin" Value="0,0,0,3" />
-                    </Style>
-                    <Style x:Key="ModeButton" TargetType="RadioButton">
-                        <Setter Property="Foreground" Value="{StaticResource AmberBrush}" />
-                        <Setter Property="HorizontalAlignment" Value="Stretch" />
-                        <Setter Property="UseSystemFocusVisuals" Value="True" />
-                        <Setter Property="MinHeight" Value="34.2" />
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="RadioButton">
-                                    <Grid x:Name="ModeRoot" MinHeight="{TemplateBinding MinHeight}" Background="Transparent">
-                                        <VisualStateManager.VisualStateGroups>
-                                            <VisualStateGroup x:Name="CommonStates">
-                                                <VisualState x:Name="Normal" />
-                                                <VisualState x:Name="PointerOver">
-                                                    <VisualState.Setters>
-                                                        <Setter Target="HoverLayer.Opacity" Value="1" />
-                                                    </VisualState.Setters>
-                                                </VisualState>
-                                                <VisualState x:Name="Pressed">
-                                                    <VisualState.Setters>
-                                                        <Setter Target="HoverLayer.Opacity" Value="1" />
-                                                    </VisualState.Setters>
-                                                </VisualState>
-                                                <VisualState x:Name="Disabled">
-                                                    <VisualState.Setters>
-                                                        <Setter Target="ModeRoot.Opacity" Value="0.45" />
-                                                    </VisualState.Setters>
-                                                </VisualState>
-                                            </VisualStateGroup>
-                                            <VisualStateGroup x:Name="CheckStates">
-                                                <VisualState x:Name="Unchecked" />
-                                                <VisualState x:Name="Checked">
-                                                    <VisualState.Setters>
-                                                        <Setter Target="SelectionLayer.Opacity" Value="1" />
-                                                    </VisualState.Setters>
-                                                </VisualState>
-                                                <VisualState x:Name="Indeterminate" />
-                                            </VisualStateGroup>
-                                        </VisualStateManager.VisualStateGroups>
-                                        <Grid Margin="0,1,0,2">
-                                            <Border Background="#383838" BorderBrush="#202020" BorderThickness="1" />
-                                            <Border x:Name="HoverLayer" Background="#474747" Opacity="0" />
-                                            <Border x:Name="SelectionLayer" Background="#4E3C28" BorderBrush="{StaticResource AmberBrush}"
-                                                    BorderThickness="1" Opacity="0" />
-                                            <ContentPresenter Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}"
-                                                              FontSize="11" Margin="8,2" VerticalAlignment="Center" />
-                                        </Grid>
-                                    </Grid>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                    <Style x:Key="ActionButton" TargetType="Button">
-                        <Setter Property="Foreground" Value="{StaticResource AmberBrush}" />
-                        <Setter Property="Background" Value="{StaticResource InsetBrush}" />
-                        <Setter Property="BorderBrush" Value="{StaticResource AmberBrush}" />
-                        <Setter Property="BorderThickness" Value="1" />
-                        <Setter Property="CornerRadius" Value="0" />
-                        <Setter Property="HorizontalAlignment" Value="Stretch" />
-                        <Setter Property="Padding" Value="5,4" />
-                        <Setter Property="FontSize" Value="12" />
-                    </Style>
-                </Grid.Resources>
-
+                      SizeChanged="OnWorkspaceSizeChanged">
+            <Grid x:Name="WorkspaceSurface"
+                  MinWidth="1100"
+                  Padding="6"
+                  RowSpacing="5"
+                  ColumnSpacing="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="156" />
@@ -146,127 +51,20 @@
                         <ColumnDefinition Width="92" />
                         <ColumnDefinition Width="2.2*" />
                     </Grid.ColumnDefinitions>
-                    <ItemsControl ItemsSource="{x:Bind ViewModel.ModeGroups}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <controls:EqualWidthColumnsPanel />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Style="{StaticResource PanelBorder}">
-                                    <StackPanel Spacing="3">
-                                        <TextBlock Text="{Binding Title}" Style="{StaticResource PanelHeading}" />
-                                        <ItemsControl ItemsSource="{Binding Modes}">
-                                            <ItemsControl.ItemsPanel>
-                                                <ItemsPanelTemplate>
-                                                        <StackPanel />
-                                                </ItemsPanelTemplate>
-                                            </ItemsControl.ItemsPanel>
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <RadioButton Content="{Binding Title}" Tag="{Binding}"
-                                                                 IsChecked="{Binding IsDefault, Mode=OneTime}"
-                                                                 GroupName="EventMode" Checked="OnModeChecked"
-                                                                 Style="{StaticResource ModeButton}" />
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
 
-                    <Border Grid.Column="1" Style="{StaticResource PanelBorder}" Padding="2">
-                        <Button MinHeight="60" HorizontalAlignment="Stretch" VerticalAlignment="Top"
-                                Background="#303030" BorderBrush="#414141" BorderThickness="1"
-                                Foreground="#D0D0D0" CornerRadius="0" Padding="3"
-                                AutomationProperties.LabeledBy="{Binding ElementName=NewEventLabel}"
-                                IsEnabled="{x:Bind ViewModel.CanStartNewEvent, Mode=OneWay}" Click="OnNewEventClick">
-                            <Button.Resources>
-                                <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#484848" />
-                                <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#696969" />
-                                <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#3B3B3B" />
-                                <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#5A5A5A" />
-                            </Button.Resources>
-                            <StackPanel Spacing="4">
-                                <FontIcon Glyph="&#xE72C;" FontSize="12" HorizontalAlignment="Center" />
-                                <TextBlock x:Name="NewEventLabel" x:Uid="Tr_NewEventLabel" FontSize="11"
-                                           TextAlignment="Center" TextWrapping="Wrap" />
-                            </StackPanel>
-                        </Button>
-                    </Border>
-
-                    <Border Grid.Column="2" Style="{StaticResource PanelBorder}">
-                        <Grid RowSpacing="3">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                            <TextBlock x:Uid="Tr_WordPreviewHeading" Style="{StaticResource PanelHeading}" />
-                            <Border Grid.Row="1" Background="{StaticResource InsetBrush}"
-                                    BorderBrush="{StaticResource OutlineBrush}" BorderThickness="1" Padding="10">
-                                <TextBlock FontSize="13" TextWrapping="Wrap" Text="{x:Bind ViewModel.Preview, Mode=OneWay}" />
-                            </Border>
-                        </Grid>
-                    </Border>
+                    <zones:ModeSelectorZone x:Name="ModeSelector" />
+                    <zones:NewEventZone x:Name="NewEvent"
+                                        Grid.Column="1" />
+                    <zones:WordPreviewZone Grid.Column="2" />
                 </Grid>
 
-                <Border Grid.Row="1" Style="{StaticResource PanelBorder}">
-                    <StackPanel Spacing="3">
-                        <TextBlock x:Uid="Tr_EventDetailsHeading" Style="{StaticResource PanelHeading}" />
-                        <controls:EventFormView x:Name="EventForm" />
-                    </StackPanel>
-                </Border>
-
-                <Border Grid.Row="2" Style="{StaticResource PanelBorder}">
-                    <StackPanel Spacing="3">
-                        <TextBlock x:Uid="Tr_CandidatesHeading" Style="{StaticResource PanelHeading}" />
-                        <controls:CandidateRowView DataContext="{x:Bind ViewModel.CandidateHeadings, Mode=OneWay}"
-                                                   Background="{StaticResource InsetBrush}" />
-                        <ListView ItemsSource="{x:Bind ViewModel.CandidateRows, Mode=OneWay}"
-                                  SelectionChanged="OnCandidateSelected" MaxHeight="260">
-                            <ListView.ItemContainerStyle>
-                                <Style TargetType="ListViewItem">
-                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                    <Setter Property="Padding" Value="0" />
-                                    <Setter Property="MinHeight" Value="24" />
-                                </Style>
-                            </ListView.ItemContainerStyle>
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <controls:CandidateRowView DataContext="{Binding Cells}" />
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                        <TextBlock Margin="6,4" FontSize="12" Opacity="0.75" Text="{x:Bind ViewModel.CandidateStatus, Mode=OneWay}" />
-                    </StackPanel>
-                </Border>
-
-                <Border Grid.Column="1" Grid.RowSpan="3" Style="{StaticResource PanelBorder}">
-                    <StackPanel Spacing="6">
-                        <TextBlock x:Uid="Tr_ActionsHeading" Style="{StaticResource PanelHeading}" />
-                        <ItemsControl ItemsSource="{x:Bind ViewModel.Actions, Mode=OneWay}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Spacing="6" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Button Content="{Binding Title}" Tag="{Binding Id}" IsEnabled="{Binding IsEnabled}"
-                                            Click="OnActionClick" Style="{StaticResource ActionButton}" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                        <Border Height="1" Background="#484848" Margin="0,3" />
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <Ellipse Width="7" Height="7" Fill="{StaticResource AmberBrush}" VerticalAlignment="Top" Margin="0,5,0,0" />
-                            <TextBlock Width="120" Text="{x:Bind ViewModel.Status, Mode=OneWay}" TextWrapping="Wrap" FontSize="12" />
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
+                <zones:EventFormZone x:Name="EventForm"
+                                     Grid.Row="1" />
+                <zones:CandidatesZone x:Name="Candidates"
+                                      Grid.Row="2" />
+                <zones:WorkspaceActionsZone x:Name="WorkspaceActions"
+                                            Grid.Column="1"
+                                            Grid.RowSpan="3" />
             </Grid>
         </ScrollViewer>
     </Grid>

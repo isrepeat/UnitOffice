@@ -36,16 +36,40 @@
   <ItemGroup>
     <ApplicationDefinition Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\App.xaml" Link="App.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\App.xaml.cs" Link="App.xaml.cs" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\CandidateRowView.cs" Link="Controls\CandidateRowView.cs" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\EqualWidthColumnsPanel.cs" Link="Controls\EqualWidthColumnsPanel.cs" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\EventFormView.cs" Link="Controls\EventFormView.cs" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WindowTitleBar.cs" Link="Controls\WindowTitleBar.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\CandidateRowView.xaml" Link="Controls\CandidateRowView.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\CandidateRowView.xaml.cs" Link="Controls\CandidateRowView.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\EqualWidthColumnsPanel.xaml" Link="Controls\EqualWidthColumnsPanel.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\EqualWidthColumnsPanel.xaml.cs" Link="Controls\EqualWidthColumnsPanel.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\Form.xaml" Link="Controls\Form.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\Form.xaml.cs" Link="Controls\Form.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\FormFieldEditor.xaml" Link="Controls\FormFieldEditor.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\FormFieldEditor.xaml.cs" Link="Controls\FormFieldEditor.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\NavigationMatrix.xaml" Link="Controls\NavigationMatrix.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\NavigationMatrix.xaml.cs" Link="Controls\NavigationMatrix.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WindowTitleBar.xaml" Link="Controls\WindowTitleBar.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WindowTitleBar.xaml.cs" Link="Controls\WindowTitleBar.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\ActiveFieldPreviewZone.xaml" Link="Controls\WorkspaceZones\ActiveFieldPreviewZone.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\ActiveFieldPreviewZone.xaml.cs" Link="Controls\WorkspaceZones\ActiveFieldPreviewZone.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\CandidatesZone.xaml" Link="Controls\WorkspaceZones\CandidatesZone.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\CandidatesZone.xaml.cs" Link="Controls\WorkspaceZones\CandidatesZone.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\EventFormZone.xaml" Link="Controls\WorkspaceZones\EventFormZone.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\EventFormZone.xaml.cs" Link="Controls\WorkspaceZones\EventFormZone.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\ModeSelectorZone.xaml" Link="Controls\WorkspaceZones\ModeSelectorZone.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\ModeSelectorZone.xaml.cs" Link="Controls\WorkspaceZones\ModeSelectorZone.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\NewEventZone.xaml" Link="Controls\WorkspaceZones\NewEventZone.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\NewEventZone.xaml.cs" Link="Controls\WorkspaceZones\NewEventZone.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WordPreviewZone.xaml" Link="Controls\WorkspaceZones\WordPreviewZone.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WordPreviewZone.xaml.cs" Link="Controls\WorkspaceZones\WordPreviewZone.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WorkspaceActionsZone.xaml" Link="Controls\WorkspaceZones\WorkspaceActionsZone.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WorkspaceActionsZone.xaml.cs" Link="Controls\WorkspaceZones\WorkspaceActionsZone.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WorkspaceResources.xaml" Link="Controls\WorkspaceZones\WorkspaceResources.xaml" />
     <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\Strings\ru-RU\Resources.resw" Link="Localization\Strings\ru-RU\Resources.resw" />
     <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\Strings\uk-UA\Resources.resw" Link="Localization\Strings\uk-UA\Resources.resw" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\UiLanguage.cs" Link="Localization\UiLanguage.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\UiStrings.cs" Link="Localization\UiStrings.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\MainWindow.xaml" Link="MainWindow.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\MainWindow.xaml.cs" Link="MainWindow.xaml.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Navigation\CellNavigation.cs" Link="Navigation\CellNavigation.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Navigation\PageManager.cs" Link="Navigation\PageManager.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Pages\SettingsPage.xaml" Link="Pages\SettingsPage.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Pages\SettingsPage.xaml.cs" Link="Pages\SettingsPage.xaml.cs" />

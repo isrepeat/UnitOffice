@@ -1,40 +1,19 @@
 <Window x:Class="PersonalEventsBuilder.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid RequestedTheme="Dark" Background="#202020">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:PersonalEventsBuilder.Controls">
+    <Grid Background="#202020"
+          RequestedTheme="Dark">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TitleBar x:Name="WorkspaceTitleBar" Background="#141414" Visibility="Collapsed"
-                  BackRequested="OnBackRequested">
-            <TitleBar.IconSource>
-                <FontIconSource Glyph="&#xE8A5;" Foreground="#F3AF61" />
-            </TitleBar.IconSource>
-            <TitleBar.Content>
-                <MenuBar HorizontalAlignment="Left" Background="Transparent">
-                    <MenuBarItem x:Uid="Tr_FileMenu">
-                        <MenuFlyoutItem x:Name="LoadDatabaseItem" x:Uid="Tr_LoadDatabaseMenu" Tag="load-database" Click="OnActionClick" />
-                        <MenuFlyoutItem x:Name="SaveEventItem" x:Uid="Tr_SaveEventMenu" Tag="save-event" Click="OnActionClick" />
-                        <MenuFlyoutSeparator />
-                        <MenuFlyoutItem x:Uid="Tr_CloseWindowMenu" Click="OnCloseWindowClick" />
-                    </MenuBarItem>
-                    <MenuBarItem x:Uid="Tr_ToolsMenu">
-                        <MenuFlyoutItem x:Name="ReloadConfigurationItem" x:Uid="Tr_ReloadConfigurationMenu"
-                                        Tag="reload-configuration" Click="OnActionClick" />
-                        <MenuFlyoutItem x:Name="SettingsItem" x:Uid="Tr_SettingsMenu" Click="OnSettingsClick" />
-                    </MenuBarItem>
-                    <MenuBarItem x:Uid="Tr_LanguageMenu">
-                        <RadioMenuFlyoutItem x:Name="UkrainianLanguageItem" x:Uid="Tr_UkrainianLanguage"
-                                             GroupName="UiLanguage" Tag="uk-UA" Click="OnLanguageClick" />
-                        <RadioMenuFlyoutItem x:Name="RussianLanguageItem" x:Uid="Tr_RussianLanguage"
-                                             GroupName="UiLanguage" Tag="ru-RU" Click="OnLanguageClick" />
-                    </MenuBarItem>
-                </MenuBar>
-            </TitleBar.Content>
-        </TitleBar>
+        <controls:WindowTitleBar x:Name="WorkspaceTitleBar"
+                                 Visibility="Collapsed" />
 
-        <Frame x:Name="PageFrame" Grid.Row="1" Navigated="OnPageNavigated" />
+        <Frame x:Name="PageFrame"
+               Grid.Row="1"
+               Navigated="OnPageNavigated" />
     </Grid>
 </Window>

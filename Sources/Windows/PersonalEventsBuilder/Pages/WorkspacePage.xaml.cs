@@ -23,20 +23,17 @@ namespace PersonalEventsBuilder.Pages {
             this.ViewModel = new ViewModels.WorkspacePageViewModel(workspaceSource);
             InitializeComponent();
             this.fieldPreviewHeight = this.ActiveFieldPreview.Height;
-            this.EventForm.ActiveFieldTextChanged += this.OnActiveFieldTextChanged;
+            this.EventForm.Matrix.ActiveFieldTextChanged += this.ActiveFieldPreview.SetText;
+            this.ModeSelector.ModeSelected += this.OnModeSelected;
+            this.NewEvent.NewEventRequested += this.ViewModel.StartNewEvent;
+            this.Candidates.CandidateSelected += this.OnCandidateSelected;
+            this.WorkspaceActions.ActionRequested += this.ExecuteAction;
             AutomationProperties.SetName(this.ActiveFieldPreview, Localization.UiStrings.Get("Tr_ActiveFieldPreview"));
             AutomationProperties.SetName(this.PreviewResizeHandle, Localization.UiStrings.Get("Tr_ResizeActiveFieldPreview"));
-            if (this.ViewModel.Current is { } modeWorkspace) {
-                this.EventForm.ApplyLayout(modeWorkspace);
-            }
         }
 
         internal void ExecuteAction(string actionId) {
-            this.ViewModel.ExecuteAction(actionId, this.EventForm.ReadValues());
-        }
-
-        private void OnActiveFieldTextChanged(string text) {
-            this.ActiveFieldPreviewText.Text = text;
+            this.ViewModel.ExecuteAction(actionId, this.EventForm.Matrix.ReadValues());
         }
 
         private void OnWorkspaceSizeChanged(object sender, SizeChangedEventArgs args) {
@@ -68,30 +65,13 @@ namespace PersonalEventsBuilder.Pages {
             this.ActiveFieldPreview.Visibility = this.fieldPreviewHeight > 0 ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        private void OnModeChecked(object sender, RoutedEventArgs args) {
-            if (this.EventForm is not null && sender is RadioButton { Tag: Workspace.EventMode eventMode }
-                && this.ViewModel.SelectMode(eventMode) && this.ViewModel.Current is { } modeWorkspace) {
-                this.EventForm.ApplyLayout(modeWorkspace);
-            }
+        private void OnModeSelected(Workspace.EventMode mode) {
+            this.ViewModel.SelectMode(mode);
         }
 
-        private void OnCandidateSelected(object sender, SelectionChangedEventArgs args) {
-            if (args.AddedItems.Count > 0 && args.AddedItems[0] is ViewModels.CandidateDisplayRow { Id: var candidateId }) {
-                this.EventForm.ApplyValues(this.ViewModel.ApplyCandidate(candidateId, this.EventForm.ReadValues()));
-            }
-        }
-
-        private void OnNewEventClick(object sender, RoutedEventArgs args) {
-            this.ViewModel.StartNewEvent();
-            if (this.ViewModel.Current is { } modeWorkspace) {
-                this.EventForm.ApplyLayout(modeWorkspace);
-            }
-        }
-
-        private void OnActionClick(object sender, RoutedEventArgs args) {
-            if (sender is Button { Tag: string actionId }) {
-                this.ExecuteAction(actionId);
-            }
+        private void OnCandidateSelected(string candidateId) {
+            var matrix = this.EventForm.Matrix;
+            matrix.ApplyValues(this.ViewModel.ApplyCandidate(candidateId, matrix.ReadValues()));
         }
     }
 }

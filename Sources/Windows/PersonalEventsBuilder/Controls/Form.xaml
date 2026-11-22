@@ -1,0 +1,10 @@
+<UserControl x:Class="PersonalEventsBuilder.Controls.Form"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="TextControlBorderBrushFocused"
+                         Color="#707070" />
+    </UserControl.Resources>
+    <Grid x:Name="FieldGrid"
+          ColumnSpacing="6" />
+</UserControl>

@@ -5,8 +5,12 @@ using Microsoft.UI.Xaml.Controls;
 using Windows.Foundation;
 
 namespace PersonalEventsBuilder.Controls {
-    public sealed class EqualWidthColumnsPanel : Panel {
+    public sealed partial class EqualWidthColumnsPanel : Panel {
         private const double ColumnSpacing = 4;
+
+        public EqualWidthColumnsPanel() {
+            InitializeComponent();
+        }
 
         protected override Size MeasureOverride(Size availableSize) {
             var children = this.Children;
