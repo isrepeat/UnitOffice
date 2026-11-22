@@ -43,7 +43,7 @@
   <data name="Tr_FieldIncomingNumber" xml:space="preserve"><value>Вх. №</value></data>
   <data name="Tr_FieldIncomingDate" xml:space="preserve"><value>Вх. дата</value></data>
   <data name="Tr_FieldEventDate" xml:space="preserve"><value>Дата події</value></data>
-  <data name="Tr_ChooseDate" xml:space="preserve"><value>Оберіть дату</value></data>
+  <data name="Tr_DateFormatHint" xml:space="preserve"><value>Формат дати: ДД.ММ.РРРР</value></data>
   <data name="Tr_CategoryArrival" xml:space="preserve"><value>Прибуття</value></data>
   <data name="Tr_CategoryDeparture" xml:space="preserve"><value>Вибуття</value></data>
   <data name="Tr_CategoryStatusChange" xml:space="preserve"><value>Зміна статусу</value></data>
@@ -73,4 +73,7 @@
   <data name="Tr_LanguageDismiss" xml:space="preserve"><value>Закрити</value></data>
   <data name="Tr_SettingsMenu.Text" xml:space="preserve"><value>Налаштування</value></data>
   <data name="Tr_SettingsHeading.Text" xml:space="preserve"><value>Налаштування</value></data>
+  <data name="Tr_NewEventLabel.Text" xml:space="preserve"><value>Нова подія</value></data>
+  <data name="Tr_ActiveFieldPreview" xml:space="preserve"><value>Текст активного поля</value></data>
+  <data name="Tr_ResizeActiveFieldPreview" xml:space="preserve"><value>Змінити висоту перегляду активного поля</value></data>
 </root>

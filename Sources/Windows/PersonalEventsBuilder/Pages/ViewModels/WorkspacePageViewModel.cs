@@ -31,6 +31,7 @@ namespace PersonalEventsBuilder.Pages.ViewModels {
 
         public Workspace.ModeGroup[] ModeGroups { get; }
         public Workspace.ModeWorkspace? Current { get; private set; }
+        public bool CanStartNewEvent => this.eventMode is not null;
         public string Preview => this.Current?.Preview ?? Localization.UiStrings.Get("Tr_ChooseMode");
         public string Status { get; private set; } = Localization.UiStrings.Get("Tr_Ready");
         public IReadOnlyList<Workspace.WorkspaceAction>? Actions => this.Current?.Actions;
@@ -43,6 +44,17 @@ namespace PersonalEventsBuilder.Pages.ViewModels {
                 return false;
             }
 
+            this.LoadMode(eventMode);
+            return true;
+        }
+
+        public void StartNewEvent() {
+            if (this.eventMode is { } mode) {
+                this.LoadMode(mode);
+            }
+        }
+
+        private void LoadMode(Workspace.EventMode eventMode) {
             var modeWorkspace = this.workspaceSource.OpenMode(eventMode.Id);
             var columns = modeWorkspace.Candidates.Columns;
             this.CandidateHeadings = columns.Select(column => column.Title).ToArray();
@@ -51,8 +63,8 @@ namespace PersonalEventsBuilder.Pages.ViewModels {
             )).ToArray();
             this.Current = modeWorkspace;
             this.eventMode = eventMode;
+            this.Status = Localization.UiStrings.Get("Tr_Ready");
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
-            return true;
         }
 
         public IReadOnlyDictionary<Workspace.CoreField, Workspace.FieldValue> ApplyCandidate(string candidateId, Workspace.FormValues values) =>

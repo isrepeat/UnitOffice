@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Globalization;
 using System.Collections.Generic;
 
 using Microsoft.UI.Xaml;
@@ -11,12 +12,17 @@ using Color = Windows.UI.Color;
 
 namespace PersonalEventsBuilder.Controls {
     public sealed class EventFormView : UserControl {
+        private sealed record FieldEditor(TextBox TextBox, Workspace.FieldKind Kind);
+
         private readonly Grid layout = new() { ColumnSpacing = 6 };
         private readonly Dictionary<Workspace.CoreField, StackPanel> columns = new();
-        private readonly Dictionary<Workspace.CoreField, Control> editors = new();
-        private readonly Dictionary<string, Control> extensionEditors = new(StringComparer.Ordinal);
+        private readonly Dictionary<Workspace.CoreField, FieldEditor> editors = new();
+        private readonly Dictionary<string, FieldEditor> extensionEditors = new(StringComparer.Ordinal);
         private readonly StackPanel left = new() { Spacing = 3 };
         private readonly StackPanel right = new() { Spacing = 3 };
+        private TextBox? activeEditor;
+
+        internal event Action<string>? ActiveFieldTextChanged;
 
         public EventFormView() {
             this.Content = this.layout;
@@ -33,6 +39,8 @@ namespace PersonalEventsBuilder.Controls {
         }
 
         public void ApplyLayout(Workspace.ModeWorkspace modeWorkspace) {
+            this.activeEditor = null;
+            this.ActiveFieldTextChanged?.Invoke("");
             this.left.Children.Clear();
             this.right.Children.Clear();
             this.extensionEditors.Clear();
@@ -56,7 +64,7 @@ namespace PersonalEventsBuilder.Controls {
                     _ => throw new ArgumentException("Invalid field placement.", nameof(modeWorkspace)),
                 };
 
-                var editor = AddEditor(column, extension.Title, extension.Kind);
+                var editor = this.AddEditor(column, extension.Title, extension.Kind);
                 Configure(editor, extension.IsEnabled, extension.InitialValue, extension.Options);
                 this.extensionEditors.Add(extension.Id, editor);
             }
@@ -76,7 +84,7 @@ namespace PersonalEventsBuilder.Controls {
             var column = new StackPanel { Spacing = 3 };
             this.AddColumn(column, new GridLength(width, GridUnitType.Star));
             this.columns.Add(field, column);
-            this.editors.Add(field, AddEditor(column, title, kind));
+            this.editors.Add(field, this.AddEditor(column, title, kind));
         }
 
         private void AddColumn(FrameworkElement column, GridLength width) {
@@ -104,50 +112,63 @@ namespace PersonalEventsBuilder.Controls {
             };
         }
 
-        private static Control AddEditor(StackPanel column, string title, Workspace.FieldKind kind) {
-            Control editor = kind switch {
-                Workspace.FieldKind.Text => new TextBox { Padding = new Thickness(5, 3, 5, 3) },
-                Workspace.FieldKind.Date => new CalendarDatePicker { PlaceholderText = Localization.UiStrings.Get("Tr_ChooseDate") },
-                Workspace.FieldKind.Choice => new ComboBox(),
-                Workspace.FieldKind.CheckBox => new CheckBox(),
-                _ => throw new ArgumentOutOfRangeException(nameof(kind)),
+        private FieldEditor AddEditor(StackPanel column, string title, Workspace.FieldKind kind) {
+            var textBox = new TextBox {
+                Padding = new Thickness(5, 3, 5, 3),
+                FontSize = 12,
+                MinWidth = 0,
+                MinHeight = 28,
+                CornerRadius = new CornerRadius(0),
+                HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 
-            editor.FontSize = 12;
-            editor.MinWidth = 0;
-            editor.MinHeight = 28;
-            editor.CornerRadius = new CornerRadius(0);
-            editor.HorizontalAlignment = HorizontalAlignment.Stretch;
-            AutomationProperties.SetName(editor, title);
+            AutomationProperties.SetName(textBox, title);
+            textBox.GotFocus += this.OnEditorGotFocus;
+            textBox.TextChanged += this.OnEditorTextChanged;
             column.Children.Add(new TextBlock { Text = title, FontSize = 11, TextTrimming = TextTrimming.CharacterEllipsis });
-            column.Children.Add(editor);
-            return editor;
+            column.Children.Add(textBox);
+            return new FieldEditor(textBox, kind);
         }
 
-        private static void Configure(Control editor, bool enabled, Workspace.FieldValue? value, IReadOnlyList<string>? options) {
-            editor.IsEnabled = enabled;
-            if (editor is ComboBox comboBox) {
-                comboBox.ItemsSource = options;
+        private void OnEditorGotFocus(object sender, RoutedEventArgs args) {
+            if (sender is TextBox textBox) {
+                this.activeEditor = textBox;
+                this.ActiveFieldTextChanged?.Invoke(textBox.Text);
             }
+        }
 
+        private void OnEditorTextChanged(object sender, TextChangedEventArgs args) {
+            if (this.activeEditor is { } editor && ReferenceEquals(sender, editor)) {
+                this.ActiveFieldTextChanged?.Invoke(editor.Text);
+            }
+        }
+
+        private static void Configure(FieldEditor editor, bool enabled, Workspace.FieldValue? value, IReadOnlyList<string>? options) {
+            editor.TextBox.IsEnabled = enabled;
+            var hint = editor.Kind == Workspace.FieldKind.Date
+                ? Localization.UiStrings.Get("Tr_DateFormatHint")
+                : options is { Count: > 0 } ? string.Join(", ", options) : null;
+            ToolTipService.SetToolTip(editor.TextBox, hint);
             SetValue(editor, value);
         }
 
-        private static void SetValue(Control editor, Workspace.FieldValue? value) {
-            switch (editor) {
-                case TextBox textBox: textBox.Text = value?.Text ?? ""; break;
-                case CalendarDatePicker datePicker: datePicker.Date = value?.Date; break;
-                case ComboBox comboBox: comboBox.SelectedItem = value?.Text; break;
-                case CheckBox checkBox: checkBox.IsChecked = value?.Checked ?? false; break;
-            }
+        private static void SetValue(FieldEditor editor, Workspace.FieldValue? value) {
+            editor.TextBox.Text = value?.Text ?? (editor.Kind switch {
+                Workspace.FieldKind.Date => value?.Date?.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture),
+                Workspace.FieldKind.CheckBox => value?.Checked?.ToString(),
+                _ => null,
+            }) ?? "";
         }
 
-        private static Workspace.FieldValue ReadValue(Control editor) => editor switch {
-            TextBox textBox => new(Text: textBox.Text),
-            CalendarDatePicker datePicker => new(Date: datePicker.Date),
-            ComboBox comboBox => new(Text: comboBox.SelectedItem as string),
-            CheckBox checkBox => new(Checked: checkBox.IsChecked),
-            _ => throw new ArgumentOutOfRangeException(nameof(editor)),
-        };
+        private static Workspace.FieldValue ReadValue(FieldEditor editor) {
+            var text = editor.TextBox.Text;
+            return editor.Kind switch {
+                Workspace.FieldKind.Date when DateTimeOffset.TryParseExact(
+                    text.Trim(), "d.M.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var date
+                ) => new(Text: text, Date: date),
+                Workspace.FieldKind.CheckBox when bool.TryParse(text, out var isChecked) => new(Text: text, Checked: isChecked),
+                _ => new(Text: text),
+            };
+        }
     }
 }
