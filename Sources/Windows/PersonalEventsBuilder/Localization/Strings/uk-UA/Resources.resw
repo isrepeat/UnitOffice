@@ -71,4 +71,6 @@
   <data name="Tr_LanguageErrorTitle" xml:space="preserve"><value>Не вдалося змінити мову</value></data>
   <data name="Tr_LanguageErrorMessage" xml:space="preserve"><value>Не вдалося зберегти налаштування мови або перезапустити застосунок.</value></data>
   <data name="Tr_LanguageDismiss" xml:space="preserve"><value>Закрити</value></data>
+  <data name="Tr_SettingsMenu.Text" xml:space="preserve"><value>Налаштування</value></data>
+  <data name="Tr_SettingsHeading.Text" xml:space="preserve"><value>Налаштування</value></data>
 </root>

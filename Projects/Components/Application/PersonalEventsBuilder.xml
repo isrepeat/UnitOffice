@@ -8,7 +8,7 @@
       <Files>
         <Input role="source">Sources/Windows/PersonalEventsBuilder/**/*.cs</Input>
         <Input role="source">Sources/Windows/PersonalEventsBuilder/**/*.xaml</Input>
-        <Input role="source">Sources/Windows/PersonalEventsBuilder/Strings/**/*.resw</Input>
+        <Input role="source">Sources/Windows/PersonalEventsBuilder/Localization/Strings/**/*.resw</Input>
       </Files>
       <Filters>
         <Filter filter="{Tree:Project}"

@@ -1,15 +1,15 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-namespace PersonalEventsBuilder.Views {
-    public sealed partial class WorkspaceView : UserControl {
-        private ViewModels.WorkspaceViewModel ViewModel { get; }
+namespace PersonalEventsBuilder.Pages {
+    public sealed partial class WorkspacePage : Page {
+        private ViewModels.WorkspacePageViewModel ViewModel { get; }
 
-        public WorkspaceView() : this(new Workspace.DemoWorkspaceSource()) {
+        public WorkspacePage() : this(new Workspace.DemoWorkspaceSource()) {
         }
 
-        public WorkspaceView(Workspace.IWorkspaceSource workspaceSource) {
-            this.ViewModel = new ViewModels.WorkspaceViewModel(workspaceSource);
+        public WorkspacePage(Workspace.IWorkspaceSource workspaceSource) {
+            this.ViewModel = new ViewModels.WorkspacePageViewModel(workspaceSource);
             InitializeComponent();
             if (this.ViewModel.Current is { } modeWorkspace) {
                 this.EventForm.ApplyLayout(modeWorkspace);

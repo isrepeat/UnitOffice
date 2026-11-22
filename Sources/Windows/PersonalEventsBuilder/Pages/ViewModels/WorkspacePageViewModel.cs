@@ -2,14 +2,14 @@ using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace PersonalEventsBuilder.ViewModels {
+namespace PersonalEventsBuilder.Pages.ViewModels {
     public sealed record CandidateDisplayRow(string Id, string[] Cells);
 
-    internal sealed class WorkspaceViewModel : INotifyPropertyChanged {
+    internal sealed class WorkspacePageViewModel : INotifyPropertyChanged {
         private readonly Workspace.IWorkspaceSource workspaceSource;
         private Workspace.EventMode? eventMode;
 
-        public WorkspaceViewModel(Workspace.IWorkspaceSource workspaceSource) {
+        public WorkspacePageViewModel(Workspace.IWorkspaceSource workspaceSource) {
             this.workspaceSource = workspaceSource;
             Workspace.ModeGroup[] groups = [
                 new(Localization.UiStrings.Get("Tr_CategoryArrival"), workspaceSource.GetModes(Workspace.ModeCategory.Arrival)),

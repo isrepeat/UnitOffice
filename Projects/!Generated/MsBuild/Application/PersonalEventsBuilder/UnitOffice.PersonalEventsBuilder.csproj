@@ -40,15 +40,20 @@
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\EqualWidthColumnsPanel.cs" Link="Controls\EqualWidthColumnsPanel.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\EventFormView.cs" Link="Controls\EventFormView.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WindowTitleBar.cs" Link="Controls\WindowTitleBar.cs" />
+    <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\Strings\ru-RU\Resources.resw" Link="Localization\Strings\ru-RU\Resources.resw" />
+    <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\Strings\uk-UA\Resources.resw" Link="Localization\Strings\uk-UA\Resources.resw" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\UiLanguage.cs" Link="Localization\UiLanguage.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\UiStrings.cs" Link="Localization\UiStrings.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\MainWindow.xaml" Link="MainWindow.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\MainWindow.xaml.cs" Link="MainWindow.xaml.cs" />
-    <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Strings\ru-RU\Resources.resw" Link="Strings\ru-RU\Resources.resw" />
-    <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Strings\uk-UA\Resources.resw" Link="Strings\uk-UA\Resources.resw" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\ViewModels\WorkspaceViewModel.cs" Link="ViewModels\WorkspaceViewModel.cs" />
-    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\WorkspaceView.xaml" Link="Views\WorkspaceView.xaml" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\WorkspaceView.xaml.cs" Link="Views\WorkspaceView.xaml.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Navigation\PageManager.cs" Link="Navigation\PageManager.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Pages\SettingsPage.xaml" Link="Pages\SettingsPage.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Pages\SettingsPage.xaml.cs" Link="Pages\SettingsPage.xaml.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Pages\ViewModels\WorkspacePageViewModel.cs" Link="Pages\ViewModels\WorkspacePageViewModel.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Pages\WorkspacePage.xaml" Link="Pages\WorkspacePage.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Pages\WorkspacePage.xaml.cs" Link="Pages\WorkspacePage.xaml.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\States\AppData.cs" Link="States\AppData.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\States\AppSessionState.cs" Link="States\AppSessionState.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Workspace\DemoWorkspaceSource.cs" Link="Workspace\DemoWorkspaceSource.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Workspace\WorkspaceContract.cs" Link="Workspace\WorkspaceContract.cs" />
   </ItemGroup>

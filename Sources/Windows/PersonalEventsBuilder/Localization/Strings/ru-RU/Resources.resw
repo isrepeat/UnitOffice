@@ -71,4 +71,6 @@
   <data name="Tr_LanguageErrorTitle" xml:space="preserve"><value>Не удалось изменить язык</value></data>
   <data name="Tr_LanguageErrorMessage" xml:space="preserve"><value>Не удалось сохранить настройку языка или перезапустить приложение.</value></data>
   <data name="Tr_LanguageDismiss" xml:space="preserve"><value>Закрыть</value></data>
+  <data name="Tr_SettingsMenu.Text" xml:space="preserve"><value>Настройки</value></data>
+  <data name="Tr_SettingsHeading.Text" xml:space="preserve"><value>Настройки</value></data>
 </root>

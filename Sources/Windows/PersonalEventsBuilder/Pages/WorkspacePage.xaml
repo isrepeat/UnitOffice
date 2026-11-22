@@ -1,7 +1,8 @@
-<UserControl x:Class="PersonalEventsBuilder.Views.WorkspaceView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:controls="using:PersonalEventsBuilder.Controls">
+<Page x:Class="PersonalEventsBuilder.Pages.WorkspacePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:controls="using:PersonalEventsBuilder.Controls"
+      NavigationCacheMode="Required">
     <ScrollViewer
                   HorizontalScrollBarVisibility="Auto"
                   HorizontalScrollMode="Enabled"
@@ -202,4 +203,4 @@
             </Border>
         </Grid>
     </ScrollViewer>
-</UserControl>
+</Page>
