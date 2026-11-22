@@ -33,14 +33,10 @@
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260921001" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="App.g.cs" />
-    <Compile Include="App.g.cs" Link="App.g.cs" />
-    <None Remove="App.g.xaml" />
-    <ApplicationDefinition Include="App.g.xaml" Link="App.g.xaml" />
-    <None Remove="MainWindow.g.cs" />
-    <Compile Include="MainWindow.g.cs" Link="MainWindow.g.cs" />
-    <None Remove="MainWindow.g.xaml" />
-    <Page Include="MainWindow.g.xaml" Link="MainWindow.g.xaml" />
+    <ApplicationDefinition Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\App.xaml" Link="App.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\App.xaml.cs" Link="App.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\MainWindow.xaml" Link="MainWindow.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\MainWindow.xaml.cs" Link="MainWindow.xaml.cs" />
   </ItemGroup>
 
 
