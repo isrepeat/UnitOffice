@@ -47,7 +47,7 @@
       deadline,
       registry(response) {
         const list = parseJson(response?.d);
-        if (Date.now() <= deadline && Array.isArray(list) && list.length) {
+        if (Date.now() <= deadline && Array.isArray(list)) {
           rows = list.slice(0, 1000).flatMap(row => {
             const counter = counterKey(row?.Counter);
             return counter === undefined ? [] : [{ counter, token: typeof row.Token === 'string' ? row.Token : undefined }];
@@ -58,7 +58,8 @@
         if (Date.now() > deadline || counter === undefined || checks.size >= 100 && !checks.has(counter)) {
           return;
         }
-        const check = { listeners: [] };
+        const candidates = rows?.filter(row => row.counter === counter);
+        const check = { listeners: [], rowToken: candidates?.length === 1 ? candidates[0].token : undefined };
         checks.set(counter, check);
         if (rows?.length) {
           const matches = rows.filter(row => row.counter === counter);
@@ -80,6 +81,18 @@
           listener(token);
         }
         check.listeners = [];
+      },
+      cardNavigation(counter, token) {
+        if (Date.now() > deadline) {
+          return;
+        }
+        const check = checks.get(counter);
+        const candidates = rows?.filter(row => row.counter === counter);
+        const rowToken = check ? check.rowToken : candidates?.length === 1 ? candidates[0].token : undefined;
+        return {
+          cardUrlTokenMatchesGetData: token && rowToken ? token === rowToken : null,
+          cardUrlTokenMatchesCheckAccessResponse: token && check?.token ? token === check.token : null
+        };
       },
       attachmentRequest(counter, token, reportMatch) {
         const check = checks.get(counter);
@@ -108,6 +121,17 @@
     Object.defineProperty(comparisonWindow, comparisonKey, { value: createCardComparison(), configurable: true });
   }
   const cardComparison = comparisonWindow[comparisonKey];
+
+  if (location.pathname.toLowerCase() === '/askod-ssl/windoweditcard.aspx') {
+    // К этому моменту мост во фрейме уже подписан на события диагностики.
+    window.addEventListener('DOMContentLoaded', () => {
+      const query = new URLSearchParams(location.search);
+      const result = cardComparison.cardNavigation(counterKey(query.get('counter')), query.get('token'));
+      if (result) {
+        emit({ kind: 'card comparisons', ...result });
+      }
+    }, { once: true });
+  }
 
   function compareCardRequest(target, body) {
     const request = parseJson(body);

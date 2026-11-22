@@ -128,14 +128,46 @@ directFilter.addEventListener('submit', async event => {
       const documents = result.documents ?? [];
       for (const record of documents) {
         const item = document.createElement('li');
-        const label = document.createElement('label');
+        const title = [record.number, record.subject].filter(Boolean).join(' — ') || 'Document';
         const radio = document.createElement('input');
         radio.type = 'radio';
         radio.name = 'direct-document';
         radio.value = record.key;
         radio.disabled = !record.downloadable;
-        label.append(radio, [record.number, record.subject].filter(Boolean).join(' — ') || 'Document');
-        item.append(label);
+        radio.setAttribute('aria-label', 'Select ' + title);
+        const open = document.createElement('button');
+        open.type = 'button';
+        open.className = 'document-link';
+        open.textContent = title;
+        open.title = 'Open card';
+        open.disabled = !record.openable;
+        open.onclick = async () => {
+          open.disabled = true;
+          radio.checked = true;
+          directDownloadZip.disabled = downloadingZip || radio.disabled;
+          directDownloadStatus.hidden = false;
+          directDownloadStatus.textContent = 'Requesting card opening…';
+          try {
+            if (readServerAddress().origin !== server.origin) {
+              throw new Error('Load documents again for the selected server.');
+            }
+            const reply = await chrome.runtime.sendMessage({
+              command: 'openCard',
+              origin: server.origin,
+              resultId: result.resultId,
+              rowKey: record.key
+            });
+            if (!reply?.ok) {
+              throw new Error(reply?.error ?? 'The registry did not receive the open command.');
+            }
+            directDownloadStatus.textContent = 'Open command sent to the registry.';
+          } catch (error) {
+            directDownloadStatus.textContent = error.message;
+          } finally {
+            open.disabled = !record.openable;
+          }
+        };
+        item.append(radio, open);
         directDocuments.append(item);
       }
       directSelection = { origin: server.origin, resultId: result.resultId };

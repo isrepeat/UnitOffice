@@ -321,3 +321,16 @@ pre,
 td details div {
   white-space: pre-wrap;
 }
+#direct-documents .document-link {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  height: auto;
+  padding: 2px 4px;
+  text-align: start;
+  white-space: normal;
+}
+
+#direct-documents .document-link:hover:enabled {
+  text-decoration: underline;
+}

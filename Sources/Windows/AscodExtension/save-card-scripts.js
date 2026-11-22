@@ -5,7 +5,7 @@
   let selection;
 
   async function readCardScripts(origin) {
-    if (location.origin !== origin || !/^\/askod-ssl\/(?:WindowEditCard|PdfViewerFrame)\.aspx$/i.test(location.pathname)) {
+    if (location.origin !== origin || !/^\/askod-ssl\/(?:Defaultv4|WindowEditCard|PdfViewerFrame)\.aspx$/i.test(location.pathname)) {
       return null;
     }
     const scripts = [];
@@ -49,10 +49,10 @@
       }
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       if (!tab?.id || !URL.canParse(tab.url) || new URL(tab.url).origin !== server.origin) {
-        throw new Error('Open an Ascod card on the selected server first.');
+        throw new Error('Open the Ascod registry or a card on the selected server first.');
       }
       selection = { tabId: tab.id, origin: server.origin };
-      status.textContent = 'Open Files if needed, then choose Save to folder.';
+      status.textContent = 'Choose Save to folder to export scripts from the current tab.';
     } catch (error) {
       status.textContent = error.message;
     } finally {
@@ -69,14 +69,14 @@
     collectButton.disabled = true;
     try {
       const folder = await window.showDirectoryPicker({ id: 'ascod-card-scripts', mode: 'readwrite' });
-      status.textContent = 'Reading card scripts…';
+      status.textContent = 'Reading page scripts…';
       const frames = await chrome.scripting.executeScript({
         target: { tabId: selection.tabId, allFrames: true },
         func: readCardScripts,
         args: [selection.origin]
       });
       if (!frames.some(frame => Array.isArray(frame.result))) {
-        throw new Error('No open Ascod card or attachment viewer found.');
+        throw new Error('No Ascod registry, card, or attachment viewer found.');
       }
       const stamp = new Date().toISOString().replace(/[:.]/g, '-');
       const directory = await folder.getDirectoryHandle('ascod-card-scripts-' + stamp, { create: true });

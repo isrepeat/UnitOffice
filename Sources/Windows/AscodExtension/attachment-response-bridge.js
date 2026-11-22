@@ -78,9 +78,11 @@ window.addEventListener('ascod-attachment-response-schema', event => {
       for (const field of [
         'getDataCounterMatchesCheckAccess',
         'getDataTokenMatchesCheckAccess',
-        'checkAccessTokenMatchesFillEcd'
+        'checkAccessTokenMatchesFillEcd',
+        'cardUrlTokenMatchesGetData',
+        'cardUrlTokenMatchesCheckAccessResponse'
       ]) {
-        if (typeof result[field] === 'boolean') {
+        if (typeof result[field] === 'boolean' || result[field] === null) {
           comparisons[field] = result[field];
         }
       }

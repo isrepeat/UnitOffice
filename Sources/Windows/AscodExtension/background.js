@@ -366,6 +366,7 @@ async function getAscodRows(origin, path, payload) {
     return { error: 'Reopen the Ascod registry to refresh userSettings.' };
   }
   try {
+    const registryName = window.GetCurrentEntityName?.();
     const response = await fetch(path, {
       method: 'POST',
       credentials: 'same-origin',
@@ -394,13 +395,14 @@ async function getAscodRows(origin, path, payload) {
       const documents = rows.map((row, index) => {
         const key = String(index);
         if (Number.isSafeInteger(row?.Counter) && row.Counter > 0 && typeof row.Token === 'string' && row.Token) {
-          cards.set(key, { counter: row.Counter, token: row.Token });
+          cards.set(key, { counter: row.Counter, token: row.Token, row, registryName });
         }
         return {
           key,
           number: row?.FullIndex ?? row?.RegIndex ?? row?.Counter,
           subject: typeof row?.Content === 'string' ? row.Content : '',
-          downloadable: cards.has(key)
+          downloadable: cards.has(key),
+          openable: cards.has(key) && !!registryName && row.AllowEdit !== false
         };
       });
       const readCard = (id, key) => id === resultId ? cards.get(key) : undefined;
@@ -532,16 +534,61 @@ async function downloadAscodZip(origin, resultId, rowKey) {
   }
 }
 
-async function runDirectDownload(message) {
+function openAscodCard(origin, resultId, rowKey) {
+  if (location.origin !== origin || !/\/Defaultv4\.aspx$/i.test(location.pathname)) {
+    return { error: 'Open the registry and load the documents again.' };
+  }
+  const readCard = window[Symbol.for('unitoffice.ascod.direct-download')];
+  const card = typeof readCard === 'function' ? readCard(resultId, rowKey) : undefined;
+  if (!card || typeof window.EditRecord !== 'function' || !card.registryName ||
+      card.registryName !== window.GetCurrentEntityName?.()) {
+    return { error: 'Return to the original registry and load the documents again.' };
+  }
+  try {
+    const row = card.row;
+    const tab = window.GetSelectedTab();
+    if (row.AllowEdit === false || !window.getGridMasterTableView() || window.IsBlockMainCard() ||
+        ['OverTheSign', 'Reminder', 'ServicesMessagesInfo', 'NotificationTab'].includes(tab)) {
+      return { error: 'Card opening is unavailable in this registry context.' };
+    }
+    if (row.CheckVirtualCard || Number(row.EntityId) === 200 || row.AdvRepId != null ||
+        ['UsersOnLine', 'BlockCards', 'BlockUsers', 'AdvancedReports', 'ReportNetEditor'].includes(card.registryName)) {
+      return { error: 'This row uses a specialized registry command.' };
+    }
+    const command = window.ReloadGridCookie('EditRecord', null);
+    if (command.IsReturn || !command.EntityName) {
+      return { error: 'The registry did not enable the edit command.' };
+    }
+    window.EditRecord(row, command.EntityName);
+    window.SetBindCommandGrid();
+    return { ok: true };
+  } catch {
+    return { error: 'The registry could not run its card-opening command.' };
+  }
+}
+
+async function runDirectRowAction(message) {
   const saved = await chrome.storage.session.get(directContextKey);
   const context = saved[directContextKey];
   if (!context || context.origin !== message.origin ||
       typeof message.resultId !== 'string' || typeof message.rowKey !== 'string') {
-    throw new Error('Load the documents again before downloading.');
+    throw new Error('Load the documents again.');
   }
   const target = { tabId: context.tabId };
   if (context.documentId) {
     target.documentIds = [context.documentId];
+  }
+  if (message.command === 'openCard') {
+    const [execution] = await chrome.scripting.executeScript({
+      target,
+      world: 'MAIN',
+      func: openAscodCard,
+      args: [context.origin, message.resultId, message.rowKey]
+    });
+    if (!execution?.result?.ok) {
+      throw new Error(execution?.result?.error ?? 'The registry did not receive the open command.');
+    }
+    return;
   }
   if (activeDirectDownloads.has(context.tabId)) {
     throw new Error('A ZIP request is already running in this tab.');
@@ -763,8 +810,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
     return true;
   }
-  if (command === 'directDownload') {
-    runDirectDownload(message).then(() => {
+  if (command === 'directDownload' || command === 'openCard') {
+    runDirectRowAction(message).then(() => {
       sendResponse({ ok: true });
     }).catch(error => {
       sendResponse({ ok: false, error: error.message });
