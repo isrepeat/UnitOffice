@@ -2,6 +2,7 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:zones="using:PersonalEventsBuilder.Controls.WorkspaceZones"
+      xmlns:main="using:PersonalEventsBuilder.Controls.WorkspaceZones.WorkspaceMain"
       DataContext="{x:Bind ViewModel}"
       NavigationCacheMode="Required">
     <Grid Background="#202020"
@@ -30,7 +31,7 @@
             <zones:WordPreviewZone Grid.Column="2" />
         </Grid>
 
-        <zones:WorkspaceMainZone Grid.Row="1" />
+        <main:WorkspaceMainZone Grid.Row="1" />
         <zones:WorkspaceActionsZone x:Name="WorkspaceActions"
                                     Grid.Column="1"
                                     Grid.RowSpan="2" />

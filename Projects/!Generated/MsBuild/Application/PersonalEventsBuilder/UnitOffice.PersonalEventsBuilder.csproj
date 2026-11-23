@@ -48,8 +48,12 @@
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WordPreviewZone.xaml.cs" Link="Controls\WorkspaceZones\WordPreviewZone.xaml.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WorkspaceActionsZone.xaml" Link="Controls\WorkspaceZones\WorkspaceActionsZone.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WorkspaceActionsZone.xaml.cs" Link="Controls\WorkspaceZones\WorkspaceActionsZone.xaml.cs" />
-    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WorkspaceMainZone.xaml" Link="Controls\WorkspaceZones\WorkspaceMainZone.xaml" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WorkspaceMainZone.xaml.cs" Link="Controls\WorkspaceZones\WorkspaceMainZone.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WorkspaceMain\CandidatesZone.xaml" Link="Controls\WorkspaceZones\WorkspaceMain\CandidatesZone.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WorkspaceMain\CandidatesZone.xaml.cs" Link="Controls\WorkspaceZones\WorkspaceMain\CandidatesZone.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WorkspaceMain\EventFormZone.xaml" Link="Controls\WorkspaceZones\WorkspaceMain\EventFormZone.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WorkspaceMain\EventFormZone.xaml.cs" Link="Controls\WorkspaceZones\WorkspaceMain\EventFormZone.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WorkspaceMain\WorkspaceMainZone.xaml" Link="Controls\WorkspaceZones\WorkspaceMain\WorkspaceMainZone.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WorkspaceMain\WorkspaceMainZone.xaml.cs" Link="Controls\WorkspaceZones\WorkspaceMain\WorkspaceMainZone.xaml.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WorkspaceResources.xaml" Link="Controls\WorkspaceZones\WorkspaceResources.xaml" />
     <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\Strings\ru-RU\Resources.resw" Link="Localization\Strings\ru-RU\Resources.resw" />
     <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\Strings\uk-UA\Resources.resw" Link="Localization\Strings\uk-UA\Resources.resw" />

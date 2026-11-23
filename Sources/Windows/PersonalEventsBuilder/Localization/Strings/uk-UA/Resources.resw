@@ -53,4 +53,5 @@
   <data name="Tr_SettingsMenu.Text" xml:space="preserve"><value>Налаштування</value></data>
   <data name="Tr_SettingsHeading.Text" xml:space="preserve"><value>Налаштування</value></data>
   <data name="Tr_NewEventLabel.Text" xml:space="preserve"><value>Нова подія</value></data>
+  <data name="Tr_CandidatesHeading.Text" xml:space="preserve"><value>Кандидати</value></data>
 </root>
