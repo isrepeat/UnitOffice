@@ -57,6 +57,8 @@
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WorkspaceResources.xaml" Link="Controls\WorkspaceZones\WorkspaceResources.xaml" />
     <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\Strings\ru-RU\Resources.resw" Link="Localization\Strings\ru-RU\Resources.resw" />
     <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\Strings\uk-UA\Resources.resw" Link="Localization\Strings\uk-UA\Resources.resw" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Helpers\ObservableObject.cs" Link="Helpers\ObservableObject.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Helpers\UserSettings.cs" Link="Helpers\UserSettings.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\UiLanguage.cs" Link="Localization\UiLanguage.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\UiStrings.cs" Link="Localization\UiStrings.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\MainWindow.xaml" Link="MainWindow.xaml" />

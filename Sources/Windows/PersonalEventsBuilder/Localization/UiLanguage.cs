@@ -1,4 +1,3 @@
-using Microsoft.Win32;
 using Microsoft.Windows.Globalization;
 
 namespace PersonalEventsBuilder.Localization {
@@ -12,12 +11,12 @@ namespace PersonalEventsBuilder.Localization {
         public static bool IsSupported(string language) => language is Ukrainian or Russian;
 
         public static void Initialize() {
-            var stored = Registry.GetValue(States.AppData.SettingsKey, LanguageValue, Ukrainian) as string;
+            var stored = Helpers.UserSettings.Read(LanguageValue, Ukrainian);
             ApplicationLanguages.PrimaryLanguageOverride = stored is Russian ? Russian : Ukrainian;
         }
 
         public static void Save(string language) {
-            Registry.SetValue(States.AppData.SettingsKey, LanguageValue, language);
+            Helpers.UserSettings.Write(LanguageValue, language);
         }
     }
 }

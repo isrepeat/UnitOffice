@@ -5,7 +5,6 @@ using System.Security;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Windowing;
-using Microsoft.Win32;
 
 using Windows.Graphics;
 
@@ -34,14 +33,14 @@ namespace PersonalEventsBuilder {
         private void RestoreWindowState() {
             var appWindow = this.AppWindow;
             this.restoredSize = appWindow.Size;
-            var settingsKey = States.AppData.SettingsKey;
-            if (Registry.GetValue(settingsKey, WindowWidthValue, 0) is int width && width > 0
-                && Registry.GetValue(settingsKey, WindowHeightValue, 0) is int height && height > 0) {
+            var width = Helpers.UserSettings.Read(WindowWidthValue, 0);
+            var height = Helpers.UserSettings.Read(WindowHeightValue, 0);
+            if (width > 0 && height > 0) {
                 appWindow.Resize(new SizeInt32 { Width = width, Height = height });
                 this.restoredSize = appWindow.Size;
             }
 
-            if (Registry.GetValue(settingsKey, WindowMaximizedValue, 0) is 1
+            if (Helpers.UserSettings.Read(WindowMaximizedValue, 0) == 1
                 && appWindow.Presenter is OverlappedPresenter presenter) {
                 this.wasMaximized = true;
                 presenter.Maximize();
@@ -66,10 +65,9 @@ namespace PersonalEventsBuilder {
 
         private void OnClosed(object sender, WindowEventArgs args) {
             try {
-                var settingsKey = States.AppData.SettingsKey;
-                Registry.SetValue(settingsKey, WindowWidthValue, this.restoredSize.Width);
-                Registry.SetValue(settingsKey, WindowHeightValue, this.restoredSize.Height);
-                Registry.SetValue(settingsKey, WindowMaximizedValue, this.wasMaximized ? 1 : 0);
+                Helpers.UserSettings.Write(WindowWidthValue, this.restoredSize.Width);
+                Helpers.UserSettings.Write(WindowHeightValue, this.restoredSize.Height);
+                Helpers.UserSettings.Write(WindowMaximizedValue, this.wasMaximized ? 1 : 0);
             } catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or SecurityException) {
                 System.Diagnostics.Debug.WriteLine(exception);
             }

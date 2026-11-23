@@ -1,9 +1,8 @@
 using System.Linq;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace PersonalEventsBuilder.Pages.ViewModels {
-    public sealed class WorkspacePageViewModel : INotifyPropertyChanged {
+    public sealed class WorkspacePageViewModel : Helpers.ObservableObject {
         private readonly Workspace.IWorkspaceSource workspaceSource;
         private Workspace.EventMode? eventMode;
 
@@ -24,8 +23,6 @@ namespace PersonalEventsBuilder.Pages.ViewModels {
                 this.SelectMode(initialMode);
             }
         }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
 
         public Workspace.ModeGroup[] ModeGroups { get; }
         public Workspace.ModeWorkspace? Current { get; private set; }
@@ -54,7 +51,7 @@ namespace PersonalEventsBuilder.Pages.ViewModels {
             this.Current = modeWorkspace;
             this.eventMode = eventMode;
             this.Status = Localization.UiStrings.Get("Tr_Ready");
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
+            this.NotifyPropertiesChanged();
         }
 
         public void ExecuteAction(string actionId) {
@@ -63,7 +60,7 @@ namespace PersonalEventsBuilder.Pages.ViewModels {
             }
 
             this.Status = this.workspaceSource.ExecuteAction(this.eventMode?.Id, actionId);
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Status)));
+            this.NotifyPropertyChanged(nameof(Status));
         }
     }
 }
