@@ -393,57 +393,70 @@ async function getAscodRows(origin, path, payload) {
   }
   try {
     const registryName = window.GetCurrentEntityName?.();
-    const response = await fetch(path, {
-      method: 'POST',
-      credentials: 'same-origin',
-      redirect: 'error',
-      cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        Accept: 'application/json'
-      },
-      body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(15000)
-    });
-    if (!response.ok) {
-      return { error: 'GetData returned HTTP ' + response.status + '.' };
-    }
-    const text = await response.text();
-    if (text.length > 2000000) {
-      return { error: 'GetData response is too large to display.' };
-    }
-    try {
-      const data = JSON.parse(text);
-      const rows = Array.isArray(data?.d) ? data.d : [];
-      const resultId = crypto.randomUUID();
-      const selectionKey = Symbol.for('unitoffice.ascod.direct-download');
-      const cards = new Map();
-      const documents = rows.map((row, index) => {
-        const key = String(index);
-        if (Number.isSafeInteger(row?.Counter) && row.Counter > 0 && typeof row.Token === 'string' && row.Token) {
-          cards.set(key, { counter: row.Counter, token: row.Token, row, registryName });
-        }
-        return {
-          key,
-          number: row?.FullIndex ?? row?.RegIndex ?? row?.Counter,
-          subject: typeof row?.Content === 'string' ? row.Content : '',
-          downloadable: cards.has(key),
-          openable: cards.has(key) && !!registryName && row.AllowEdit !== false
-        };
+    const rows = [];
+    const seenPages = new Set();
+    let data;
+    for (;;) {
+      const response = await fetch(path, {
+        method: 'POST',
+        credentials: 'same-origin',
+        redirect: 'error',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify({ ...payload, startRowIndex: rows.length }),
+        signal: AbortSignal.timeout(15000)
       });
-      const readCard = (id, key) => id === resultId ? cards.get(key) : undefined;
-      window[selectionKey] = readCard;
-      setTimeout(() => {
-        if (window[selectionKey] === readCard) {
-          delete window[selectionKey];
-        }
-      }, 300000);
-      const redacted = JSON.parse(JSON.stringify(data, (key, value) =>
-        /token|secret|password|cookie|authorization|session|credential/i.test(key) ? '[redacted]' : value));
-      return { data: redacted, documents, resultId };
-    } catch {
-      return { error: 'GetData did not return JSON. Check that the registry session is still signed in.' };
+      if (!response.ok) {
+        return { error: 'GetData returned HTTP ' + response.status + '.' };
+      }
+      const text = await response.text();
+      if (text.length > 2000000) {
+        return { error: 'GetData response is too large to display.' };
+      }
+      let page;
+      try {
+        page = JSON.parse(text);
+      } catch {
+        return { error: 'GetData did not return JSON. Check the registry session.' };
+      }
+      if (!Array.isArray(page?.d)) {
+        return { error: 'GetData did not return a document list.' };
+      }
+      data ??= { ...page, d: rows };
+      if (!page.d.length) {
+        break;
+      }
+      const signature = JSON.stringify(page.d.map(row => [row?.EntityId, row?.Counter, row?.FullIndex]));
+      if (seenPages.has(signature)) {
+        return { error: 'The registry repeated a page. Could not load the full list.' };
+      }
+      seenPages.add(signature);
+      rows.push(...page.d);
     }
+    const resultId = crypto.randomUUID();
+    const selectionKey = Symbol.for('unitoffice.ascod.direct-download');
+    const cards = new Map();
+    const documents = rows.map((row, index) => {
+      const key = String(index);
+      if (Number.isSafeInteger(row?.Counter) && row.Counter > 0 && typeof row.Token === 'string' && row.Token) {
+        cards.set(key, { counter: row.Counter, token: row.Token, row, registryName });
+      }
+      return {
+        key,
+        number: row?.FullIndex ?? row?.RegIndex ?? row?.Counter,
+        subject: typeof row?.Content === 'string' ? row.Content : '',
+        downloadable: cards.has(key),
+        openable: cards.has(key) && !!registryName && row.AllowEdit !== false
+      };
+    });
+    // Список принадлежит загруженному реестру и заменяется при следующей фильтрации.
+    window[selectionKey] = (id, key) => id === resultId ? cards.get(key) : undefined;
+    const redacted = JSON.parse(JSON.stringify(data, (key, value) =>
+      /token|secret|password|cookie|authorization|session|credential/i.test(key) ? '[redacted]' : value));
+    return { data: redacted, documents, resultId };
   } catch {
     return { error: 'GetData request failed. Check the connection and the current registry session.' };
   }

@@ -275,7 +275,7 @@ directDownloadZip.onclick = async () => {
     }
     directDownloadStatus.textContent = 'ZIP downloads completed: ' + saved + '.';
     if (failures.length) {
-      directDownloadStatus.textContent += ' Failed: ' + failures.length + '. ' + failures.join(' ');
+      directDownloadStatus.textContent += ' Failed: ' + failures.length + '. ' + [...new Set(failures)].join(' ');
     }
   } catch (error) {
     directDownloadStatus.textContent = error.message;
