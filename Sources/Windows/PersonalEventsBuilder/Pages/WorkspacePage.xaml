@@ -14,6 +14,7 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -30,9 +31,17 @@
             <zones:WordPreviewZone Grid.Column="2" />
         </Grid>
 
-        <zones:CandidatesZone Grid.Row="1" />
+        <Border Grid.Row="1"
+                Style="{StaticResource PanelBorder}">
+            <StackPanel Spacing="3">
+                <TextBlock x:Uid="Tr_EventDetailsHeading"
+                           Style="{StaticResource PanelHeading}" />
+                <Grid MinHeight="40" />
+            </StackPanel>
+        </Border>
+        <zones:CandidatesZone Grid.Row="2" />
         <zones:WorkspaceActionsZone x:Name="WorkspaceActions"
                                     Grid.Column="1"
-                                    Grid.RowSpan="2" />
+                                    Grid.RowSpan="3" />
     </Grid>
 </Page>
