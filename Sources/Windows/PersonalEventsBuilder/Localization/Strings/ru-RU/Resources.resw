@@ -54,4 +54,7 @@
   <data name="Tr_SettingsHeading.Text" xml:space="preserve"><value>Настройки</value></data>
   <data name="Tr_NewEventLabel.Text" xml:space="preserve"><value>Новое событие</value></data>
   <data name="Tr_CandidatesHeading.Text" xml:space="preserve"><value>Кандидаты</value></data>
+  <data name="Tr_MatrixPerson" xml:space="preserve"><value>ФИО</value></data>
+  <data name="Tr_MatrixRank" xml:space="preserve"><value>Звание</value></data>
+  <data name="Tr_MatrixDocumentNumber" xml:space="preserve"><value>№ документа</value></data>
 </root>

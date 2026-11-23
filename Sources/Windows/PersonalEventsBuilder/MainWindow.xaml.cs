@@ -22,8 +22,8 @@ namespace PersonalEventsBuilder {
             this.InitializeComponent();
             States.AppData.AppSessionState.InitializeNavigation(this.PageFrame);
             this.Title = Localization.UiStrings.Get("Tr_AppTitle");
-            this.WorkspaceTitleBar.CloseRequested += this.Close;
-            this.WorkspaceTitleBar.AttachTo(this);
+            this.WindowTitleBar.CloseRequested += this.Close;
+            this.WindowTitleBar.AttachTo(this);
             MainWindow.PageManager.Navigate<Pages.WorkspacePage>();
             this.RestoreWindowState();
             this.AppWindow.Changed += this.OnAppWindowChanged;
@@ -75,7 +75,7 @@ namespace PersonalEventsBuilder {
 
         private void OnPageNavigated(object sender, NavigationEventArgs args) {
             var pageManager = MainWindow.PageManager;
-            this.WorkspaceTitleBar.UpdateNavigationState(pageManager.CurrentWorkspace is not null, pageManager.CanGoBack);
+            this.WindowTitleBar.UpdateNavigationState(pageManager.CurrentWorkspace is not null, pageManager.CanGoBack);
         }
     }
 }

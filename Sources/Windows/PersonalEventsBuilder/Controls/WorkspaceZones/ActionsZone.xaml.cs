@@ -4,8 +4,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace PersonalEventsBuilder.Controls.WorkspaceZones {
-    public sealed partial class WorkspaceActionsZone : UserControl {
-        public WorkspaceActionsZone() {
+    public sealed partial class ActionsZone : UserControl {
+        public ActionsZone() {
             InitializeComponent();
         }
 

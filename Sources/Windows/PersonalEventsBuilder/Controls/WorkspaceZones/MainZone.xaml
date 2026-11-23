@@ -1,7 +1,7 @@
-<UserControl x:Class="PersonalEventsBuilder.Controls.WorkspaceZones.WorkspaceMain.WorkspaceMainZone"
+<UserControl x:Class="PersonalEventsBuilder.Controls.WorkspaceZones.MainZone"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:main="using:PersonalEventsBuilder.Controls.WorkspaceZones.WorkspaceMain">
+             xmlns:main="using:PersonalEventsBuilder.Controls.WorkspaceZones.MainZones">
     <Border Style="{StaticResource PanelBorder}">
         <Grid RowSpacing="5">
             <Grid.RowDefinitions>
@@ -9,7 +9,7 @@
                 <RowDefinition Height="1" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <main:EventFormZone />
+            <main:MatrixZone x:Name="MatrixZone" />
             <!--<Border Grid.Row="1"
                     Background="{StaticResource OutlineBrush}" />
             <main:CandidatesZone Grid.Row="2" />-->

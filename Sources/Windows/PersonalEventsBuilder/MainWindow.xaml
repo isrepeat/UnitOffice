@@ -9,7 +9,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <controls:WindowTitleBar x:Name="WorkspaceTitleBar"
+        <controls:WindowTitleBar x:Name="WindowTitleBar"
                                  Visibility="Collapsed" />
 
         <Frame x:Name="PageFrame"
