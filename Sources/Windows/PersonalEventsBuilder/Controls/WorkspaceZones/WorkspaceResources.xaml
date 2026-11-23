@@ -6,10 +6,6 @@
                      Color="#515151" />
     <SolidColorBrush x:Key="InsetBrush"
                      Color="#1D1D1D" />
-    <SolidColorBrush x:Key="CandidateHeaderBrush"
-                     Color="#3D3D3D" />
-    <SolidColorBrush x:Key="CandidateStripeBrush"
-                     Color="#343434" />
     <SolidColorBrush x:Key="AmberBrush"
                      Color="#F3AF61" />
     <Style x:Key="PanelBorder"

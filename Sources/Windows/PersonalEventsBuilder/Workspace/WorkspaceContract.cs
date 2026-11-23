@@ -13,13 +13,7 @@ namespace PersonalEventsBuilder.Workspace {
 
     public sealed record WorkspaceAction(string Id, string Title, bool IsEnabled = true);
 
-    public sealed record CandidateColumn(string Id, string Title);
-
-    public sealed record CandidateRow(string Id, IReadOnlyDictionary<string, string> Cells);
-
-    public sealed record CandidateTable(IReadOnlyList<CandidateColumn> Columns, IReadOnlyList<CandidateRow> Rows);
-
-    public sealed record ModeWorkspace(string Preview, IReadOnlyList<WorkspaceAction> Actions, CandidateTable Candidates);
+    public sealed record ModeWorkspace(string Preview, IReadOnlyList<WorkspaceAction> Actions);
 
     public interface IWorkspaceSource {
         IReadOnlyList<EventMode> GetModes(ModeCategory category);

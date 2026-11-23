@@ -33,8 +33,6 @@ namespace PersonalEventsBuilder.Pages.ViewModels {
         public string Preview => this.Current?.Preview ?? Localization.UiStrings.Get("Tr_ChooseMode");
         public string Status { get; private set; } = Localization.UiStrings.Get("Tr_Ready");
         public IReadOnlyList<Workspace.WorkspaceAction>? Actions => this.Current?.Actions;
-        public CandidateTableLayout? CandidateTable { get; private set; }
-        public string CandidateStatus => this.CandidateTable?.Rows.Length > 0 ? "" : Localization.UiStrings.Get("Tr_NoCandidates");
 
         public bool SelectMode(Workspace.EventMode eventMode) {
             if (this.eventMode?.Id == eventMode.Id) {
@@ -53,7 +51,6 @@ namespace PersonalEventsBuilder.Pages.ViewModels {
 
         private void LoadMode(Workspace.EventMode eventMode) {
             var modeWorkspace = this.workspaceSource.OpenMode(eventMode.Id);
-            this.CandidateTable = CandidateTableBuilder.Build(modeWorkspace.Candidates);
             this.Current = modeWorkspace;
             this.eventMode = eventMode;
             this.Status = Localization.UiStrings.Get("Tr_Ready");
