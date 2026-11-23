@@ -129,12 +129,12 @@ directFilter.addEventListener('submit', async event => {
       for (const record of documents) {
         const item = document.createElement('li');
         const title = [record.number, record.subject].filter(Boolean).join(' — ') || 'Document';
-        const radio = document.createElement('input');
-        radio.type = 'radio';
-        radio.name = 'direct-document';
-        radio.value = record.key;
-        radio.disabled = !record.downloadable;
-        radio.setAttribute('aria-label', 'Select ' + title);
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.name = 'direct-document';
+        checkbox.value = record.key;
+        checkbox.disabled = !record.downloadable;
+        checkbox.setAttribute('aria-label', 'Select ' + title);
         const open = document.createElement('button');
         open.type = 'button';
         open.className = 'document-link';
@@ -143,8 +143,9 @@ directFilter.addEventListener('submit', async event => {
         open.disabled = !record.openable;
         open.onclick = async () => {
           open.disabled = true;
-          radio.checked = true;
-          directDownloadZip.disabled = downloadingZip || radio.disabled;
+          checkbox.checked = !checkbox.disabled;
+          directSelection.openedRow = undefined;
+          refreshZipSelection();
           directDownloadStatus.hidden = false;
           directDownloadStatus.textContent = 'Requesting card opening…';
           try {
@@ -161,13 +162,15 @@ directFilter.addEventListener('submit', async event => {
               throw new Error(reply?.error ?? 'The registry did not receive the open command.');
             }
             directDownloadStatus.textContent = 'Open command sent to the registry.';
+            directSelection.openedRow = record.key;
+            refreshZipSelection();
           } catch (error) {
             directDownloadStatus.textContent = error.message;
           } finally {
             open.disabled = !record.openable;
           }
         };
-        item.append(radio, open);
+        item.append(checkbox, open);
         directDocuments.append(item);
       }
       directSelection = { origin: server.origin, resultId: result.resultId };
@@ -201,13 +204,17 @@ directFilter.addEventListener('submit', async event => {
   }
 });
 
-directDocuments.addEventListener('change', () => {
-  directDownloadZip.disabled = downloadingZip || !directDocuments.querySelector('input:checked');
-});
+function refreshZipSelection() {
+  const checked = Array.from(directDocuments.querySelectorAll('input:checked'));
+  directDownloadZip.disabled = downloadingZip || !checked.some(row => row.value === directSelection?.openedRow);
+  directDownloadZip.textContent = 'Download ZIP for open card';
+}
+
+directDocuments.addEventListener('change', refreshZipSelection);
 
 directDownloadZip.onclick = async () => {
   const selection = directSelection;
-  const row = directDocuments.querySelector('input:checked');
+  const row = Array.from(directDocuments.querySelectorAll('input:checked')).find(item => item.value === selection?.openedRow);
   if (downloadingZip || !selection || !row || row.disabled) {
     return;
   }
@@ -221,6 +228,7 @@ directDownloadZip.onclick = async () => {
     if (readServerAddress().origin !== selection.origin) {
       throw new Error('Load documents again for the selected server.');
     }
+    const startedAfter = new Date().toISOString();
     const result = await chrome.runtime.sendMessage({
       command: 'directDownload',
       ...selection,
@@ -229,12 +237,48 @@ directDownloadZip.onclick = async () => {
     if (!result?.ok) {
       throw new Error(result?.error ?? 'ZIP download did not start.');
     }
-    directDownloadStatus.textContent = 'ZIP sent to Edge Downloads.';
+    directDownloadStatus.textContent = 'Waiting for Edge to start the ZIP download…';
+    const deadline = Date.now() + 60000;
+    let download;
+    while (!download && Date.now() < deadline) {
+      const items = await chrome.downloads.search({
+        startedAfter,
+        filenameRegex: 'card_files_[0-9]+( \\([0-9]+\\))?\\.zip$'
+      });
+      const matches = items.filter(item => {
+        const url = new URL(item.finalUrl || item.url);
+        return url.origin === selection.origin && /\/FileHandler\.ashx$/i.test(url.pathname);
+      });
+      if (matches.length > 1) {
+        throw new Error('Multiple ZIP downloads started. Check Edge Downloads.');
+      }
+      download = matches[0];
+      if (!download) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+    if (!download) {
+      throw new Error('Edge did not report a matching ZIP download within one minute.');
+    }
+    directDownloadStatus.textContent = 'Edge is downloading the ZIP…';
+    while (download?.state === 'in_progress') {
+      await new Promise(resolve => setTimeout(resolve, 750));
+      [download] = await chrome.downloads.search({ id: download.id });
+    }
+    if (download?.state !== 'complete') {
+      throw new Error('ZIP download interrupted or removed. Check Edge Downloads.');
+    }
+    row.checked = false;
+    const remaining = directDocuments.querySelectorAll('input:checked').length;
+    directDownloadStatus.textContent = 'ZIP saved: ' + download.filename;
+    if (remaining) {
+      directDownloadStatus.textContent += ' · Still selected: ' + remaining + '. Open the next selected card to continue.';
+    }
   } catch (error) {
     directDownloadStatus.textContent = error.message;
   } finally {
     downloadingZip = false;
-    directDownloadZip.disabled = false;
+    refreshZipSelection();
     loadButton.disabled = false;
   }
 };

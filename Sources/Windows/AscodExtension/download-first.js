@@ -1,6 +1,7 @@
-async function downloadRegistryCards(origin, count) {
+async function downloadRegistryCards(origin, count, selection) {
   const visible = element => !!element?.getClientRects().length &&
-    getComputedStyle(element).visibility === 'visible';
+    getComputedStyle(element).visibility === 'visible' &&
+    getComputedStyle(element).display !== 'none';
 
   async function waitFor(find, timeoutMs) {
     const deadline = performance.now() + timeoutMs;
@@ -48,10 +49,11 @@ async function downloadRegistryCards(origin, count) {
         if (menu.parentElement?.closest('.context-menu-list') || !visible(menu)) {
           continue;
         }
-        for (const item of menu.querySelectorAll('.context-menu-item.context-menu-icon-downloadFiles')) {
+        for (const item of menu.querySelectorAll('[id="downloadFiles"], [key="downloadFiles"], .context-menu-item.context-menu-icon-downloadFiles')) {
           const parent = item.parentElement?.closest('.context-menu-submenu');
           const caption = item.querySelector(':scope > span') ?? item;
-          if (enabled(item) && menuLabel(caption) === label && (visible(item) || visible(parent))) {
+          if (enabled(item) && (item.id === 'downloadFiles' || item.getAttribute('key') === 'downloadFiles' ||
+              menuLabel(caption) === label) && (visible(item) || visible(parent))) {
             return item;
           }
         }
@@ -87,6 +89,18 @@ async function downloadRegistryCards(origin, count) {
   if (!Number.isInteger(count) || count < 1 || count > 20) {
     return { error: 'Choose a document count from 1 to 20.' };
   }
+  const trace = [];
+  if (selection) {
+    const readCard = window[Symbol.for('unitoffice.ascod.direct-download')];
+    const card = typeof readCard === 'function' && readCard(selection.resultId, selection.rowKey);
+    const opened = getViewer();
+    const address = opened?.frame.contentDocument?.location.href;
+    if (!address || !card || new URL(address).searchParams.get('counter') !== String(card.counter)) {
+      return { error: 'Open the selected card and wait for its files panel.' };
+    }
+    const result = await downloadFromViewer(opened);
+    return { ok: !result.error, ...result };
+  }
   const grid = document.querySelector('[id$="_AskodGridCards_CommonGrid"]');
   if (!visible(grid)) {
     return { error: 'Open the filtered document registry first.' };
@@ -102,7 +116,6 @@ async function downloadRegistryCards(origin, count) {
   const registryTab = [activeTab, incomingTab].find(tab => visible(tab) && !tab.id.startsWith('askodtab_card_'));
 
   let requested = 0;
-  const trace = [];
   function log(message) {
     trace.push({
       time: Date.now(),
@@ -156,6 +169,10 @@ async function downloadRegistryCards(origin, count) {
     if (!opened) {
       return { error: 'The selected document did not open its files viewer.' };
     }
+    return downloadFromViewer(opened);
+  }
+
+  async function downloadFromViewer(opened) {
     const { frame, viewer } = opened;
     log('Files viewer opened.');
     const action = await waitFor(() => {
@@ -164,6 +181,44 @@ async function downloadRegistryCards(origin, count) {
     }, 8000);
     if (!action || !visible(frame)) {
       return { error: 'Could not find the attachments menu in the opened document.' };
+    }
+
+    if (selection) {
+      const jquery = viewer.defaultView.jQuery;
+      if (typeof jquery !== 'function') {
+        return { error: 'The attachment menu is unavailable in this files panel.' };
+      }
+      const readMenu = () => jquery(action).data('contextMenu');
+      if (!readMenu()) {
+        action.click();
+      }
+      const root = await waitFor(readMenu, 3500);
+      if (!root || root.$trigger?.[0] !== action || !visible(root.$menu?.[0]) ||
+          getViewer()?.viewer !== viewer) {
+        return { error: 'Could not verify the active menu for this attachment.' };
+      }
+      const group = root.items?.downloadMain;
+      const item = group?.items?.downloadFiles;
+      const node = item?.$node?.[0];
+      const groupNode = group?.$node?.[0];
+      if (!node || !groupNode || !root.$menu[0].contains(groupNode) || !groupNode.contains(node) ||
+          !visible(groupNode) || !enabled(node) || viewer.defaultView.getComputedStyle(node).display === 'none' ||
+          node.classList.contains(root.classNames.notSelectable) || !enabled(groupNode)) {
+        return { error: 'Download all files is unavailable for this attachment.' };
+      }
+      const data = jquery(node).data();
+      if (data.contextMenuKey !== 'downloadFiles' || data.contextMenuRoot !== root ||
+          data.contextMenu?.items?.downloadFiles !== item) {
+        return { error: 'Could not verify the download command in the attachment menu.' };
+      }
+      const callback = data.contextMenu.callbacks?.downloadFiles ?? root.callback;
+      if (typeof callback !== 'function') {
+        return { error: 'The attachment menu has no download action.' };
+      }
+      if (callback.call(root.$trigger, 'downloadFiles', root) !== false) {
+        root.$menu.trigger('contextmenu:hide');
+      }
+      return {};
     }
 
     const pages = [viewer, frame.contentDocument, document].filter(Boolean);
@@ -176,6 +231,13 @@ async function downloadRegistryCards(origin, count) {
     action.click();
     log('File menu triggered.');
     const menu = await waitFor(() => {
+      for (const page of pages) {
+        const parents = page.querySelectorAll('.context-menu-list [id="downloadMain"], .context-menu-list [key="downloadMain"]');
+        const parent = Array.from(parents).find(item => visible(item) && enabled(item));
+        if (parent) {
+          return { parent };
+        }
+      }
       const direct = findArchiveCommand(pages, downloadAllLabel) ?? findMenuItem(pages, downloadAllLabel);
       if (direct) {
         return { direct };
@@ -186,7 +248,8 @@ async function downloadRegistryCards(origin, count) {
     if (!menu) {
       return { error: 'The file menu did not expose a visible download item.' };
     }
-    const parent = menu.parent ?? menu.direct?.parentElement?.closest('.context-menu-submenu');
+    const parent = menu.parent?.closest('.context-menu-submenu') ??
+      menu.direct?.parentElement?.closest('.context-menu-submenu') ?? menu.parent;
     if (parent) {
       const view = parent.ownerDocument.defaultView;
       const bounds = parent.getBoundingClientRect();
@@ -198,21 +261,33 @@ async function downloadRegistryCards(origin, count) {
           view
         }));
       }
+      const jquery = view.jQuery;
+      if (typeof jquery === 'function' && visible(parent) && enabled(parent) &&
+          parent.matches('.context-menu-submenu') && jquery(parent).data('contextMenuRoot')) {
+        jquery(parent).trigger('contextmenu:focus');
+      }
       log('Download submenu hovered.');
     }
     const downloadAll = await waitFor(() => {
-      const command = findArchiveCommand(pages, downloadAllLabel) ?? findMenuItem(pages, downloadAllLabel);
-      return visible(command) && enabled(command) ? command : null;
+      const command = findMenuItem(pages, downloadAllLabel);
+      if (visible(command) && enabled(command)) {
+        return command;
+      }
+      const archive = findArchiveCommand(pages, downloadAllLabel);
+      return visible(archive) && enabled(archive) ? archive : null;
     }, 3500);
     if (!downloadAll || !visible(frame)) {
-      return { error: 'The ZIP command did not become visible in the download submenu.' };
+      const childExists = pages.some(page => page.querySelector('[id="downloadFiles"], [key="downloadFiles"]'));
+      return { error: childExists ?
+        'The site created the ZIP menu item, but it remained hidden or disabled.' :
+        'The open menu did not expose the downloadFiles command.' };
     }
     await new Promise(resolve => setTimeout(resolve, 350));
     if (!visible(downloadAll) || !enabled(downloadAll) || !visible(frame)) {
       return { error: 'The ZIP command closed or became unavailable before selection.' };
     }
     log('Visible ZIP command found. Sending selection event.');
-    if (downloadAll.matches('.context-menu-item')) {
+    if (downloadAll.matches('.context-menu-item:not([key])')) {
       const view = downloadAll.ownerDocument.defaultView;
       const bounds = downloadAll.getBoundingClientRect();
       downloadAll.dispatchEvent(new view.MouseEvent('mouseup', {

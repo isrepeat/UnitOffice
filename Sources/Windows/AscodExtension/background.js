@@ -1,4 +1,5 @@
 importScripts('filter-redaction.js');
+importScripts('download-first.js');
 
 const storageKey = 'monitor';
 const directContextKey = 'directFilterContext';
@@ -154,6 +155,31 @@ function addDownloadLog(monitor, message, time = Date.now()) {
     monitor.downloadLog.shift();
   }
 }
+
+chrome.downloads.onDeterminingFilename.addListener((item, suggest) => {
+  const filename = item.filename.split(/[/\\]/).pop();
+  const address = item.finalUrl || item.url;
+  if (!/^card_files_\d+\.zip$/i.test(filename) || !URL.canParse(address)) {
+    suggest();
+    return;
+  }
+  const url = new URL(address);
+  if (!/\/Handlers\/FileHandler\.ashx$/i.test(url.pathname)) {
+    suggest();
+    return;
+  }
+  chrome.storage.local.get('serverOrigin').then(settings => {
+    if (url.origin === (settings.serverOrigin ?? defaultOrigin)) {
+      suggest({
+        filename: 'AscodExtensionDownloads/' + filename,
+        conflictAction: 'uniquify'
+      });
+    } else {
+      suggest();
+    }
+  }, () => suggest());
+  return true;
+});
 
 chrome.downloads.onCreated.addListener(item => {
   const filename = item.filename.split(/[/\\]/).pop();
@@ -600,8 +626,8 @@ async function runDirectRowAction(message) {
     [execution] = await chrome.scripting.executeScript({
       target,
       world: 'MAIN',
-      func: downloadAscodZip,
-      args: [context.origin, message.resultId, message.rowKey]
+      func: downloadRegistryCards,
+      args: [context.origin, 1, { resultId: message.resultId, rowKey: message.rowKey }]
     });
   } finally {
     activeDirectDownloads.delete(context.tabId);
@@ -811,8 +837,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
   if (command === 'directDownload' || command === 'openCard') {
-    runDirectRowAction(message).then(() => {
-      sendResponse({ ok: true });
+    runDirectRowAction(message).then(result => {
+      sendResponse({ ok: true, ...result });
     }).catch(error => {
       sendResponse({ ok: false, error: error.message });
     });
