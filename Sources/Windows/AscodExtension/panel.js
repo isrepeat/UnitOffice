@@ -48,6 +48,7 @@ const directFilter = document.getElementById('direct-filter');
 const directDate = document.getElementById('direct-date');
 const directResult = document.getElementById('direct-result');
 const directDownloadZip = document.getElementById('direct-download-zip');
+const selectAllDocuments = document.getElementById('select-all-documents');
 const directDownloadStatus = document.getElementById('direct-download-status');
 let directSelection;
 let downloadingZip = false;
@@ -101,6 +102,7 @@ directFilter.addEventListener('submit', async event => {
   directDownloadZip.disabled = true;
   directDownloadStatus.hidden = true;
   directDocuments.replaceChildren();
+  refreshZipSelection();
   directJson.textContent = '';
   directJsonDetails.hidden = true;
   directJsonDetails.open = false;
@@ -133,47 +135,15 @@ directFilter.addEventListener('submit', async event => {
         checkbox.type = 'checkbox';
         checkbox.name = 'direct-document';
         checkbox.value = record.key;
-        checkbox.disabled = !record.downloadable;
         checkbox.setAttribute('aria-label', 'Select ' + title);
-        const open = document.createElement('button');
-        open.type = 'button';
-        open.className = 'document-link';
-        open.textContent = title;
-        open.title = 'Open card';
-        open.disabled = !record.openable;
-        open.onclick = async () => {
-          open.disabled = true;
-          checkbox.checked = !checkbox.disabled;
-          directSelection.openedRow = undefined;
-          refreshZipSelection();
-          directDownloadStatus.hidden = false;
-          directDownloadStatus.textContent = 'Requesting card opening…';
-          try {
-            if (readServerAddress().origin !== server.origin) {
-              throw new Error('Load documents again for the selected server.');
-            }
-            const reply = await chrome.runtime.sendMessage({
-              command: 'openCard',
-              origin: server.origin,
-              resultId: result.resultId,
-              rowKey: record.key
-            });
-            if (!reply?.ok) {
-              throw new Error(reply?.error ?? 'The registry did not receive the open command.');
-            }
-            directDownloadStatus.textContent = 'Open command sent to the registry.';
-            directSelection.openedRow = record.key;
-            refreshZipSelection();
-          } catch (error) {
-            directDownloadStatus.textContent = error.message;
-          } finally {
-            open.disabled = !record.openable;
-          }
-        };
-        item.append(checkbox, open);
+        checkbox.disabled = !record.openable || !record.downloadable;
+        const label = document.createElement('label');
+        label.append(checkbox, document.createTextNode(title));
+        item.append(label);
         directDocuments.append(item);
       }
       directSelection = { origin: server.origin, resultId: result.resultId };
+      refreshZipSelection();
       directDownloadZip.hidden = !documents.some(record => record.downloadable);
       directResult.textContent = 'Documents on ' + date + ': ' + documents.length + '.';
       return;
@@ -206,19 +176,33 @@ directFilter.addEventListener('submit', async event => {
 
 function refreshZipSelection() {
   const checked = Array.from(directDocuments.querySelectorAll('input:checked'));
-  directDownloadZip.disabled = downloadingZip || !checked.some(row => row.value === directSelection?.openedRow);
-  directDownloadZip.textContent = 'Download ZIP for open card';
+  const available = directDocuments.querySelectorAll('input:enabled').length;
+  selectAllDocuments.parentElement.hidden = !available;
+  selectAllDocuments.checked = available > 0 && checked.length === available;
+  selectAllDocuments.indeterminate = checked.length > 0 && checked.length < available;
+  selectAllDocuments.disabled = downloadingZip || !available;
+  directDownloadZip.disabled = downloadingZip || !checked.length;
+  directDownloadZip.textContent = 'Download selected ZIPs (' + checked.length + ')';
 }
 
 directDocuments.addEventListener('change', refreshZipSelection);
+selectAllDocuments.addEventListener('change', () => {
+  for (const input of directDocuments.querySelectorAll('input:enabled')) {
+    input.checked = selectAllDocuments.checked;
+  }
+  refreshZipSelection();
+});
 
 directDownloadZip.onclick = async () => {
   const selection = directSelection;
-  const row = Array.from(directDocuments.querySelectorAll('input:checked')).find(item => item.value === selection?.openedRow);
-  if (downloadingZip || !selection || !row || row.disabled) {
+  const rows = [...directDocuments.querySelectorAll('input:checked:enabled')];
+  if (downloadingZip || !selection || !rows.length) {
     return;
   }
   downloadingZip = true;
+  selectAllDocuments.disabled = true;
+  const selectable = [...directDocuments.querySelectorAll('input:enabled')];
+  selectable.forEach(input => { input.disabled = true; });
   const loadButton = directFilter.querySelector('button');
   loadButton.disabled = true;
   directDownloadZip.disabled = true;
@@ -228,56 +212,76 @@ directDownloadZip.onclick = async () => {
     if (readServerAddress().origin !== selection.origin) {
       throw new Error('Load documents again for the selected server.');
     }
-    const startedAfter = new Date().toISOString();
-    const result = await chrome.runtime.sendMessage({
-      command: 'directDownload',
-      ...selection,
-      rowKey: row.value
-    });
-    if (!result?.ok) {
-      throw new Error(result?.error ?? 'ZIP download did not start.');
-    }
-    directDownloadStatus.textContent = 'Waiting for Edge to start the ZIP download…';
-    const deadline = Date.now() + 60000;
-    let download;
-    while (!download && Date.now() < deadline) {
-      const items = await chrome.downloads.search({
-        startedAfter,
-        filenameRegex: 'card_files_[0-9]+( \\([0-9]+\\))?\\.zip$'
-      });
-      const matches = items.filter(item => {
-        const url = new URL(item.finalUrl || item.url);
-        return url.origin === selection.origin && /\/FileHandler\.ashx$/i.test(url.pathname);
-      });
-      if (matches.length > 1) {
-        throw new Error('Multiple ZIP downloads started. Check Edge Downloads.');
+    let saved = 0;
+    const failures = [];
+    for (const row of rows) {
+      directDownloadStatus.textContent = 'Opening document ' + (saved + failures.length + 1) + ' of ' + rows.length + '…';
+      const action = { ...selection, rowKey: row.value };
+      const opened = await chrome.runtime.sendMessage({ command: 'openCard', ...action });
+      if (!opened?.ok) {
+        failures.push(opened?.error ?? 'Could not open the card.');
+        continue;
       }
-      download = matches[0];
-      if (!download) {
-        await new Promise(resolve => setTimeout(resolve, 500));
+      try {
+        const startedAfter = new Date().toISOString();
+        const result = await chrome.runtime.sendMessage({
+          command: 'directDownload',
+          ...selection,
+          rowKey: row.value
+        });
+        if (!result?.ok) {
+          throw new Error(result?.error ?? 'ZIP download did not start.');
+        }
+        directDownloadStatus.textContent = 'Waiting for Edge to start the ZIP download…';
+        const deadline = Date.now() + 60000;
+        let download;
+        while (!download && Date.now() < deadline) {
+          const items = await chrome.downloads.search({
+            startedAfter,
+            filenameRegex: 'card_files_[0-9]+( \\([0-9]+\\))?\\.zip$'
+          });
+          const matches = items.filter(item => {
+            const url = new URL(item.finalUrl || item.url);
+            return url.origin === selection.origin && /\/FileHandler\.ashx$/i.test(url.pathname);
+          });
+          if (matches.length > 1) {
+            throw new Error('Multiple ZIP downloads started. Check Edge Downloads.');
+          }
+          download = matches[0];
+          if (!download) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        }
+        if (!download) {
+          throw new Error('Edge did not report a matching ZIP download within one minute.');
+        }
+        directDownloadStatus.textContent = 'Edge is downloading the ZIP…';
+        while (download?.state === 'in_progress') {
+          await new Promise(resolve => setTimeout(resolve, 750));
+          [download] = await chrome.downloads.search({ id: download.id });
+        }
+        if (download?.state !== 'complete') {
+          throw new Error('ZIP download interrupted or removed. Check Edge Downloads.');
+        }
+        row.checked = false;
+        saved++;
+      } catch (error) {
+        failures.push(error.message);
+      }
+      const closed = await chrome.runtime.sendMessage({ command: 'closeCard', ...action });
+      if (!closed?.ok) {
+        throw new Error(closed?.error ?? 'ZIP saved, but the card could not be closed.');
       }
     }
-    if (!download) {
-      throw new Error('Edge did not report a matching ZIP download within one minute.');
-    }
-    directDownloadStatus.textContent = 'Edge is downloading the ZIP…';
-    while (download?.state === 'in_progress') {
-      await new Promise(resolve => setTimeout(resolve, 750));
-      [download] = await chrome.downloads.search({ id: download.id });
-    }
-    if (download?.state !== 'complete') {
-      throw new Error('ZIP download interrupted or removed. Check Edge Downloads.');
-    }
-    row.checked = false;
-    const remaining = directDocuments.querySelectorAll('input:checked').length;
-    directDownloadStatus.textContent = 'ZIP saved: ' + download.filename;
-    if (remaining) {
-      directDownloadStatus.textContent += ' · Still selected: ' + remaining + '. Open the next selected card to continue.';
+    directDownloadStatus.textContent = 'ZIP downloads completed: ' + saved + '.';
+    if (failures.length) {
+      directDownloadStatus.textContent += ' Failed: ' + failures.length + '. ' + failures.join(' ');
     }
   } catch (error) {
     directDownloadStatus.textContent = error.message;
   } finally {
     downloadingZip = false;
+    selectable.forEach(input => { input.disabled = false; });
     refreshZipSelection();
     loadButton.disabled = false;
   }

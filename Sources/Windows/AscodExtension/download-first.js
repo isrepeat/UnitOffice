@@ -93,9 +93,12 @@ async function downloadRegistryCards(origin, count, selection) {
   if (selection) {
     const readCard = window[Symbol.for('unitoffice.ascod.direct-download')];
     const card = typeof readCard === 'function' && readCard(selection.resultId, selection.rowKey);
-    const opened = getViewer();
-    const address = opened?.frame.contentDocument?.location.href;
-    if (!address || !card || new URL(address).searchParams.get('counter') !== String(card.counter)) {
+    const opened = card && await waitFor(() => {
+      const current = getViewer();
+      const address = current?.frame.contentDocument?.location.href;
+      return address && new URL(address).searchParams.get('counter') === String(card.counter) && current;
+    }, 20000);
+    if (!opened) {
       return { error: 'Open the selected card and wait for its files panel.' };
     }
     const result = await downloadFromViewer(opened);
@@ -175,50 +178,69 @@ async function downloadRegistryCards(origin, count, selection) {
   async function downloadFromViewer(opened) {
     const { frame, viewer } = opened;
     log('Files viewer opened.');
+    if (selection) {
+      const jquery = viewer.defaultView.jQuery;
+      if (typeof jquery !== 'function') {
+        return { error: 'The attachment menu is unavailable in this files panel.' };
+      }
+      // Меню привязано и к самой строке дерева, даже когда кнопка видна только при наведении.
+      const targets = await waitFor(() => {
+        const rows = Array.from(viewer.querySelectorAll('#EcdTreeView li > span[id]')).filter(visible);
+        const actions = rows.map(row => {
+          const button = row.querySelector(':scope > .additionalBtn');
+          return visible(button) ? button : row;
+        });
+        return actions.length && actions;
+      }, 8000);
+      if (!targets) {
+        return { error: 'No visible attachment rows in the card tree.' };
+      }
+      for (const action of targets) {
+        if (getViewer()?.viewer !== viewer || !visible(action)) {
+          return { error: 'The active attachment tree changed.' };
+        }
+        if (action.matches('.additionalBtn')) {
+          action.click();
+        } else {
+          action.dispatchEvent(new viewer.defaultView.MouseEvent('contextmenu', { bubbles: true, cancelable: true, button: 2 }));
+        }
+        const root = await waitFor(() => jquery(action).data('contextMenu'), 700);
+        if (!root || root.$trigger?.[0] !== action || !visible(root.$menu?.[0])) {
+          continue;
+        }
+        const group = root.items?.downloadMain;
+        const item = group?.items?.downloadFiles;
+        const node = item?.$node?.[0];
+        const groupNode = group?.$node?.[0];
+        if (!node || !groupNode || !root.$menu[0].contains(groupNode) || !groupNode.contains(node) ||
+            !visible(groupNode) || !enabled(node) || viewer.defaultView.getComputedStyle(node).display === 'none' ||
+            node.classList.contains(root.classNames.notSelectable) || !enabled(groupNode)) {
+          root.$menu.trigger('contextmenu:hide');
+          continue;
+        }
+        const data = jquery(node).data();
+        if (data.contextMenuKey !== 'downloadFiles' || data.contextMenuRoot !== root ||
+            data.contextMenu?.items?.downloadFiles !== item) {
+          return { error: 'Could not verify the download command in the attachment menu.' };
+        }
+        const callback = data.contextMenu.callbacks?.downloadFiles ?? root.callback;
+        if (typeof callback !== 'function') {
+          return { error: 'The attachment menu has no download action.' };
+        }
+        if (callback.call(root.$trigger, 'downloadFiles', root) !== false) {
+          root.$menu.trigger('contextmenu:hide');
+        }
+        return {};
+      }
+      return { error: 'No visible attachment row offers Download all files.' };
+    }
+
     const action = await waitFor(() => {
       const buttons = viewer.querySelectorAll('#EcdTreeView .file .additionalBtn');
       return Array.from(buttons).find(visible);
     }, 8000);
     if (!action || !visible(frame)) {
       return { error: 'Could not find the attachments menu in the opened document.' };
-    }
-
-    if (selection) {
-      const jquery = viewer.defaultView.jQuery;
-      if (typeof jquery !== 'function') {
-        return { error: 'The attachment menu is unavailable in this files panel.' };
-      }
-      const readMenu = () => jquery(action).data('contextMenu');
-      if (!readMenu()) {
-        action.click();
-      }
-      const root = await waitFor(readMenu, 3500);
-      if (!root || root.$trigger?.[0] !== action || !visible(root.$menu?.[0]) ||
-          getViewer()?.viewer !== viewer) {
-        return { error: 'Could not verify the active menu for this attachment.' };
-      }
-      const group = root.items?.downloadMain;
-      const item = group?.items?.downloadFiles;
-      const node = item?.$node?.[0];
-      const groupNode = group?.$node?.[0];
-      if (!node || !groupNode || !root.$menu[0].contains(groupNode) || !groupNode.contains(node) ||
-          !visible(groupNode) || !enabled(node) || viewer.defaultView.getComputedStyle(node).display === 'none' ||
-          node.classList.contains(root.classNames.notSelectable) || !enabled(groupNode)) {
-        return { error: 'Download all files is unavailable for this attachment.' };
-      }
-      const data = jquery(node).data();
-      if (data.contextMenuKey !== 'downloadFiles' || data.contextMenuRoot !== root ||
-          data.contextMenu?.items?.downloadFiles !== item) {
-        return { error: 'Could not verify the download command in the attachment menu.' };
-      }
-      const callback = data.contextMenu.callbacks?.downloadFiles ?? root.callback;
-      if (typeof callback !== 'function') {
-        return { error: 'The attachment menu has no download action.' };
-      }
-      if (callback.call(root.$trigger, 'downloadFiles', root) !== false) {
-        root.$menu.trigger('contextmenu:hide');
-      }
-      return {};
     }
 
     const pages = [viewer, frame.contentDocument, document].filter(Boolean);

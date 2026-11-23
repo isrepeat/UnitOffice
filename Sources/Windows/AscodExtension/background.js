@@ -560,12 +560,39 @@ async function downloadAscodZip(origin, resultId, rowKey) {
   }
 }
 
-function openAscodCard(origin, resultId, rowKey) {
+async function openAscodCard(origin, resultId, rowKey, close) {
   if (location.origin !== origin || !/\/Defaultv4\.aspx$/i.test(location.pathname)) {
     return { error: 'Open the registry and load the documents again.' };
   }
   const readCard = window[Symbol.for('unitoffice.ascod.direct-download')];
   const card = typeof readCard === 'function' ? readCard(resultId, rowKey) : undefined;
+  if (close) {
+    const frame = card && Array.from(document.querySelectorAll('iframe[id^="cardframe_"]')).find(item =>
+      item.getClientRects().length && new URL(item.contentWindow.location.href).searchParams.get('counter') === String(card.counter));
+    if (!frame || typeof window.CloseTab !== 'function' || String(window.GetCurentTabCardCounter?.()) !== String(card.counter)) {
+      return { error: 'The downloaded card is no longer active.' };
+    }
+    const closingTab = window.GetSelectedTabId();
+    window.CloseTab(closingTab);
+    let registryActivated = false;
+    for (let attempt = 0; attempt < 80; attempt++) {
+      // АСКОД может скрыть фрейм закрытой карточки и восстановить реестр позже.
+      const activeTab = window.GetSelectedTabId();
+      if (activeTab !== closingTab && (!frame.isConnected || !frame.getClientRects().length)) {
+        if (activeTab === card.registryTabId && window.GetCurrentEntityName?.() === card.registryName &&
+            window.getGridMasterTableView?.() && !window.IsBlockMainCard()) {
+          return { ok: true };
+        }
+        const registryTab = document.getElementById(card.registryTabId);
+        if (activeTab !== card.registryTabId && !registryActivated && registryTab?.getClientRects().length) {
+          registryActivated = true;
+          registryTab.click();
+        }
+      }
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    return { error: 'The original registry did not become ready after closing the card.' };
+  }
   if (!card || typeof window.EditRecord !== 'function' || !card.registryName ||
       card.registryName !== window.GetCurrentEntityName?.()) {
     return { error: 'Return to the original registry and load the documents again.' };
@@ -585,6 +612,7 @@ function openAscodCard(origin, resultId, rowKey) {
     if (command.IsReturn || !command.EntityName) {
       return { error: 'The registry did not enable the edit command.' };
     }
+    card.registryTabId = window.GetSelectedTabId();
     window.EditRecord(row, command.EntityName);
     window.SetBindCommandGrid();
     return { ok: true };
@@ -604,12 +632,12 @@ async function runDirectRowAction(message) {
   if (context.documentId) {
     target.documentIds = [context.documentId];
   }
-  if (message.command === 'openCard') {
+  if (message.command === 'openCard' || message.command === 'closeCard') {
     const [execution] = await chrome.scripting.executeScript({
       target,
       world: 'MAIN',
       func: openAscodCard,
-      args: [context.origin, message.resultId, message.rowKey]
+      args: [context.origin, message.resultId, message.rowKey, message.command === 'closeCard']
     });
     if (!execution?.result?.ok) {
       throw new Error(execution?.result?.error ?? 'The registry did not receive the open command.');
@@ -836,7 +864,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
     return true;
   }
-  if (command === 'directDownload' || command === 'openCard') {
+  if (command === 'directDownload' || command === 'openCard' || command === 'closeCard') {
     runDirectRowAction(message).then(result => {
       sendResponse({ ok: true, ...result });
     }).catch(error => {
