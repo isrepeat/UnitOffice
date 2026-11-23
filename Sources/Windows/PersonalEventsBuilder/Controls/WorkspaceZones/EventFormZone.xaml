@@ -1,4 +1,5 @@
 <UserControl x:Class="PersonalEventsBuilder.Controls.WorkspaceZones.EventFormZone"
+             x:Name="FormZone"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:PersonalEventsBuilder.Controls">
@@ -24,17 +25,17 @@
                             IsHitTestVisible="False" />
                     <controls:Form Margin="4"
                                    FlowDirection="RightToLeft"
-                                   ItemsSource="{Binding LeftForm}" />
+                                   ItemsSource="{Binding Layout.Left, ElementName=FormZone}" />
                     <controls:Form Grid.Column="1"
                                    Margin="0,4"
-                                   ItemsSource="{Binding CenterForm}" />
+                                   ItemsSource="{Binding Layout.Center, ElementName=FormZone}" />
                     <Border Grid.Column="2"
                             BorderBrush="#9B703D"
                             BorderThickness="1"
                             IsHitTestVisible="False" />
                     <controls:Form Grid.Column="2"
                                    Margin="4"
-                                   ItemsSource="{Binding RightForm}" />
+                                   ItemsSource="{Binding Layout.Right, ElementName=FormZone}" />
                 </Grid>
             </controls:NavigationMatrix>
         </StackPanel>

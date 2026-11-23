@@ -16,12 +16,12 @@
             <controls:CandidateRowView x:Name="CandidateHeader"
                                        Grid.Row="1"
                                        Background="{StaticResource CandidateHeaderBrush}"
-                                       DataContext="{Binding CandidateHeadings}" />
+                                       DataContext="{Binding CandidateTable.Headings}" />
             <ListView x:Name="CandidateList"
                       Grid.Row="2"
                       ScrollViewer.VerticalScrollBarVisibility="Auto"
                       ScrollViewer.HorizontalScrollMode="Disabled"
-                      ItemsSource="{Binding CandidateRows}"
+                      ItemsSource="{Binding CandidateTable.Rows}"
                       ContainerContentChanging="OnCandidateContainerContentChanging"
                       SelectionChanged="OnCandidateSelected">
                 <ListView.ItemContainerStyle>

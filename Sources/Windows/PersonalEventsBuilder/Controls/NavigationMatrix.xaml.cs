@@ -31,24 +31,6 @@ namespace PersonalEventsBuilder.Controls {
             this.PreviewKeyDown += this.OnFormPreviewKeyDown;
         }
 
-        internal Workspace.FormValues ReadValues() {
-            var editors = this.forms.SelectMany(form => form.Editors).ToArray();
-            return new Workspace.FormValues(
-                editors.Where(editor => editor.Field.CoreField.HasValue)
-                    .ToDictionary(editor => editor.Field.CoreField.GetValueOrDefault(), Form.ReadValue),
-                editors.Where(editor => !editor.Field.CoreField.HasValue)
-                    .ToDictionary(editor => editor.Field.Id, Form.ReadValue)
-            );
-        }
-
-        internal void ApplyValues(IReadOnlyDictionary<Workspace.CoreField, Workspace.FieldValue> values) {
-            foreach (var editor in this.forms.SelectMany(form => form.Editors)) {
-                if (editor.Field.CoreField is { } field && values.TryGetValue(field, out var value)) {
-                    Form.SetValue(editor, value);
-                }
-            }
-        }
-
         private void OnLoaded(object sender, RoutedEventArgs args) {
             this.forms = this.Content is Grid grid ? grid.Children.OfType<Form>().ToArray() : [];
             foreach (var form in this.forms) {

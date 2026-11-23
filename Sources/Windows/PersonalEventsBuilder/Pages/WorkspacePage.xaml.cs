@@ -27,7 +27,7 @@ namespace PersonalEventsBuilder.Pages {
             this.ViewModel = new ViewModels.WorkspacePageViewModel(workspaceSource);
             InitializeComponent();
             this.fieldPreviewHeight = this.ActiveFieldPreview.Height;
-            this.EventForm.Matrix.ActiveFieldTextChanged += this.ActiveFieldPreview.SetText;
+            this.EventForm.ActiveFieldTextChanged += this.ActiveFieldPreview.SetText;
             this.ModeSelector.ModeSelected += this.OnModeSelected;
             this.NewEvent.NewEventRequested += this.ViewModel.StartNewEvent;
             this.Candidates.CandidateSelected += this.OnCandidateSelected;
@@ -39,7 +39,7 @@ namespace PersonalEventsBuilder.Pages {
         }
 
         internal void ExecuteAction(string actionId) {
-            this.ViewModel.ExecuteAction(actionId, this.EventForm.Matrix.ReadValues());
+            this.ViewModel.ExecuteAction(actionId, this.EventForm.ReadValues());
         }
 
         private void OnPreviewDragDelta(object sender, DragDeltaEventArgs args) {
@@ -126,8 +126,9 @@ namespace PersonalEventsBuilder.Pages {
         }
 
         private void OnCandidateSelected(string candidateId) {
-            var matrix = this.EventForm.Matrix;
-            matrix.ApplyValues(this.ViewModel.ApplyCandidate(candidateId, matrix.ReadValues()));
+            var values = this.EventForm.ReadValues();
+            var candidateValues = this.ViewModel.ApplyCandidate(candidateId, values);
+            this.EventForm.ApplyValues(candidateValues);
         }
     }
 }

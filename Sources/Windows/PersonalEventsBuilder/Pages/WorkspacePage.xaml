@@ -69,7 +69,8 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <zones:EventFormZone x:Name="EventForm" />
+                        <zones:EventFormZone x:Name="EventForm"
+                                             Layout="{Binding FormLayout}" />
                         <zones:CandidatesZone x:Name="Candidates"
                                               Grid.Row="1" />
                     </Grid>
