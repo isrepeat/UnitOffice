@@ -53,6 +53,8 @@ const directDownloadStatus = document.getElementById('direct-download-status');
 let directSelection;
 let downloadingZip = false;
 const directDocuments = document.getElementById('direct-documents');
+let documentAnchor;
+let focusedDocument;
 const directJson = document.getElementById('direct-json');
 const directJsonDetails = document.getElementById('direct-json-details');
 const saveAll = document.getElementById('save-all');
@@ -102,6 +104,7 @@ directFilter.addEventListener('submit', async event => {
   directDownloadZip.disabled = true;
   directDownloadStatus.hidden = true;
   directDocuments.replaceChildren();
+  documentAnchor = focusedDocument = undefined;
   refreshZipSelection();
   directJson.textContent = '';
   directJsonDetails.hidden = true;
@@ -137,6 +140,11 @@ directFilter.addEventListener('submit', async event => {
         checkbox.value = record.key;
         checkbox.setAttribute('aria-label', 'Select ' + title);
         checkbox.disabled = !record.openable || !record.downloadable;
+        checkbox.tabIndex = -1;
+        if (!focusedDocument && !checkbox.disabled) {
+          focusedDocument = checkbox;
+          checkbox.tabIndex = 0;
+        }
         const label = document.createElement('label');
         label.append(checkbox, document.createTextNode(title));
         item.append(label);
@@ -186,6 +194,70 @@ function refreshZipSelection() {
 }
 
 directDocuments.addEventListener('change', refreshZipSelection);
+function focusDocument(input) {
+  if (focusedDocument) {
+    focusedDocument.tabIndex = -1;
+  }
+  focusedDocument = input;
+  input.tabIndex = 0;
+  input.focus();
+}
+
+function selectDocumentRange(inputs, target, additive) {
+  documentAnchor ??= focusedDocument ?? target;
+  const start = inputs.indexOf(documentAnchor);
+  const end = inputs.indexOf(target);
+  inputs.forEach((input, index) => {
+    const inside = index >= Math.min(start, end) && index <= Math.max(start, end);
+    input.checked = inside || (additive && input.checked);
+  });
+}
+
+directDocuments.addEventListener('click', event => {
+  const input = event.target.closest('li')?.querySelector('input');
+  if (!input || input.disabled) {
+    return;
+  }
+  const inputs = [...directDocuments.querySelectorAll('input:enabled')];
+  const nativeToggle = event.target === input;
+  if (!nativeToggle) {
+    event.preventDefault();
+  }
+  if (event.shiftKey) {
+    selectDocumentRange(inputs, input, event.ctrlKey);
+  } else {
+    documentAnchor = input;
+    if (!nativeToggle && event.ctrlKey) {
+      input.checked = !input.checked;
+    } else if (!nativeToggle) {
+      inputs.forEach(row => { row.checked = row === input; });
+    }
+  }
+  focusDocument(input);
+  refreshZipSelection();
+});
+
+directDocuments.addEventListener('keydown', event => {
+  const input = event.target;
+  if (!input.matches('input:enabled') || !['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) {
+    return;
+  }
+  event.preventDefault();
+  const inputs = [...directDocuments.querySelectorAll('input:enabled')];
+  const index = inputs.indexOf(input);
+  const next = { Home: 0, End: inputs.length - 1, ArrowUp: Math.max(0, index - 1),
+    ArrowDown: Math.min(inputs.length - 1, index + 1) }[event.key];
+  const target = inputs[next];
+  if (event.shiftKey) {
+    documentAnchor ??= input;
+    selectDocumentRange(inputs, target, event.ctrlKey);
+  } else if (!event.ctrlKey) {
+    inputs.forEach(row => { row.checked = row === target; });
+    documentAnchor = target;
+  }
+  focusDocument(target);
+  refreshZipSelection();
+});
 selectAllDocuments.addEventListener('change', () => {
   for (const input of directDocuments.querySelectorAll('input:enabled')) {
     input.checked = selectAllDocuments.checked;

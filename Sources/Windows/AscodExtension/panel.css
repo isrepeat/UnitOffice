@@ -321,6 +321,18 @@ pre,
 td details div {
   white-space: pre-wrap;
 }
+#direct-documents li:has(input:checked) {
+  background: rgba(225, 167, 89, 0.18);
+}
+
+#direct-documents li:has(input:focus-visible) {
+  outline: 1px solid currentColor;
+}
+
+#direct-documents li:has(input) {
+  user-select: none;
+}
+
 #direct-documents .document-link {
   background: transparent;
   border: 0;
