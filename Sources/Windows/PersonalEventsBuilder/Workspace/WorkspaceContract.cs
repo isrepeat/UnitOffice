@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace PersonalEventsBuilder.Workspace {
@@ -8,65 +7,24 @@ namespace PersonalEventsBuilder.Workspace {
         StatusChange,
     }
 
-    public enum CoreField {
-        Person,
-        Reporter,
-        Rank,
-        IncomingNumber,
-        IncomingDate,
-        DocumentType,
-        DocumentNumber,
-        EventDate,
-    }
-
-    public enum FieldKind {
-        Text,
-        Date,
-        Choice,
-        CheckBox,
-    }
-
-    public enum FieldPlacement {
-        Left,
-        Right,
-        Below,
-        Inline,
-    }
-
     public sealed record EventMode(string Id, string Title, bool IsDefault = false);
 
     public sealed record ModeGroup(string Title, IReadOnlyList<EventMode> Modes);
 
-    public sealed record FieldValue(string? Text = null, DateTimeOffset? Date = null, bool? Checked = null);
-
-    public sealed record FormField(string Id, string Title, FieldKind Kind, CoreField? CoreField = null,
-        double Width = 98, bool IsEnabled = true, FieldValue? InitialValue = null, IReadOnlyList<string>? Options = null, CoreField? Anchor = null);
-
-    public sealed record CoreFieldState(CoreField Field, bool IsEnabled = true, FieldValue? InitialValue = null,
-        IReadOnlyList<string>? Options = null, string? Title = null);
-
-    public sealed record ExtensionField(string Id, string Title, FieldKind Kind, FieldPlacement Placement,
-        CoreField? Anchor = null, bool IsEnabled = true, FieldValue? InitialValue = null, IReadOnlyList<string>? Options = null, double Width = 98);
-
     public sealed record WorkspaceAction(string Id, string Title, bool IsEnabled = true);
 
-    public sealed record CandidateColumn(string Id, string Title, CoreField? TargetField = null, string? TargetExtensionId = null);
+    public sealed record CandidateColumn(string Id, string Title);
 
     public sealed record CandidateRow(string Id, IReadOnlyDictionary<string, string> Cells);
 
     public sealed record CandidateTable(IReadOnlyList<CandidateColumn> Columns, IReadOnlyList<CandidateRow> Rows);
 
-    public sealed record FormValues(IReadOnlyDictionary<CoreField, FieldValue> Core, IReadOnlyDictionary<string, FieldValue> Extensions);
-
-    public sealed record ModeWorkspace(string Preview, IReadOnlyList<CoreFieldState> CoreFields,
-        IReadOnlyList<ExtensionField> Extensions, IReadOnlyList<WorkspaceAction> Actions, CandidateTable Candidates,
-        IReadOnlyList<string>? CenterFieldOrder = null);
+    public sealed record ModeWorkspace(string Preview, IReadOnlyList<WorkspaceAction> Actions, CandidateTable Candidates);
 
     public interface IWorkspaceSource {
         IReadOnlyList<EventMode> GetModes(ModeCategory category);
         ModeWorkspace OpenMode(string modeId);
-        IReadOnlyDictionary<CoreField, FieldValue> ApplyCandidate(string modeId, string candidateId, FormValues values);
-        string ExecuteAction(string? modeId, string actionId, FormValues values);
+        string ExecuteAction(string? modeId, string actionId);
     }
 
     internal static class WorkspaceActions {

@@ -13,17 +13,15 @@
             <TextBlock x:Uid="Tr_CandidatesHeading"
                        Margin="0,0,0,4"
                        Style="{StaticResource PanelHeading}" />
-            <controls:CandidateRowView x:Name="CandidateHeader"
-                                       Grid.Row="1"
+            <controls:CandidateRowView Grid.Row="1"
                                        Background="{StaticResource CandidateHeaderBrush}"
                                        DataContext="{Binding CandidateTable.Headings}" />
-            <ListView x:Name="CandidateList"
-                      Grid.Row="2"
+            <ListView Grid.Row="2"
                       ScrollViewer.VerticalScrollBarVisibility="Auto"
                       ScrollViewer.HorizontalScrollMode="Disabled"
                       ItemsSource="{Binding CandidateTable.Rows}"
-                      ContainerContentChanging="OnCandidateContainerContentChanging"
-                      SelectionChanged="OnCandidateSelected">
+                      SelectionMode="None"
+                      ContainerContentChanging="OnCandidateContainerContentChanging">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
                         <Setter Property="HorizontalContentAlignment"

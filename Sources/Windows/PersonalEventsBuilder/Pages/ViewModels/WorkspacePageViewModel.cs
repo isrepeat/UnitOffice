@@ -30,7 +30,6 @@ namespace PersonalEventsBuilder.Pages.ViewModels {
         public Workspace.ModeGroup[] ModeGroups { get; }
         public Workspace.ModeWorkspace? Current { get; private set; }
         public bool CanStartNewEvent => this.eventMode is not null;
-        public Workspace.EventFormLayout? FormLayout { get; private set; }
         public string Preview => this.Current?.Preview ?? Localization.UiStrings.Get("Tr_ChooseMode");
         public string Status { get; private set; } = Localization.UiStrings.Get("Tr_Ready");
         public IReadOnlyList<Workspace.WorkspaceAction>? Actions => this.Current?.Actions;
@@ -54,26 +53,19 @@ namespace PersonalEventsBuilder.Pages.ViewModels {
 
         private void LoadMode(Workspace.EventMode eventMode) {
             var modeWorkspace = this.workspaceSource.OpenMode(eventMode.Id);
-            var formLayout = Workspace.EventFormLayoutBuilder.Build(modeWorkspace);
-            this.FormLayout = formLayout;
-            this.CandidateTable = CandidateTableBuilder.Build(modeWorkspace.Candidates, formLayout.PrimaryRow);
+            this.CandidateTable = CandidateTableBuilder.Build(modeWorkspace.Candidates);
             this.Current = modeWorkspace;
             this.eventMode = eventMode;
             this.Status = Localization.UiStrings.Get("Tr_Ready");
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
         }
 
-        public IReadOnlyDictionary<Workspace.CoreField, Workspace.FieldValue> ApplyCandidate(string candidateId, Workspace.FormValues values) =>
-            this.eventMode is { } mode
-                ? this.workspaceSource.ApplyCandidate(mode.Id, candidateId, values)
-                : new Dictionary<Workspace.CoreField, Workspace.FieldValue>();
-
-        public void ExecuteAction(string actionId, Workspace.FormValues values) {
+        public void ExecuteAction(string actionId) {
             if (this.Actions?.Any(action => action.Id == actionId && action.IsEnabled) != true) {
                 return;
             }
 
-            this.Status = this.workspaceSource.ExecuteAction(this.eventMode?.Id, actionId, values);
+            this.Status = this.workspaceSource.ExecuteAction(this.eventMode?.Id, actionId);
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Status)));
         }
     }

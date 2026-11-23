@@ -38,48 +38,6 @@ namespace PersonalEventsBuilder.Workspace {
                 ? Localization.UiStrings.Get("Tr_DemoAnnualLeavePreview")
                 : Localization.UiStrings.Get("Tr_PreviewPending");
 
-            CoreFieldState[] coreFields = modeId switch {
-                BusinessTrip => [
-                    new(CoreField.DocumentType, InitialValue: new(Localization.UiStrings.Get("Tr_DemoOrder")), Options: new[] { Localization.UiStrings.Get("Tr_DemoOrder"), Localization.UiStrings.Get("Tr_DemoReport") }),
-                    new(CoreField.IncomingNumber, IsEnabled: false),
-                ],
-                Treatment => [
-                    new(CoreField.Reporter, Title: Localization.UiStrings.Get("Tr_FieldReporterPerson")),
-                    new(CoreField.EventDate, Title: Localization.UiStrings.Get("Tr_FieldTreatmentDepartureDate")),
-                ],
-                _ => [],
-            };
-            ExtensionField[] extensions = modeId switch {
-                Treatment => [
-                    new("hospital-short-name", Localization.UiStrings.Get("Tr_FieldHospitalShortName"), FieldKind.Text, FieldPlacement.Left, Width: 160),
-                    new("hospital", Localization.UiStrings.Get("Tr_FieldHospital"), FieldKind.Text, FieldPlacement.Left),
-                    new("tax-number", Localization.UiStrings.Get("Tr_FieldTaxNumber"), FieldKind.Text, FieldPlacement.Inline),
-                    new("role-code", Localization.UiStrings.Get("Tr_FieldRoleCode"), FieldKind.Text, FieldPlacement.Inline),
-                    new("role", Localization.UiStrings.Get("Tr_FieldRole"), FieldKind.Text, FieldPlacement.Inline),
-                    new("reporter-rank", Localization.UiStrings.Get("Tr_FieldReporterRank"), FieldKind.Text, FieldPlacement.Inline),
-                    new("reporter-role-code", Localization.UiStrings.Get("Tr_FieldReporterRoleCode"), FieldKind.Text, FieldPlacement.Inline, Width: 140),
-                    new("document-date", Localization.UiStrings.Get("Tr_FieldDocumentDate"), FieldKind.Date, FieldPlacement.Inline),
-                ],
-                BusinessTrip => [
-                    new("destination", Localization.UiStrings.Get("Tr_FieldDestination"), FieldKind.Text, FieldPlacement.Left),
-                    new("host-unit", Localization.UiStrings.Get("Tr_FieldHostUnit"), FieldKind.Text, FieldPlacement.Left),
-                    new("contact", Localization.UiStrings.Get("Tr_FieldTripContact"), FieldKind.Text, FieldPlacement.Left),
-                    new("return-date", Localization.UiStrings.Get("Tr_FieldReturnDate"), FieldKind.Date, FieldPlacement.Right),
-                    new("departure-date", Localization.UiStrings.Get("Tr_FieldDepartureDate"), FieldKind.Date, FieldPlacement.Right),
-                    new("purpose", Localization.UiStrings.Get("Tr_FieldTripPurpose"), FieldKind.Text, FieldPlacement.Below, CoreField.DocumentNumber),
-                ],
-                ExtendLeave => [
-                    new("leave-place", Localization.UiStrings.Get("Tr_FieldDestination"), FieldKind.Text, FieldPlacement.Left),
-                    new("contact", Localization.UiStrings.Get("Tr_FieldTripContact"), FieldKind.Text, FieldPlacement.Left),
-                    new("previous-return", Localization.UiStrings.Get("Tr_FieldPreviousReturnDate"), FieldKind.Date, FieldPlacement.Right),
-                    new("new-return", Localization.UiStrings.Get("Tr_FieldReturnDate"), FieldKind.Date, FieldPlacement.Right),
-                    new("extra-days", Localization.UiStrings.Get("Tr_FieldExtraDays"), FieldKind.Text, FieldPlacement.Right, InitialValue: new("3")),
-                    new("basis", Localization.UiStrings.Get("Tr_FieldExtensionBasis"), FieldKind.Text, FieldPlacement.Below, CoreField.DocumentNumber),
-                    new("basis-date", Localization.UiStrings.Get("Tr_FieldDocumentDate"), FieldKind.Date, FieldPlacement.Below, CoreField.DocumentNumber),
-                ],
-                _ => [],
-            };
-
             WorkspaceAction[] actions = [
                 new(WorkspaceActions.LoadDatabase, Localization.UiStrings.Get("Tr_LoadDatabase")),
                 new(WorkspaceActions.ReloadConfiguration, Localization.UiStrings.Get("Tr_ReloadConfiguration")),
@@ -88,52 +46,23 @@ namespace PersonalEventsBuilder.Workspace {
 
             CandidateColumn[] columns = modeId == BusinessTrip
                 ? [
-                    new("person", Localization.UiStrings.Get("Tr_FieldPerson"), CoreField.Person),
-                    new("rank", Localization.UiStrings.Get("Tr_FieldRank"), CoreField.Rank),
+                    new("person", Localization.UiStrings.Get("Tr_FieldPerson")),
+                    new("rank", Localization.UiStrings.Get("Tr_FieldRank")),
                     new("role", Localization.UiStrings.Get("Tr_FieldRole")),
                 ]
                 : [
-                    new("person", Localization.UiStrings.Get("Tr_FieldPerson"), CoreField.Person),
-                    new("rank", Localization.UiStrings.Get("Tr_FieldRank"), CoreField.Rank),
-                    new("role", Localization.UiStrings.Get("Tr_FieldRole"), TargetExtensionId: "role"),
-                    new("document", Localization.UiStrings.Get("Tr_FieldDocument"), CoreField.DocumentType),
-                    new("document-number", Localization.UiStrings.Get("Tr_FieldDocumentNumber"), CoreField.DocumentNumber),
-                    new("document-date", Localization.UiStrings.Get("Tr_FieldDocumentDate"), TargetExtensionId: "document-date"),
+                    new("person", Localization.UiStrings.Get("Tr_FieldPerson")),
+                    new("rank", Localization.UiStrings.Get("Tr_FieldRank")),
+                    new("role", Localization.UiStrings.Get("Tr_FieldRole")),
+                    new("document", Localization.UiStrings.Get("Tr_FieldDocument")),
+                    new("document-number", Localization.UiStrings.Get("Tr_FieldDocumentNumber")),
+                    new("document-date", Localization.UiStrings.Get("Tr_FieldDocumentDate")),
                 ];
             CandidateRow[] rows = modeId == BusinessTrip
                 ? CreateDemoCandidates()
                 : [];
 
-            string[]? centerFieldOrder = modeId == Treatment ? [
-                nameof(CoreField.Rank),
-                nameof(CoreField.Person),
-                "tax-number",
-                "role-code",
-                "role",
-                "reporter-rank",
-                nameof(CoreField.Reporter),
-                "reporter-role-code",
-                nameof(CoreField.IncomingNumber),
-                nameof(CoreField.IncomingDate),
-                nameof(CoreField.DocumentType),
-                nameof(CoreField.DocumentNumber),
-                "document-date",
-                nameof(CoreField.EventDate),
-            ] : null;
-
-            return new ModeWorkspace(preview, coreFields, extensions, actions, new CandidateTable(columns, rows), centerFieldOrder);
-        }
-
-        public IReadOnlyDictionary<CoreField, FieldValue> ApplyCandidate(string modeId, string candidateId, FormValues values) {
-            var candidate = modeId == BusinessTrip
-                ? Array.Find(CreateDemoCandidates(), row => row.Id == candidateId)
-                : null;
-            return candidate is not null
-                ? new Dictionary<CoreField, FieldValue> {
-                    [CoreField.Person] = new(candidate.Cells["person"]),
-                    [CoreField.Rank] = new(candidate.Cells["rank"]),
-                }
-                : new Dictionary<CoreField, FieldValue>();
+            return new ModeWorkspace(preview, actions, new CandidateTable(columns, rows));
         }
 
         private static CandidateRow[] CreateDemoCandidates() => [
@@ -150,6 +79,6 @@ namespace PersonalEventsBuilder.Workspace {
                 ["role"] = Localization.UiStrings.Get(roleKey),
             });
 
-        public string ExecuteAction(string? modeId, string actionId, FormValues values) => Localization.UiStrings.Get("Tr_ActionPending");
+        public string ExecuteAction(string? modeId, string actionId) => Localization.UiStrings.Get("Tr_ActionPending");
     }
 }

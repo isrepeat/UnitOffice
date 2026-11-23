@@ -123,44 +123,4 @@
         <Setter Property="FontSize"
                 Value="12" />
     </Style>
-    <Style x:Key="WorkspaceResizeHandle"
-           TargetType="Thumb">
-        <Setter Property="IsTabStop"
-                Value="True" />
-        <Setter Property="UseSystemFocusVisuals"
-                Value="True" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Thumb">
-                    <Grid Background="Transparent">
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="CommonStates">
-                                <VisualState x:Name="Normal" />
-                                <VisualState x:Name="PointerOver">
-                                    <VisualState.Setters>
-                                        <Setter Target="ResizeLine.Background"
-                                                Value="#909090" />
-                                        <Setter Target="ResizeLine.Height"
-                                                Value="2" />
-                                    </VisualState.Setters>
-                                </VisualState>
-                                <VisualState x:Name="Pressed">
-                                    <VisualState.Setters>
-                                        <Setter Target="ResizeLine.Background"
-                                                Value="#909090" />
-                                        <Setter Target="ResizeLine.Height"
-                                                Value="2" />
-                                    </VisualState.Setters>
-                                </VisualState>
-                            </VisualStateGroup>
-                        </VisualStateManager.VisualStateGroups>
-                        <Border x:Name="ResizeLine"
-                                Height="1"
-                                Background="#515151"
-                                VerticalAlignment="Center" />
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
 </ResourceDictionary>

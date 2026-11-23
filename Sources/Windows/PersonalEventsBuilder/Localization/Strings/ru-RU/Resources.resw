@@ -21,17 +21,6 @@
 Коваля Алексея — после ежегодного отпуска.
 Основание: рапорт № 42 от 20.11.2026.</value></data>
   <data name="Tr_PreviewPending" xml:space="preserve"><value>Предпросмотр появится после подключения шаблонов.</value></data>
-  <data name="Tr_DemoOrder" xml:space="preserve"><value>Приказ</value></data>
-  <data name="Tr_DemoReport" xml:space="preserve"><value>Рапорт</value></data>
-  <data name="Tr_FieldDestination" xml:space="preserve"><value>Место</value></data>
-  <data name="Tr_FieldReturnDate" xml:space="preserve"><value>Дата возвращения</value></data>
-  <data name="Tr_FieldTripPurpose" xml:space="preserve"><value>Цель командировки</value></data>
-  <data name="Tr_FieldHostUnit" xml:space="preserve"><value>Подразделение</value></data>
-  <data name="Tr_FieldTripContact" xml:space="preserve"><value>Контакт</value></data>
-  <data name="Tr_FieldDepartureDate" xml:space="preserve"><value>Дата выезда</value></data>
-  <data name="Tr_FieldPreviousReturnDate" xml:space="preserve"><value>Прежняя дата</value></data>
-  <data name="Tr_FieldExtraDays" xml:space="preserve"><value>Доп. дни</value></data>
-  <data name="Tr_FieldExtensionBasis" xml:space="preserve"><value>Основание</value></data>
   <data name="Tr_LoadDatabase" xml:space="preserve"><value>Загрузить базу</value></data>
   <data name="Tr_ReloadConfiguration" xml:space="preserve"><value>Обновить конфигурацию</value></data>
   <data name="Tr_SaveEvent" xml:space="preserve"><value>Сохранить событие</value></data>
@@ -53,11 +42,6 @@
   <data name="Tr_DemoPerson4" xml:space="preserve"><value>Бондарь Максим</value></data>
   <data name="Tr_DemoRole4" xml:space="preserve"><value>Механик</value></data>
   <data name="Tr_ActionPending" xml:space="preserve"><value>Команда пока не подключена.</value></data>
-  <data name="Tr_FieldReporter" xml:space="preserve"><value>Докладчик</value></data>
-  <data name="Tr_FieldIncomingNumber" xml:space="preserve"><value>Вх. №</value></data>
-  <data name="Tr_FieldIncomingDate" xml:space="preserve"><value>Вх. дата</value></data>
-  <data name="Tr_FieldEventDate" xml:space="preserve"><value>Дата события</value></data>
-  <data name="Tr_DateFormatHint" xml:space="preserve"><value>Формат даты: ДД.ММ.ГГГГ</value></data>
   <data name="Tr_CategoryArrival" xml:space="preserve"><value>Прибытие</value></data>
   <data name="Tr_CategoryDeparture" xml:space="preserve"><value>Убытие</value></data>
   <data name="Tr_CategoryStatusChange" xml:space="preserve"><value>Изменение статуса</value></data>
@@ -88,16 +72,4 @@
   <data name="Tr_SettingsMenu.Text" xml:space="preserve"><value>Настройки</value></data>
   <data name="Tr_SettingsHeading.Text" xml:space="preserve"><value>Настройки</value></data>
   <data name="Tr_NewEventLabel.Text" xml:space="preserve"><value>Новое событие</value></data>
-  <data name="Tr_ActiveFieldPreview" xml:space="preserve"><value>Текст активного поля</value></data>
-  <data name="Tr_ResizeActiveFieldPreview" xml:space="preserve"><value>Изменить высоту просмотра активного поля</value></data>
-  <data name="Tr_ScrollFormLeft" xml:space="preserve"><value>Прокрутить форму влево</value></data>
-  <data name="Tr_ScrollFormRight" xml:space="preserve"><value>Прокрутить форму вправо</value></data>
-  <data name="Tr_FieldHospital" xml:space="preserve"><value>Больница</value></data>
-  <data name="Tr_FieldHospitalShortName" xml:space="preserve"><value>Больница. Краткое название</value></data>
-  <data name="Tr_FieldTaxNumber" xml:space="preserve"><value>ИНН</value></data>
-  <data name="Tr_FieldRoleCode" xml:space="preserve"><value>Код должности</value></data>
-  <data name="Tr_FieldReporterRank" xml:space="preserve"><value>Рапорт. звание</value></data>
-  <data name="Tr_FieldReporterPerson" xml:space="preserve"><value>Рапорт. ФИО</value></data>
-  <data name="Tr_FieldReporterRoleCode" xml:space="preserve"><value>Рапорт. код должности</value></data>
-  <data name="Tr_FieldTreatmentDepartureDate" xml:space="preserve"><value>Дата выбытия</value></data>
 </root>
