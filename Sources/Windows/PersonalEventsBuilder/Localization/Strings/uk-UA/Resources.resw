@@ -53,8 +53,13 @@
   <data name="Tr_SettingsMenu.Text" xml:space="preserve"><value>Налаштування</value></data>
   <data name="Tr_SettingsHeading.Text" xml:space="preserve"><value>Налаштування</value></data>
   <data name="Tr_NewEventLabel.Text" xml:space="preserve"><value>Нова подія</value></data>
-  <data name="Tr_CandidatesHeading.Text" xml:space="preserve"><value>Кандидати</value></data>
-  <data name="Tr_MatrixPerson" xml:space="preserve"><value>ПІБ</value></data>
-  <data name="Tr_MatrixRank" xml:space="preserve"><value>Звання</value></data>
-  <data name="Tr_MatrixDocumentNumber" xml:space="preserve"><value>№ документа</value></data>
+  <data name="Tr_WorkspacePerson" xml:space="preserve"><value>ПІБ</value></data>
+  <data name="Tr_WorkspaceRank" xml:space="preserve"><value>Звання</value></data>
+  <data name="Tr_WorkspaceDocumentNumber" xml:space="preserve"><value>№ документа</value></data>
+  <data name="Tr_WorkspaceSummaryHeading.Text" xml:space="preserve"><value>Зведення</value></data>
+  <data name="Tr_WorkspaceSummaryPreview" xml:space="preserve"><value>Підтвердьте кандидата клавішею Enter.</value></data>
+  <data name="Tr_WorkspaceCandidateOne" xml:space="preserve"><value>Коваль Олексій</value></data>
+  <data name="Tr_WorkspaceCandidateTwo" xml:space="preserve"><value>Мельник Андрій</value></data>
+  <data name="Tr_WorkspaceRankOne" xml:space="preserve"><value>солдат</value></data>
+  <data name="Tr_WorkspaceRankTwo" xml:space="preserve"><value>сержант</value></data>
 </root>

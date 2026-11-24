@@ -30,9 +30,10 @@
             <zones:WordPreviewZone Grid.Column="2" />
         </Grid>
 
-        <zones:MainZone Grid.Row="1" />
+        <zones:MainZone Grid.Row="1"
+                        Layout="{Binding WorkspaceLayout}" />
         <zones:ActionsZone x:Name="ActionsZone"
-                                    Grid.Column="1"
-                                    Grid.RowSpan="2" />
+                           Grid.Column="1"
+                           Grid.RowSpan="2" />
     </Grid>
 </Page>
