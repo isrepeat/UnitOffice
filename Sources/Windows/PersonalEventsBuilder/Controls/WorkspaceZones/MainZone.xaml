@@ -3,11 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:main="using:PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections"
              IsTabStop="True"
+             AllowFocusOnInteraction="False"
              GotFocus="OnWorkspaceGotFocus"
              PreviewKeyDown="OnWorkspaceKeyDown">
     <Border Style="{StaticResource PanelBorder}">
         <ScrollViewer x:Name="WorkspaceViewport"
                       IsTabStop="False"
+                      AllowFocusOnInteraction="False"
                       HorizontalScrollMode="Enabled"
                       HorizontalScrollBarVisibility="Auto"
                       VerticalScrollMode="Enabled"
@@ -17,6 +19,7 @@
             <Grid x:Name="WorkspaceSurface"
                   Background="Transparent"
                   SizeChanged="OnWorkspaceSurfaceSizeChanged"
+                  PointerPressed="OnWorkspacePointerPressed"
                   Tapped="OnWorkspaceTapped"
                   DoubleTapped="OnWorkspaceDoubleTapped">
                 <Canvas IsHitTestVisible="False">

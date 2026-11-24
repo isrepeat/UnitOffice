@@ -141,9 +141,30 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones {
             );
         }
 
+        private void OnWorkspacePointerPressed(object sender, PointerRoutedEventArgs args) {
+            if (this.activeTarget is not { } navigationTarget
+                || !args.GetCurrentPoint(this.WorkspaceSurface).Properties.IsLeftButtonPressed
+                || this.FindTargetAt(args.GetCurrentPoint(this.WorkspaceSurface).Position).HasValue) {
+                return;
+            }
+
+            args.Handled = true;
+            if (!navigationTarget.Zone.IsEditing) {
+                this.Focus(FocusState.Programmatic);
+            }
+        }
+
         private void OnWorkspaceTapped(object sender, TappedRoutedEventArgs args) {
-            if (this.FindTargetAt(args.GetPosition(this.WorkspaceSurface)) is { } navigationTarget
-                && (this.activeTarget?.Zone.IsEditing != true || this.activeTarget != navigationTarget)) {
+            var targetAtPointer = this.FindTargetAt(args.GetPosition(this.WorkspaceSurface));
+            if (targetAtPointer is not { } navigationTarget) {
+                if (this.activeTarget is { } currentTarget && !currentTarget.Zone.IsEditing) {
+                    this.Focus(FocusState.Programmatic);
+                }
+
+                return;
+            }
+
+            if (this.activeTarget?.Zone.IsEditing != true || this.activeTarget != navigationTarget) {
                 this.FocusTarget(navigationTarget);
             }
         }

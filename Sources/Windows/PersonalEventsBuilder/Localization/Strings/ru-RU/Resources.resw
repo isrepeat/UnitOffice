@@ -56,6 +56,7 @@
   <data name="Tr_WorkspacePerson" xml:space="preserve"><value>ФИО</value></data>
   <data name="Tr_WorkspaceRank" xml:space="preserve"><value>Звание</value></data>
   <data name="Tr_WorkspaceDocumentNumber" xml:space="preserve"><value>№ документа</value></data>
+  <data name="Tr_WorkspaceDocumentDate" xml:space="preserve"><value>Дата документа</value></data>
   <data name="Tr_WorkspaceSummaryHeading.Text" xml:space="preserve"><value>Сводка</value></data>
   <data name="Tr_WorkspaceSummaryPreview" xml:space="preserve"><value>Подтвердите кандидата клавишей Enter.</value></data>
   <data name="Tr_WorkspaceCandidateOne" xml:space="preserve"><value>Коваль Алексей</value></data>

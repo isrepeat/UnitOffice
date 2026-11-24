@@ -4,6 +4,8 @@
     <Canvas>
         <Canvas x:Name="FieldLabels"
                 IsHitTestVisible="False" />
+        <Canvas x:Name="FieldValues"
+                IsHitTestVisible="False" />
         <TextBox x:Name="FieldEditor"
                  MinWidth="0"
                  MinHeight="0"
