@@ -56,6 +56,8 @@
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\MainZoneSections\SummarySection.xaml.cs" Link="Controls\WorkspaceZones\MainZoneSections\SummarySection.xaml.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\MainZone.xaml" Link="Controls\WorkspaceZones\MainZone.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\MainZone.xaml.cs" Link="Controls\WorkspaceZones\MainZone.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WorkspaceCells.xaml" Link="Controls\WorkspaceZones\WorkspaceCells.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WorkspaceCells.xaml.cs" Link="Controls\WorkspaceZones\WorkspaceCells.xaml.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\WorkspaceResources.xaml" Link="Controls\WorkspaceZones\WorkspaceResources.xaml" />
     <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\Strings\ru-RU\Resources.resw" Link="Localization\Strings\ru-RU\Resources.resw" />
     <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\Strings\uk-UA\Resources.resw" Link="Localization\Strings\uk-UA\Resources.resw" />
@@ -79,6 +81,7 @@
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\MainZoneSections\CandidatesSectionViewModel.cs" Link="Controls\WorkspaceZones\MainZoneSections\CandidatesSectionViewModel.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\MainZoneSections\EventFormSectionViewModel.cs" Link="Controls\WorkspaceZones\MainZoneSections\EventFormSectionViewModel.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\MainZoneSections\SummarySectionViewModel.cs" Link="Controls\WorkspaceZones\MainZoneSections\SummarySectionViewModel.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Workspace\WorkspaceCell.cs" Link="Workspace\WorkspaceCell.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Workspace\WorkspaceGrid.cs" Link="Workspace\WorkspaceGrid.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Workspace\INavigableZone.cs" Link="Workspace\INavigableZone.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Workspace\WorkspaceLayout.cs" Link="Workspace\WorkspaceLayout.cs" />

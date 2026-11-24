@@ -1,3 +1,7 @@
+using System;
+
+using Windows.Foundation;
+
 namespace PersonalEventsBuilder.Workspace {
     internal readonly record struct NavigationTarget(INavigableZone Zone, int Index) {
         internal GridArea Area => this.Zone.GetWorkspaceArea(this.Index);
@@ -23,6 +27,32 @@ namespace PersonalEventsBuilder.Workspace {
             }
 
             return null;
+        }
+
+        internal NavigationTarget? FindNearest(Point position) {
+            var row = (int)(position.Y / WorkspaceGrid.RowHeight);
+            var column = (int)(position.X / WorkspaceGrid.ColumnWidth);
+            if (this.FindAt(row, column) is { } directTarget) {
+                return directTarget;
+            }
+
+            NavigationTarget? nearestTarget = null;
+            var bestDistance = double.PositiveInfinity;
+            foreach (var navigableZone in this.navigableZones) {
+                for (var index = 0; index < navigableZone.TargetCount; index++) {
+                    var navigationTarget = new NavigationTarget(navigableZone, index);
+                    var bounds = WorkspaceGrid.GetBounds(navigationTarget.Area);
+                    var dx = position.X - Math.Clamp(position.X, bounds.Left, bounds.Right);
+                    var dy = position.Y - Math.Clamp(position.Y, bounds.Top, bounds.Bottom);
+                    var distance = dx * dx + dy * dy;
+                    if (distance < bestDistance) {
+                        bestDistance = distance;
+                        nearestTarget = navigationTarget;
+                    }
+                }
+            }
+
+            return nearestTarget;
         }
 
         internal NavigationTarget? FindNext(NavigationTarget? current, NavigationDirection direction) {

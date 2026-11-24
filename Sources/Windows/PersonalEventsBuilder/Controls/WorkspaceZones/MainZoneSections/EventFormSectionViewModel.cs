@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 
 using Windows.System;
 
 using GridArea = PersonalEventsBuilder.Workspace.GridArea;
+using CellTextStyle = PersonalEventsBuilder.Workspace.CellTextStyle;
 using INavigableZone = PersonalEventsBuilder.Workspace.INavigableZone;
 using WorkspaceSectionBase = PersonalEventsBuilder.Workspace.WorkspaceSectionBase;
+using WorkspaceCell = PersonalEventsBuilder.Workspace.WorkspaceCell;
 
 namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
     internal enum LabelPlacement {
@@ -28,6 +31,7 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
     }
 
     public sealed class EventFormSectionViewModel : WorkspaceSectionBase, INavigableZone {
+        public WorkspaceCell[] VisibleCells { get; private set; } = [];
         internal override int RowCount { get; }
         internal override int ColumnCount { get; }
         internal int? EditingIndex { get; private set; }
@@ -56,10 +60,11 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
                     this.ColumnCount = Math.Max(this.ColumnCount, labelArea.Right);
                 }
             }
+
+            this.UpdateVisibleCells();
         }
 
         internal event Action? EditingChanged;
-        internal event Action<int>? FieldChanged;
 
         GridArea INavigableZone.GetTargetArea(int index) => this.eventFields[index].Area;
         int? INavigableZone.FindTargetAt(int row, int column) => this.FindTargetAt(row, column);
@@ -92,7 +97,7 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
             this.EditingIndex = null;
             if (commit) {
                 this.eventFields[index] = this.eventFields[index] with { Text = this.EditorText };
-                this.FieldChanged?.Invoke(index);
+                this.UpdateVisibleCells();
             }
 
             this.EditingChanged?.Invoke();
@@ -101,6 +106,19 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
         internal override bool IsInsideRowSpan(int row, int column) {
             var above = this.FindDisplayArea(row - 1, column);
             return above.HasValue && above == this.FindDisplayArea(row, column);
+        }
+
+        private void UpdateVisibleCells() {
+            var workspaceCells = new List<WorkspaceCell>();
+            foreach (var eventField in this.eventFields) {
+                workspaceCells.Add(new WorkspaceCell(eventField.Area, eventField.DisplayText));
+                if (eventField.LabelArea is { } labelArea) {
+                    workspaceCells.Add(new WorkspaceCell(labelArea, eventField.Label, CellTextStyle.Heading));
+                }
+            }
+
+            this.VisibleCells = workspaceCells.ToArray();
+            this.NotifyPropertyChanged(nameof(VisibleCells));
         }
 
         internal override bool IsInsideColumnSpan(int row, int column) {

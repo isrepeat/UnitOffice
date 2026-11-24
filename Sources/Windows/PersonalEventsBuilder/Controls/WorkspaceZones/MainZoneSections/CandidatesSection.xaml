@@ -1,6 +1,6 @@
 <UserControl x:Class="PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections.CandidatesSection"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Canvas x:Name="CellLabels"
-            IsHitTestVisible="False" />
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:zones="using:PersonalEventsBuilder.Controls.WorkspaceZones">
+    <zones:WorkspaceCells Cells="{x:Bind ViewModel.VisibleCells, Mode=OneWay}" />
 </UserControl>

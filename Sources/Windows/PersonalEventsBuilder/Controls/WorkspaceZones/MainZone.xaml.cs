@@ -142,29 +142,20 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones {
         }
 
         private void OnWorkspacePointerPressed(object sender, PointerRoutedEventArgs args) {
-            if (this.activeTarget is not { } navigationTarget
-                || !args.GetCurrentPoint(this.WorkspaceSurface).Properties.IsLeftButtonPressed
-                || this.FindTargetAt(args.GetCurrentPoint(this.WorkspaceSurface).Position).HasValue) {
+            var pointerPoint = args.GetCurrentPoint(this.WorkspaceSurface);
+            if (!pointerPoint.Properties.IsLeftButtonPressed
+                || this.FindTargetAt(pointerPoint.Position).HasValue
+                || this.Layout?.WorkspaceNavigation.FindNearest(pointerPoint.Position) is not { } navigationTarget) {
                 return;
             }
 
             args.Handled = true;
-            if (!navigationTarget.Zone.IsEditing) {
-                this.Focus(FocusState.Programmatic);
-            }
+            this.FocusTarget(navigationTarget);
         }
 
         private void OnWorkspaceTapped(object sender, TappedRoutedEventArgs args) {
-            var targetAtPointer = this.FindTargetAt(args.GetPosition(this.WorkspaceSurface));
-            if (targetAtPointer is not { } navigationTarget) {
-                if (this.activeTarget is { } currentTarget && !currentTarget.Zone.IsEditing) {
-                    this.Focus(FocusState.Programmatic);
-                }
-
-                return;
-            }
-
-            if (this.activeTarget?.Zone.IsEditing != true || this.activeTarget != navigationTarget) {
+            if (this.Layout?.WorkspaceNavigation.FindNearest(args.GetPosition(this.WorkspaceSurface)) is { } navigationTarget
+                && (this.activeTarget?.Zone.IsEditing != true || this.activeTarget != navigationTarget)) {
                 this.FocusTarget(navigationTarget);
             }
         }

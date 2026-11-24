@@ -1,11 +1,9 @@
 <UserControl x:Class="PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections.EventFormSection"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:zones="using:PersonalEventsBuilder.Controls.WorkspaceZones">
     <Canvas>
-        <Canvas x:Name="FieldLabels"
-                IsHitTestVisible="False" />
-        <Canvas x:Name="FieldValues"
-                IsHitTestVisible="False" />
+        <zones:WorkspaceCells Cells="{x:Bind ViewModel.VisibleCells, Mode=OneWay}" />
         <TextBox x:Name="FieldEditor"
                  MinWidth="0"
                  MinHeight="0"

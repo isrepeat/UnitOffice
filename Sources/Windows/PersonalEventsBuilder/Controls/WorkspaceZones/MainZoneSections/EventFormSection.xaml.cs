@@ -26,37 +26,13 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
             if (args.OldValue is EventFormSectionViewModel oldViewModel) {
                 oldViewModel.EndEditing(commit: false);
                 oldViewModel.EditingChanged -= eventFormSection.UpdateEditor;
-                oldViewModel.FieldChanged -= eventFormSection.UpdateField;
             }
 
             if (args.NewValue is EventFormSectionViewModel eventFormSectionViewModel) {
                 eventFormSectionViewModel.EditingChanged += eventFormSection.UpdateEditor;
-                eventFormSectionViewModel.FieldChanged += eventFormSection.UpdateField;
             }
 
-            eventFormSection.BuildLabels();
             eventFormSection.UpdateEditor();
-        }
-
-        private void BuildLabels() {
-            this.FieldLabels.Children.Clear();
-            this.FieldValues.Children.Clear();
-            if (this.ViewModel is not { } eventFormSectionViewModel) {
-                return;
-            }
-
-            var cellStyle = (Style)Application.Current.Resources["WorkspaceCellText"];
-            var labelStyle = (Style)Application.Current.Resources["WorkspaceHeaderText"];
-            foreach (var eventField in eventFormSectionViewModel.Fields) {
-                var valueTextBlock = new TextBlock { Text = eventField.DisplayText, Style = cellStyle };
-                WorkspaceGrid.Place(valueTextBlock, eventField.Area);
-                this.FieldValues.Children.Add(valueTextBlock);
-                if (eventField.LabelArea is { } labelArea) {
-                    var labelTextBlock = new TextBlock { Text = eventField.Label, Style = labelStyle };
-                    WorkspaceGrid.Place(labelTextBlock, labelArea);
-                    this.FieldLabels.Children.Add(labelTextBlock);
-                }
-            }
         }
 
         private void UpdateEditor() {
@@ -73,12 +49,6 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
             this.FieldEditor.Visibility = Visibility.Visible;
             this.FieldEditor.Focus(FocusState.Programmatic);
             this.FieldEditor.SelectAll();
-        }
-
-        private void UpdateField(int index) {
-            if (this.ViewModel is { } eventFormSectionViewModel) {
-                ((TextBlock)this.FieldValues.Children[index]).Text = eventFormSectionViewModel.Fields[index].DisplayText;
-            }
         }
 
         private void OnFieldEditorTextChanged(object sender, TextChangedEventArgs args) {
