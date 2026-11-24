@@ -9,7 +9,9 @@ using WorkspaceSectionBase = PersonalEventsBuilder.Workspace.WorkspaceSectionBas
 using WorkspaceCell = PersonalEventsBuilder.Workspace.WorkspaceCell;
 
 namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
-    internal sealed record CandidateColumn(string Title, int Column, int ColumnSpan);
+    internal sealed record CandidateColumn(string Title, int Column, int ColumnSpan) {
+        internal CandidateColumn(string title, GridArea gridArea) : this(title, gridArea.Column, gridArea.ColumnSpan) { }
+    }
     internal sealed record CandidateRow(string[] Cells);
 
     public sealed class CandidatesSectionViewModel : WorkspaceSectionBase, INavigableZone {
@@ -66,7 +68,7 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
         void INavigableZone.ActivateTarget(int index) =>
             this.CandidateConfirmed?.Invoke(this.candidateRows[index / this.candidateColumns.Length]);
 
-        int? INavigableZone.FindDirectionalTarget(GridArea origin, NavigationDirection direction) {
+        int? INavigableZone.FindDirectionalTarget(GridArea origin, NavigationDirection direction, double preferredColumn) {
             var firstDataRow = this.StartRow + 1;
             var lastDataRow = this.StartRow + this.candidateRows.Length;
             var firstRow = direction switch {
@@ -83,11 +85,11 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
             }
 
             int? result = null;
-            var best = (Distance: int.MaxValue, Alignment: int.MaxValue);
+            var best = (Distance: int.MaxValue, Alignment: double.PositiveInfinity, CenterDistance: double.PositiveInfinity);
             for (var row = firstRow; row <= lastRow; row++) {
                 for (var column = 0; column < this.candidateColumns.Length; column++) {
                     var index = (row - firstDataRow) * this.candidateColumns.Length + column;
-                    var score = INavigableZone.Score(origin, ((INavigableZone)this).GetWorkspaceArea(index), direction);
+                    var score = INavigableZone.Score(origin, ((INavigableZone)this).GetWorkspaceArea(index), direction, preferredColumn);
                     if (score is { } candidate && candidate.CompareTo(best) < 0) {
                         result = index;
                         best = candidate;

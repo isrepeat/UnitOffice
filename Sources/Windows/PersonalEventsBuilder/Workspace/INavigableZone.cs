@@ -29,11 +29,11 @@ namespace PersonalEventsBuilder.Workspace {
             return gridArea with { Row = gridArea.Row + this.StartRow };
         }
 
-        int? FindDirectionalTarget(GridArea origin, NavigationDirection direction) {
+        int? FindDirectionalTarget(GridArea origin, NavigationDirection direction, double preferredColumn) {
             int? result = null;
-            var best = (Distance: int.MaxValue, Alignment: int.MaxValue);
+            var best = (Distance: int.MaxValue, Alignment: double.PositiveInfinity, CenterDistance: double.PositiveInfinity);
             for (var index = 0; index < this.TargetCount; index++) {
-                var score = Score(origin, this.GetWorkspaceArea(index), direction);
+                var score = Score(origin, this.GetWorkspaceArea(index), direction, preferredColumn);
                 if (score is { } candidate && candidate.CompareTo(best) < 0) {
                     best = candidate;
                     result = index;
@@ -43,18 +43,24 @@ namespace PersonalEventsBuilder.Workspace {
             return result;
         }
 
-        internal static (int Distance, int Alignment)? Score(GridArea origin, GridArea target, NavigationDirection direction) {
+        internal static (int Distance, double Alignment, double CenterDistance)? Score(
+            GridArea origin,
+            GridArea target,
+            NavigationDirection direction,
+            double preferredColumn
+        ) {
             var rowsOverlap = origin.Row < target.Bottom && target.Row < origin.Bottom;
-            var columnsOverlap = origin.Column < target.Right && target.Column < origin.Right;
+            var columnDistance = Math.Abs(preferredColumn - Math.Clamp(preferredColumn, target.Column, target.Right));
+            var centerDistance = Math.Abs(preferredColumn - (target.Column + target.ColumnSpan / 2.0));
             return direction switch {
                 NavigationDirection.Left when rowsOverlap && target.Right <= origin.Column =>
-                    (origin.Column - target.Right, Math.Abs(origin.Row - target.Row)),
+                    (origin.Column - target.Right, Math.Abs(origin.Row - target.Row), 0),
                 NavigationDirection.Right when rowsOverlap && target.Column >= origin.Right =>
-                    (target.Column - origin.Right, Math.Abs(origin.Row - target.Row)),
-                NavigationDirection.Up when columnsOverlap && target.Bottom <= origin.Row =>
-                    (origin.Row - target.Bottom, Math.Abs(origin.Column - target.Column)),
-                NavigationDirection.Down when columnsOverlap && target.Row >= origin.Bottom =>
-                    (target.Row - origin.Bottom, Math.Abs(origin.Column - target.Column)),
+                    (target.Column - origin.Right, Math.Abs(origin.Row - target.Row), 0),
+                NavigationDirection.Up when target.Bottom <= origin.Row =>
+                    (origin.Row - target.Bottom, columnDistance, centerDistance),
+                NavigationDirection.Down when target.Row >= origin.Bottom =>
+                    (target.Row - origin.Bottom, columnDistance, centerDistance),
                 _ => null,
             };
         }

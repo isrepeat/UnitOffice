@@ -63,4 +63,7 @@
   <data name="Tr_WorkspaceCandidateTwo" xml:space="preserve"><value>Мельник Андрій</value></data>
   <data name="Tr_WorkspaceRankOne" xml:space="preserve"><value>солдат</value></data>
   <data name="Tr_WorkspaceRankTwo" xml:space="preserve"><value>сержант</value></data>
+  <data name="Tr_WorkspaceDestination" xml:space="preserve"><value>Місце</value></data>
+  <data name="Tr_WorkspaceDepartureDate" xml:space="preserve"><value>Дата виїзду</value></data>
+  <data name="Tr_WorkspaceNotes" xml:space="preserve"><value>Примітка</value></data>
 </root>

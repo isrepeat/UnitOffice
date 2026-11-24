@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Windows.System;
 
@@ -18,7 +19,7 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
         Above,
     }
 
-    internal sealed record EventField(GridArea Area, string Label, string Text = "", LabelPlacement LabelPlacement = LabelPlacement.Placeholder) {
+    internal sealed record EventField(string Id, GridArea Area, string Label, string Text = "", LabelPlacement LabelPlacement = LabelPlacement.Placeholder) {
         internal string Placeholder => this.LabelPlacement == LabelPlacement.Placeholder ? this.Label : "";
         internal string DisplayText => this.Text.Length == 0 ? this.Placeholder : this.Text;
         internal GridArea? LabelArea => this.LabelPlacement switch {
@@ -45,17 +46,13 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
 
         private readonly EventField[] eventFields;
 
-        internal EventFormSectionViewModel(EventField[] eventFields) {
-            this.eventFields = (EventField[])eventFields.Clone();
+        internal EventFormSectionViewModel(EventFormLayout eventFormLayout) {
+            this.eventFields = eventFormLayout.Fields.ToArray();
             this.RowCount = 1;
             foreach (var eventField in this.eventFields) {
                 this.RowCount = Math.Max(this.RowCount, eventField.Area.Bottom);
                 this.ColumnCount = Math.Max(this.ColumnCount, eventField.Area.Right);
                 if (eventField.LabelArea is { } labelArea) {
-                    if (labelArea.Row < 0 || labelArea.Column < 0) {
-                        throw new ArgumentException("A field label must fit inside the form grid.", nameof(eventFields));
-                    }
-
                     this.RowCount = Math.Max(this.RowCount, labelArea.Bottom);
                     this.ColumnCount = Math.Max(this.ColumnCount, labelArea.Right);
                 }

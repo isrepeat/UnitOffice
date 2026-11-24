@@ -55,7 +55,7 @@ namespace PersonalEventsBuilder.Workspace {
             return nearestTarget;
         }
 
-        internal NavigationTarget? FindNext(NavigationTarget? current, NavigationDirection direction) {
+        internal NavigationTarget? FindNext(NavigationTarget? current, NavigationDirection direction, double? preferredColumn = null) {
             if (direction is NavigationDirection.Next or NavigationDirection.Previous) {
                 return this.FindSequentialTarget(current, direction == NavigationDirection.Next ? 1 : -1);
             }
@@ -64,19 +64,22 @@ namespace PersonalEventsBuilder.Workspace {
                 return this.FindSequentialTarget(null, 1);
             }
 
-            if (target.Zone.FindDirectionalTarget(target.Area, direction) is { } insideIndex) {
+            var staysInRow = direction is NavigationDirection.Left or NavigationDirection.Right;
+            var column = preferredColumn ?? target.Area.Column + target.Area.ColumnSpan / 2.0;
+            if (staysInRow && target.Zone.FindDirectionalTarget(target.Area, direction, column) is { } insideIndex) {
                 return new(target.Zone, insideIndex);
             }
 
             NavigationTarget? result = null;
-            var best = (Distance: int.MaxValue, Alignment: int.MaxValue);
+            var best = (Distance: int.MaxValue, Alignment: double.PositiveInfinity, CenterDistance: double.PositiveInfinity);
             foreach (var navigableZone in this.navigableZones) {
-                if (navigableZone == target.Zone || navigableZone.FindDirectionalTarget(target.Area, direction) is not { } index) {
+                if ((staysInRow && navigableZone == target.Zone)
+                    || navigableZone.FindDirectionalTarget(target.Area, direction, column) is not { } index) {
                     continue;
                 }
 
                 var candidate = new NavigationTarget(navigableZone, index);
-                var score = INavigableZone.Score(target.Area, candidate.Area, direction);
+                var score = INavigableZone.Score(target.Area, candidate.Area, direction, column);
                 if (score is { } value && value.CompareTo(best) < 0) {
                     best = value;
                     result = candidate;

@@ -30,6 +30,7 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones {
         }
 
         private NavigationTarget? activeTarget;
+        private double preferredColumn;
 
         public static readonly DependencyProperty LayoutProperty = DependencyProperty.Register(
             nameof(Layout),
@@ -150,27 +151,35 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones {
             }
 
             args.Handled = true;
-            this.FocusTarget(navigationTarget);
+            this.FocusPointerTarget(navigationTarget, pointerPoint.Position);
         }
 
         private void OnWorkspaceTapped(object sender, TappedRoutedEventArgs args) {
-            if (this.Layout?.WorkspaceNavigation.FindNearest(args.GetPosition(this.WorkspaceSurface)) is { } navigationTarget
+            var position = args.GetPosition(this.WorkspaceSurface);
+            if (this.Layout?.WorkspaceNavigation.FindNearest(position) is { } navigationTarget
                 && (this.activeTarget?.Zone.IsEditing != true || this.activeTarget != navigationTarget)) {
-                this.FocusTarget(navigationTarget);
+                this.FocusPointerTarget(navigationTarget, position);
             }
         }
 
         private void OnWorkspaceDoubleTapped(object sender, DoubleTappedRoutedEventArgs args) {
+            var position = args.GetPosition(this.WorkspaceSurface);
             if (this.activeTarget?.Zone.IsEditing != true
-                && this.FindTargetAt(args.GetPosition(this.WorkspaceSurface)) is { } navigationTarget) {
-                this.FocusTarget(navigationTarget);
+                && this.FindTargetAt(position) is { } navigationTarget) {
+                this.FocusPointerTarget(navigationTarget, position);
                 navigationTarget.Zone.ActivateTarget(navigationTarget.Index);
             }
         }
 
-        private void FocusTarget(NavigationTarget navigationTarget) {
+        private void FocusPointerTarget(NavigationTarget navigationTarget, Point position) {
+            var column = position.X / WorkspaceGrid.ColumnWidth;
+            this.FocusTarget(navigationTarget, Math.Clamp(column, navigationTarget.Area.Column, navigationTarget.Area.Right));
+        }
+
+        private void FocusTarget(NavigationTarget navigationTarget, double? preferredColumn = null) {
             this.activeTarget?.Zone.LeaveTarget();
             this.activeTarget = navigationTarget;
+            this.preferredColumn = preferredColumn ?? navigationTarget.Area.Column + navigationTarget.Area.ColumnSpan / 2.0;
             WorkspaceGrid.Place(this.FocusOutline, navigationTarget.Area);
             this.FocusOutline.Visibility = Visibility.Visible;
             this.Focus(FocusState.Programmatic);
@@ -225,8 +234,12 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones {
                 VirtualKey.Down => NavigationDirection.Down,
                 _ => null,
             };
-            if (direction.HasValue && this.Layout?.WorkspaceNavigation.FindNext(this.activeTarget, direction.Value) is { } navigationTarget) {
-                this.FocusTarget(navigationTarget);
+            double? preferredColumn = this.activeTarget.HasValue && direction is NavigationDirection.Up or NavigationDirection.Down
+                ? this.preferredColumn
+                : null;
+            if (direction.HasValue
+                && this.Layout?.WorkspaceNavigation.FindNext(this.activeTarget, direction.Value, preferredColumn) is { } navigationTarget) {
+                this.FocusTarget(navigationTarget, preferredColumn);
                 args.Handled = true;
             } else if (args.Key == VirtualKey.Tab) {
                 if (this.activeTarget?.Zone.IsEditing == true) {
