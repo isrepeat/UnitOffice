@@ -7,7 +7,7 @@ using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 
-namespace PersonalEventsBuilder.Layout {
+namespace UDK.WinUI.Layout {
     [ContentProperty(Name = nameof(Root))]
     public sealed class WorkspaceHost : UserControl {
         public Zone? Root { get; set; }

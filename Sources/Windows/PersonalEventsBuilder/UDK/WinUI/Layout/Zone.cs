@@ -4,7 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Markup;
 
-namespace PersonalEventsBuilder.Layout {
+namespace UDK.WinUI.Layout {
     public enum ZoneDirection { Rows, Columns }
     public sealed class Splitter : DependencyObject {
         public Style? Style { get; set; }
