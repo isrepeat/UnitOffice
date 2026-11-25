@@ -22,7 +22,7 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones {
     public sealed partial class MainZone : UserControl {
         public WorkspaceLayout? Layout {
             get => (WorkspaceLayout?)this.GetValue(LayoutProperty);
-            set => this.SetValue(LayoutProperty, value);
+            private set => this.SetValue(LayoutProperty, value);
         }
         public GridDrawing? GridDrawing {
             get => (GridDrawing?)this.GetValue(GridDrawingProperty);
@@ -48,7 +48,8 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones {
 
         public MainZone() {
             this.InitializeComponent();
-            this.UpdateSurfaceSize();
+            var formDefinition = (MainZoneSections.FormDefinition)this.Resources["EventFormDefinition"];
+            this.Layout = Fixtures.WorkspacePreviewFixture.Create(formDefinition.CreateLayout());
         }
 
         private static void OnLayoutChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args) {

@@ -6,6 +6,66 @@
              AllowFocusOnInteraction="False"
              GotFocus="OnWorkspaceGotFocus"
              PreviewKeyDown="OnWorkspaceKeyDown">
+    <UserControl.Resources>
+        <Style x:Key="ExtensionGroupBorderStyle"
+               TargetType="Border">
+            <Setter Property="BorderBrush"
+                    Value="{StaticResource AmberBrush}" />
+            <Setter Property="BorderThickness"
+                    Value="1" />
+        </Style>
+        <main:FormDefinition x:Key="EventFormDefinition">
+            <main:FormDefinition.Groups>
+                <main:FormGroup Placement="Primary"
+                                    Row="0"
+                                    Column="2">
+                    <main:FormGroup.Fields>
+                        <main:FormField Id="person"
+                                            ColumnSpan="3"
+                                            LabelKey="Tr_WorkspacePerson"
+                                            LabelPlacement="Above" />
+                        <main:FormField Id="rank"
+                                            ColumnSpan="2"
+                                            LabelKey="Tr_WorkspaceRank"
+                                            LabelPlacement="Above" />
+                        <main:FormField Id="document-number"
+                                            ColumnSpan="4"
+                                            LabelKey="Tr_WorkspaceDocumentNumber"
+                                            LabelPlacement="Above" />
+                    </main:FormGroup.Fields>
+                </main:FormGroup>
+                <main:FormGroup Placement="Left"
+                                    BorderStyle="{StaticResource ExtensionGroupBorderStyle}">
+                    <main:FormGroup.Fields>
+                        <main:FormField Id="destination"
+                                            ColumnSpan="2"
+                                            LabelKey="Tr_WorkspaceDestination"
+                                            LabelPlacement="Above" />
+                    </main:FormGroup.Fields>
+                </main:FormGroup>
+                <main:FormGroup Placement="Right"
+                                    BorderStyle="{StaticResource ExtensionGroupBorderStyle}">
+                    <main:FormGroup.Fields>
+                        <main:FormField Id="departure-date"
+                                            ColumnSpan="2"
+                                            LabelKey="Tr_WorkspaceDepartureDate"
+                                            LabelPlacement="Above" />
+                    </main:FormGroup.Fields>
+                </main:FormGroup>
+                <main:FormGroup Placement="BelowField"
+                                    AnchorFieldId="document-number"
+                                    Orientation="Vertical"
+                                    BorderStyle="{StaticResource ExtensionGroupBorderStyle}">
+                    <main:FormGroup.Fields>
+                        <main:FormField Id="notes"
+                                            ColumnSpan="4"
+                                            LabelKey="Tr_WorkspaceNotes"
+                                            LabelPlacement="Above" />
+                    </main:FormGroup.Fields>
+                </main:FormGroup>
+            </main:FormDefinition.Groups>
+        </main:FormDefinition>
+    </UserControl.Resources>
     <Border Style="{StaticResource PanelBorder}">
         <ScrollViewer x:Name="WorkspaceViewport"
                       IsTabStop="False"

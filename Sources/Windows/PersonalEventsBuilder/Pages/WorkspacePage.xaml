@@ -2,69 +2,8 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:zones="using:PersonalEventsBuilder.Controls.WorkspaceZones"
-      xmlns:sections="using:PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections"
       DataContext="{x:Bind WorkspacePageViewModel}"
       NavigationCacheMode="Required">
-    <Page.Resources>
-        <Style x:Key="ExtensionGroupBorderStyle"
-               TargetType="Border">
-            <Setter Property="BorderBrush"
-                    Value="{StaticResource AmberBrush}" />
-            <Setter Property="BorderThickness"
-                    Value="1" />
-        </Style>
-        <sections:FormDefinition x:Key="EventFormDefinition">
-            <sections:FormDefinition.Groups>
-                <sections:FormGroup Placement="Primary"
-                                    Row="0"
-                                    Column="2">
-                    <sections:FormGroup.Fields>
-                        <sections:FormField Id="person"
-                                            ColumnSpan="3"
-                                            LabelKey="Tr_WorkspacePerson"
-                                            LabelPlacement="Above" />
-                        <sections:FormField Id="rank"
-                                            ColumnSpan="2"
-                                            LabelKey="Tr_WorkspaceRank"
-                                            LabelPlacement="Above" />
-                        <sections:FormField Id="document-number"
-                                            ColumnSpan="4"
-                                            LabelKey="Tr_WorkspaceDocumentNumber"
-                                            LabelPlacement="Above" />
-                    </sections:FormGroup.Fields>
-                </sections:FormGroup>
-                <sections:FormGroup Placement="Left"
-                                    BorderStyle="{StaticResource ExtensionGroupBorderStyle}">
-                    <sections:FormGroup.Fields>
-                        <sections:FormField Id="destination"
-                                            ColumnSpan="2"
-                                            LabelKey="Tr_WorkspaceDestination"
-                                            LabelPlacement="Above" />
-                    </sections:FormGroup.Fields>
-                </sections:FormGroup>
-                <sections:FormGroup Placement="Right"
-                                    BorderStyle="{StaticResource ExtensionGroupBorderStyle}">
-                    <sections:FormGroup.Fields>
-                        <sections:FormField Id="departure-date"
-                                            ColumnSpan="2"
-                                            LabelKey="Tr_WorkspaceDepartureDate"
-                                            LabelPlacement="Above" />
-                    </sections:FormGroup.Fields>
-                </sections:FormGroup>
-                <sections:FormGroup Placement="BelowField"
-                                    AnchorFieldId="document-number"
-                                    Orientation="Vertical"
-                                    BorderStyle="{StaticResource ExtensionGroupBorderStyle}">
-                    <sections:FormGroup.Fields>
-                        <sections:FormField Id="notes"
-                                            ColumnSpan="4"
-                                            LabelKey="Tr_WorkspaceNotes"
-                                            LabelPlacement="Above" />
-                    </sections:FormGroup.Fields>
-                </sections:FormGroup>
-            </sections:FormDefinition.Groups>
-        </sections:FormDefinition>
-    </Page.Resources>
     <Grid Background="#202020"
           Padding="6"
           RowSpacing="5"
@@ -85,15 +24,14 @@
                 <ColumnDefinition Width="2.2*" />
             </Grid.ColumnDefinitions>
 
-            <zones:ModeSelectorZone x:Name="ModeSelectorZone" />
-            <zones:NewEventZone x:Name="NewEventZone"
+            <zones:ModeSelectorZone />
+            <zones:NewEventZone
                                 Grid.Column="1" />
             <zones:WordPreviewZone Grid.Column="2" />
         </Grid>
 
-        <zones:MainZone Grid.Row="1"
-                        Layout="{Binding WorkspaceLayout}" />
-        <zones:ActionsZone x:Name="ActionsZone"
+        <zones:MainZone Grid.Row="1" />
+        <zones:ActionsZone
                            Grid.Column="1"
                            Grid.RowSpan="2" />
     </Grid>

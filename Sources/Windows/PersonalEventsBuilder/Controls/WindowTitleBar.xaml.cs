@@ -89,7 +89,7 @@ namespace PersonalEventsBuilder.Controls {
 
         private void OnActionClick(object sender, RoutedEventArgs args) {
             if (sender is MenuFlyoutItem { Tag: string actionId }) {
-                WindowTitleBar.PageManager.CurrentWorkspace?.ExecuteAction(actionId);
+                WindowTitleBar.PageManager.CurrentWorkspace?.WorkspacePageViewModel.ExecuteAction(actionId);
             }
         }
 
