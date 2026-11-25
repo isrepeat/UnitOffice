@@ -4,7 +4,8 @@
       xmlns:layout="using:UDK.WinUI.Layout"
       xmlns:views="using:PersonalEventsBuilder.Views"
       xmlns:controls="using:PersonalEventsBuilder.Controls"
-      Style="{StaticResource WorkspacePageStyle}">
+      Style="{StaticResource WorkspacePageStyle}"
+      NavigationCacheMode="Required">
     <layout:WorkspaceHost>
         <layout:WorkspaceHost.Resources>
             <controls:GridScale x:Key="EventGridScale"

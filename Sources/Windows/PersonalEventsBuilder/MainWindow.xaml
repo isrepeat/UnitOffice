@@ -1,6 +1,19 @@
 <Window x:Class="PersonalEventsBuilder.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:pages="using:PersonalEventsBuilder.Pages">
-    <pages:WorkspacePage />
+        xmlns:controls="using:PersonalEventsBuilder.Controls">
+    <Grid Background="#202020"
+          RequestedTheme="Dark">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <controls:WindowTitleBar x:Name="WindowTitleBar"
+                                 Visibility="Collapsed" />
+
+        <Frame x:Name="PageFrame"
+               Grid.Row="1"
+               Navigated="OnPageNavigated" />
+    </Grid>
 </Window>

@@ -3,6 +3,7 @@ using System.IO;
 using System.Security;
 
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Windowing;
 
 using Windows.Graphics;
@@ -15,9 +16,15 @@ namespace PersonalEventsBuilder {
         private SizeInt32 restoredSize;
         private bool wasMaximized;
 
+        private static Navigation.PageManager PageManager => States.AppData.AppSessionState.PageManager;
+
         public MainWindow() {
             this.InitializeComponent();
+            States.AppData.AppSessionState.InitializeNavigation(this.PageFrame);
             this.Title = Localization.UiStrings.Get("Tr_AppTitle");
+            this.WindowTitleBar.CloseRequested += this.Close;
+            this.WindowTitleBar.AttachTo(this);
+            MainWindow.PageManager.Navigate<Pages.WorkspacePage>();
             this.RestoreWindowState();
             this.AppWindow.Changed += this.OnAppWindowChanged;
             this.Closed += this.OnClosed;
@@ -66,5 +73,9 @@ namespace PersonalEventsBuilder {
             }
         }
 
+        private void OnPageNavigated(object sender, NavigationEventArgs args) {
+            var pageManager = MainWindow.PageManager;
+            this.WindowTitleBar.UpdateNavigationState(pageManager.CurrentWorkspace is not null, pageManager.CanGoBack);
+        }
     }
 }

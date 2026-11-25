@@ -47,6 +47,13 @@
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\UiLanguage.cs" Link="Localization\UiLanguage.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\UiStrings.cs" Link="Localization\UiStrings.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\MainWindow.xaml" Link="MainWindow.xaml" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WindowTitleBar.xaml" Link="Controls\WindowTitleBar.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WindowTitleBar.xaml.cs" Link="Controls\WindowTitleBar.xaml.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Navigation\PageManager.cs" Link="Navigation\PageManager.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Pages\SettingsPage.xaml" Link="Pages\SettingsPage.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Pages\SettingsPage.xaml.cs" Link="Pages\SettingsPage.xaml.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\States\AppData.cs" Link="States\AppData.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\States\AppSessionState.cs" Link="States\AppSessionState.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\MainWindow.xaml.cs" Link="MainWindow.xaml.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Pages\WorkspacePage.xaml" Link="Pages\WorkspacePage.xaml" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventForm.xaml" Link="Views\EventForm.xaml" />
