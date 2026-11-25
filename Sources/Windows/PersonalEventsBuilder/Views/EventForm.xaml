@@ -1,0 +1,10 @@
+<UserControl x:Class="PersonalEventsBuilder.Views.EventForm"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:PersonalEventsBuilder.Controls">
+    <Grid RowDefinitions="Auto,*">
+        <TextBlock Text="Форма события" />
+        <controls:GridCanvas Grid.Row="1"
+                             GridScale="{x:Bind GridScale, Mode=OneWay}" />
+    </Grid>
+</UserControl>

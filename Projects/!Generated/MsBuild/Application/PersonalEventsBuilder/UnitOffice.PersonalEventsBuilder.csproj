@@ -37,6 +37,9 @@
     <ApplicationDefinition Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\App.xaml" Link="App.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\App.xaml.cs" Link="App.xaml.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Layout\Zone.cs" Link="Layout\Zone.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\GridScale.cs" Link="Controls\GridScale.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\GridCanvas.xaml" Link="Controls\GridCanvas.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\GridCanvas.xaml.cs" Link="Controls\GridCanvas.xaml.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Layout\WorkspaceHost.cs" Link="Layout\WorkspaceHost.cs" />
     <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\Strings\ru-RU\Resources.resw" Link="Localization\Strings\ru-RU\Resources.resw" />
     <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\Strings\uk-UA\Resources.resw" Link="Localization\Strings\uk-UA\Resources.resw" />
@@ -46,6 +49,10 @@
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\MainWindow.xaml" Link="MainWindow.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\MainWindow.xaml.cs" Link="MainWindow.xaml.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Pages\WorkspacePage.xaml" Link="Pages\WorkspacePage.xaml" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventForm.xaml" Link="Views\EventForm.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventForm.xaml.cs" Link="Views\EventForm.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTable.xaml" Link="Views\CandidatesTable.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTable.xaml.cs" Link="Views\CandidatesTable.xaml.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Pages\WorkspacePage.xaml.cs" Link="Pages\WorkspacePage.xaml.cs" />
   </ItemGroup>
 

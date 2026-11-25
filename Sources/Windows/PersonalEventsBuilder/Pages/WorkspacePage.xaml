@@ -2,9 +2,13 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:layout="using:PersonalEventsBuilder.Layout"
+      xmlns:views="using:PersonalEventsBuilder.Views"
+      xmlns:controls="using:PersonalEventsBuilder.Controls"
       Style="{StaticResource WorkspacePageStyle}">
     <layout:WorkspaceHost>
         <layout:WorkspaceHost.Resources>
+            <controls:GridScale x:Key="EventGridScale"
+                                Step="48" />
             <Style TargetType="Thumb"
                    BasedOn="{StaticResource ZoneSplitterStyle}" />
             <Style TargetType="TextBlock"
@@ -43,7 +47,7 @@
                              Direction="Rows">
                     <layout:Zone Size="2*"
                                  Style="{StaticResource ZonePanelStyle}">
-                        <TextBlock Text="Форма события" />
+                        <views:EventForm GridScale="{StaticResource EventGridScale}" />
                     </layout:Zone>
                     <layout:Zone Size="*"
                                  Style="{StaticResource ZonePanelStyle}">
@@ -51,7 +55,7 @@
                     </layout:Zone>
                     <layout:Zone Size="3*"
                                  Style="{StaticResource ZonePanelStyle}">
-                        <TextBlock Text="Таблица кандидатов" />
+                        <views:CandidatesTable GridScale="{StaticResource EventGridScale}" />
                     </layout:Zone>
                 </layout:Zone>
             </layout:Zone>

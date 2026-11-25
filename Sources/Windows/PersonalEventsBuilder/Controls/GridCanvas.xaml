@@ -1,0 +1,11 @@
+<UserControl x:Class="PersonalEventsBuilder.Controls.GridCanvas"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Canvas x:Name="Surface"
+            Background="Transparent">
+        <Path x:Name="Lines"
+              Stroke="{StaticResource ZoneSplitterBrush}"
+              StrokeThickness="1"
+              IsHitTestVisible="False" />
+    </Canvas>
+</UserControl>
