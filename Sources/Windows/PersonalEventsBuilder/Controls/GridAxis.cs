@@ -19,7 +19,7 @@ namespace PersonalEventsBuilder.Controls {
             nameof(Step),
             typeof(double),
             typeof(GridAxis),
-            new PropertyMetadata(48.0, (sender, _) => ((GridAxis)sender).UpdateViewport())
+            new PropertyMetadata(48.0, (sender, _) => ((GridAxis)sender).UpdateViewport(stepChanged: true))
         );
 
         public int Count {
@@ -34,10 +34,14 @@ namespace PersonalEventsBuilder.Controls {
         }
         public int FirstVisibleIndex { get; private set; }
 
+        internal readonly record struct ColumnWindow(int First, int Count, double Left, int Slot, int Slots);
+
         internal double Origin { get; private set; }
 
         private readonly Dictionary<object, (double Start, double End)> viewports = new();
         private int count = 1;
+        private int previousCapacity;
+        private double scrollPosition;
         internal event Action? Changed;
 
         internal void SetViewport(object owner, double length, double start = 0) {
@@ -54,18 +58,48 @@ namespace PersonalEventsBuilder.Controls {
             this.UpdateViewport();
         }
 
-        private void UpdateViewport() {
+        private void UpdateViewport(bool stepChanged = false) {
             // Центрируем сетку один раз в общем диапазоне участвующих поверхностей.
             double start = this.viewports.Values.Select(viewport => viewport.Start).DefaultIfEmpty().Min();
             double end = this.viewports.Values.Select(viewport => viewport.End).DefaultIfEmpty().Max();
             double width = end - start;
-            this.Origin = start + (width - this.Capacity(width, 0) * this.Step) / 2;
-            this.FirstVisibleIndex = Math.Min(this.FirstVisibleIndex, Math.Max(0, this.Count - 1));
+            int capacity = this.Capacity(width, 0);
+            this.Origin = start + (width - capacity * this.Step) / 2;
+            // Сохраняем половину ячейки между соседними шагами перетаскивания.
+            if (stepChanged && this.previousCapacity > 0 && capacity > 0) {
+                this.scrollPosition += (this.previousCapacity - capacity) / 2.0;
+            }
+            this.scrollPosition = Math.Clamp(this.scrollPosition, 0, Math.Max(0, this.Count - Math.Max(1, capacity)));
+            this.FirstVisibleIndex = (int)Math.Floor(this.scrollPosition);
+            this.previousCapacity = capacity;
             this.Changed?.Invoke();
         }
 
         internal int Capacity(double length, double offset) =>
             (int)Math.Min(this.Count, Math.Floor(Math.Max(0, length - offset) / this.Step));
+
+        internal ColumnWindow GetColumns(double start, double width) {
+            // Положение полосы на экране и индекс колонки в данных меняются независимо.
+            double origin = this.Origin - start;
+            int slot = (int)Math.Clamp(Math.Ceiling(-origin / this.Step), 0, this.previousCapacity);
+            double left = origin + slot * this.Step;
+            int slots = Math.Min(this.previousCapacity - slot, this.Capacity(width, left));
+            int first = this.FirstVisibleIndex + slot;
+            int skip = Math.Clamp(-first, 0, slots);
+            int count = Math.Clamp(this.Count - Math.Max(0, first), 0, slots - skip);
+            return new ColumnWindow(Math.Clamp(first, 0, this.Count), count, left + skip * this.Step, slot, slots);
+        }
+
+        internal void ScrollColumns(int delta, ColumnWindow window) {
+            if (delta == 0 || window.Slots == 0) {
+                return;
+            }
+            int min = -window.Slot;
+            int max = this.Count - window.Slot - window.Slots;
+            long requested = (long)this.FirstVisibleIndex + delta;
+            int index = (int)Math.Clamp(requested, Math.Min(min, this.FirstVisibleIndex), Math.Max(max, this.FirstVisibleIndex));
+            this.SetScrollIndex(index);
+        }
 
         internal int VisibleCount(double length, double offset) =>
             Math.Min(this.Count - this.FirstVisibleIndex, this.Capacity(length, offset));
@@ -75,7 +109,12 @@ namespace PersonalEventsBuilder.Controls {
                 return;
             }
             int index = (int)Math.Clamp((long)this.FirstVisibleIndex + delta, 0, Math.Max(this.FirstVisibleIndex, this.Count - capacity));
+            this.SetScrollIndex(index);
+        }
+
+        private void SetScrollIndex(int index) {
             if (index != this.FirstVisibleIndex) {
+                this.scrollPosition = index;
                 this.FirstVisibleIndex = index;
                 this.Changed?.Invoke();
             }
