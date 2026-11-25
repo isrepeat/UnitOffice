@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace PersonalEventsBuilder.Pages.ViewModels {
     public sealed class WorkspacePageViewModel : Helpers.ObservableObjectBase {
-        public Workspace.WorkspaceLayout WorkspaceLayout { get; } = Fixtures.WorkspacePreviewFixture.Create();
+        public Workspace.WorkspaceLayout? WorkspaceLayout { get; private set; }
         public Workspace.ModeGroup[] ModeGroups { get; }
         public Workspace.ModeWorkspace? Current { get; private set; }
         public bool CanStartNewEvent => this.eventMode is not null;
@@ -32,6 +32,11 @@ namespace PersonalEventsBuilder.Pages.ViewModels {
             if (initialMode is not null) {
                 this.SelectMode(initialMode);
             }
+        }
+
+        internal void SetWorkspaceLayout(Workspace.WorkspaceLayout workspaceLayout) {
+            this.WorkspaceLayout = workspaceLayout;
+            this.NotifyPropertyChanged(nameof(WorkspaceLayout));
         }
 
         public bool SelectMode(Workspace.EventMode eventMode) {

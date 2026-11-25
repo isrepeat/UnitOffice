@@ -2,33 +2,40 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
+using Microsoft.UI.Xaml;
+
 using GridArea = PersonalEventsBuilder.Workspace.GridArea;
 
 namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
-    internal enum FormExtensionPlacement {
+    public enum FormGroupPlacement {
+        Primary,
         Left,
         Right,
         BelowField,
     }
 
-    internal sealed record EventFormGroup(EventField[] Fields);
+    internal sealed record EventFormGroup(EventField[] Fields, Style? BorderStyle);
+    internal sealed record FormGroupBorder(GridArea Area, Style Style);
 
     internal sealed record EventFormExtension(
         EventFormGroup Group,
-        FormExtensionPlacement Placement,
+        FormGroupPlacement Placement,
         string? AnchorFieldId = null
     );
 
     internal sealed class EventFormLayout {
         internal IReadOnlyList<EventField> Fields { get; }
+        internal IReadOnlyList<FormGroupBorder> GroupBorders => this.groupBorders;
 
         private readonly Dictionary<string, EventField> fieldsById = new(StringComparer.Ordinal);
+        private readonly List<FormGroupBorder> groupBorders = new();
 
-        internal EventFormLayout(EventFormGroup primaryGroup, int startColumn, params EventFormExtension[] extensions) {
+        internal EventFormLayout(EventFormGroup primaryGroup, int startRow, int startColumn, params EventFormExtension[] extensions) {
+            ArgumentOutOfRangeException.ThrowIfNegative(startRow);
             ArgumentOutOfRangeException.ThrowIfNegative(startColumn);
 
             var fields = new List<EventField>();
-            this.AddGroup(fields, primaryGroup, row: 0, column: startColumn);
+            this.AddGroup(fields, primaryGroup, row: startRow, column: startColumn);
             var primaryFields = new Dictionary<string, EventField>(this.fieldsById, StringComparer.Ordinal);
             var left = startColumn;
             var right = startColumn + GetWidth(primaryGroup);
@@ -36,15 +43,15 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
 
             foreach (var eventFormExtension in extensions) {
                 switch (eventFormExtension.Placement) {
-                    case FormExtensionPlacement.Left:
+                    case FormGroupPlacement.Left:
                         left -= GetWidth(eventFormExtension.Group);
-                        this.AddGroup(fields, eventFormExtension.Group, row: 0, column: left);
+                        this.AddGroup(fields, eventFormExtension.Group, row: startRow, column: left);
                         break;
-                    case FormExtensionPlacement.Right:
-                        this.AddGroup(fields, eventFormExtension.Group, row: 0, column: right);
+                    case FormGroupPlacement.Right:
+                        this.AddGroup(fields, eventFormExtension.Group, row: startRow, column: right);
                         right += GetWidth(eventFormExtension.Group);
                         break;
-                    case FormExtensionPlacement.BelowField:
+                    case FormGroupPlacement.BelowField:
                         if (eventFormExtension.AnchorFieldId is not { } id || !primaryFields.TryGetValue(id, out var anchorField)) {
                             throw new ArgumentException("A lower extension needs an anchor in the primary group.", nameof(extensions));
                         }
@@ -84,6 +91,13 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
 
                 this.fieldsById.Add(resolvedField.Id, resolvedField);
                 fields.Add(resolvedField);
+            }
+
+            if (eventFormGroup.Fields.Length > 0 && eventFormGroup.BorderStyle is { } borderStyle) {
+                this.groupBorders.Add(new FormGroupBorder(
+                    new GridArea(row, column, GetHeight(eventFormGroup), GetWidth(eventFormGroup)),
+                    borderStyle
+                ));
             }
         }
 

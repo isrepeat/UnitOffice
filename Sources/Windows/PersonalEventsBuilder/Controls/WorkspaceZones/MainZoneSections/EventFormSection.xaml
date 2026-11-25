@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:zones="using:PersonalEventsBuilder.Controls.WorkspaceZones">
     <Canvas>
+        <Canvas x:Name="GroupBorders"
+                IsHitTestVisible="False" />
         <zones:WorkspaceCells Cells="{x:Bind ViewModel.VisibleCells, Mode=OneWay}" />
         <TextBox x:Name="FieldEditor"
                  MinWidth="0"

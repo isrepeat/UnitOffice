@@ -1,5 +1,7 @@
 using Microsoft.UI.Xaml.Controls;
 
+using FormDefinition = PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections.FormDefinition;
+
 namespace PersonalEventsBuilder.Pages {
     public sealed partial class WorkspacePage : Page {
         private ViewModels.WorkspacePageViewModel WorkspacePageViewModel { get; }
@@ -9,7 +11,9 @@ namespace PersonalEventsBuilder.Pages {
 
         public WorkspacePage(Workspace.IWorkspaceSource workspaceSource) {
             this.WorkspacePageViewModel = new ViewModels.WorkspacePageViewModel(workspaceSource);
-            InitializeComponent();
+            this.InitializeComponent();
+            var formDefinition = (FormDefinition)this.Resources["EventFormDefinition"];
+            this.WorkspacePageViewModel.SetWorkspaceLayout(Fixtures.WorkspacePreviewFixture.Create(formDefinition.CreateLayout()));
             this.ModeSelectorZone.ModeSelected += this.OnModeSelected;
             this.NewEventZone.NewEventRequested += this.WorkspacePageViewModel.StartNewEvent;
             this.ActionsZone.ActionRequested += this.ExecuteAction;

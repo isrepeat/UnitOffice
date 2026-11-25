@@ -1,38 +1,16 @@
 using CandidatesSectionViewModel = PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections.CandidatesSectionViewModel;
 using EventFormSectionViewModel = PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections.EventFormSectionViewModel;
-using EventFormGroup = PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections.EventFormGroup;
 using EventFormLayout = PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections.EventFormLayout;
-using FormExtensionPlacement = PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections.FormExtensionPlacement;
 using SummarySectionViewModel = PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections.SummarySectionViewModel;
 using WorkspaceLayout = PersonalEventsBuilder.Workspace.WorkspaceLayout;
-using GridArea = PersonalEventsBuilder.Workspace.GridArea;
-using LabelPlacement = PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections.LabelPlacement;
 
 namespace PersonalEventsBuilder.Fixtures {
     internal static class WorkspacePreviewFixture {
-        internal static WorkspaceLayout Create() {
+        internal static WorkspaceLayout Create(EventFormLayout eventFormLayout) {
             var person = Localization.UiStrings.Get("Tr_WorkspacePerson");
             var rank = Localization.UiStrings.Get("Tr_WorkspaceRank");
             var documentNumber = Localization.UiStrings.Get("Tr_WorkspaceDocumentNumber");
             var documentDate = Localization.UiStrings.Get("Tr_WorkspaceDocumentDate");
-            var primaryGroup = new EventFormGroup([
-                new("person", new GridArea(1, 0, ColumnSpan: 3), person, LabelPlacement: LabelPlacement.Above),
-                new("rank", new GridArea(1, 3, ColumnSpan: 2), rank, LabelPlacement: LabelPlacement.Above),
-                new("document-number", new GridArea(1, 5, ColumnSpan: 4), documentNumber, LabelPlacement: LabelPlacement.Above),
-            ]);
-            var eventFormLayout = new EventFormLayout(
-                primaryGroup,
-                2,
-                new(new EventFormGroup([
-                    new("destination", new GridArea(1, 0, ColumnSpan: 2), Localization.UiStrings.Get("Tr_WorkspaceDestination"), LabelPlacement: LabelPlacement.Above),
-                ]), FormExtensionPlacement.Left),
-                new(new EventFormGroup([
-                    new("departure-date", new GridArea(1, 0, ColumnSpan: 2), Localization.UiStrings.Get("Tr_WorkspaceDepartureDate"), LabelPlacement: LabelPlacement.Above),
-                ]), FormExtensionPlacement.Right),
-                new(new EventFormGroup([
-                    new("notes", new GridArea(1, 0, ColumnSpan: 4), Localization.UiStrings.Get("Tr_WorkspaceNotes"), LabelPlacement: LabelPlacement.Above),
-                ]), FormExtensionPlacement.BelowField, "document-number")
-            );
             var eventFormSectionViewModel = new EventFormSectionViewModel(eventFormLayout);
 
             var summarySectionViewModel = new SummarySectionViewModel(Localization.UiStrings.Get("Tr_WorkspaceSummaryPreview"));

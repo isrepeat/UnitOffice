@@ -81,6 +81,7 @@
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\MainZoneSections\CandidatesSectionViewModel.cs" Link="Controls\WorkspaceZones\MainZoneSections\CandidatesSectionViewModel.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\MainZoneSections\EventFormLayout.cs" Link="Controls\WorkspaceZones\MainZoneSections\EventFormLayout.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\MainZoneSections\EventFormSectionViewModel.cs" Link="Controls\WorkspaceZones\MainZoneSections\EventFormSectionViewModel.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\MainZoneSections\FormDefinition.cs" Link="Controls\WorkspaceZones\MainZoneSections\FormDefinition.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WorkspaceZones\MainZoneSections\SummarySectionViewModel.cs" Link="Controls\WorkspaceZones\MainZoneSections\SummarySectionViewModel.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Workspace\WorkspaceCell.cs" Link="Workspace\WorkspaceCell.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Workspace\WorkspaceGrid.cs" Link="Workspace\WorkspaceGrid.cs" />

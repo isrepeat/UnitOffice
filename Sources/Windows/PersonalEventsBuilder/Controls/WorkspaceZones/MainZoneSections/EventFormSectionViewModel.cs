@@ -11,7 +11,7 @@ using WorkspaceSectionBase = PersonalEventsBuilder.Workspace.WorkspaceSectionBas
 using WorkspaceCell = PersonalEventsBuilder.Workspace.WorkspaceCell;
 
 namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
-    internal enum LabelPlacement {
+    public enum LabelPlacement {
         Placeholder,
         Left,
         Right,
@@ -33,6 +33,7 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
 
     public sealed class EventFormSectionViewModel : WorkspaceSectionBase, INavigableZone {
         public WorkspaceCell[] VisibleCells { get; private set; } = [];
+        internal IReadOnlyList<FormGroupBorder> GroupBorders { get; }
         internal override int RowCount { get; }
         internal override int ColumnCount { get; }
         internal int? EditingIndex { get; private set; }
@@ -47,6 +48,7 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
         private readonly EventField[] eventFields;
 
         internal EventFormSectionViewModel(EventFormLayout eventFormLayout) {
+            this.GroupBorders = eventFormLayout.GroupBorders;
             this.eventFields = eventFormLayout.Fields.ToArray();
             this.RowCount = 1;
             foreach (var eventField in this.eventFields) {

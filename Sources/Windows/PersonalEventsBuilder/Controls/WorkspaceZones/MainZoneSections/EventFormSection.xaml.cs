@@ -32,7 +32,21 @@ namespace PersonalEventsBuilder.Controls.WorkspaceZones.MainZoneSections {
                 eventFormSectionViewModel.EditingChanged += eventFormSection.UpdateEditor;
             }
 
+            eventFormSection.DrawGroupBorders();
             eventFormSection.UpdateEditor();
+        }
+
+        private void DrawGroupBorders() {
+            this.GroupBorders.Children.Clear();
+            if (this.ViewModel is not { } eventFormSectionViewModel) {
+                return;
+            }
+
+            foreach (var formGroupBorder in eventFormSectionViewModel.GroupBorders) {
+                var border = new Border { Style = formGroupBorder.Style };
+                WorkspaceGrid.Place(border, formGroupBorder.Area);
+                this.GroupBorders.Children.Add(border);
+            }
         }
 
         private void UpdateEditor() {
