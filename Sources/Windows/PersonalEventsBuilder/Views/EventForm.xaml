@@ -4,7 +4,8 @@
              xmlns:controls="using:PersonalEventsBuilder.Controls">
     <Grid RowDefinitions="Auto,*">
         <TextBlock Text="Форма события" />
-        <controls:GridCanvas Grid.Row="1"
+        <controls:GridCanvas x:Name="Surface"
+                             Grid.Row="1"
                              GridLayout="{x:Bind GridLayout, Mode=OneWay}" />
     </Grid>
 </UserControl>

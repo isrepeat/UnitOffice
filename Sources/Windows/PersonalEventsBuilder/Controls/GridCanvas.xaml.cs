@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Collections.Generic;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
@@ -20,6 +22,8 @@ namespace PersonalEventsBuilder.Controls {
             new PropertyMetadata(null, OnLayoutChanged)
         );
 
+        public DataTemplate? TargetTemplate { get; set; }
+
         public bool CanScrollLeft => this.columns is { FirstVisibleIndex: > 0 };
         public bool CanScrollRight => this.columns is { } axis && this.visibleColumns > 0 && axis.FirstVisibleIndex + this.skippedColumns + this.visibleColumns < axis.Count;
 
@@ -35,6 +39,17 @@ namespace PersonalEventsBuilder.Controls {
         private int skippedColumns;
         private double gridLeft;
         private int visibleColumns;
+        private int visibleRows;
+        internal GridCell[] Cells { get; set; } = [];
+        internal int NavigationOrder => this.observedLayout?.NavigationOrder ?? 0;
+        private int LeftColumn => (this.columns?.FirstVisibleIndex ?? 0) + this.skippedColumns;
+        internal IEnumerable<GridCell> ReachableCells => this.Cells.Where(cell =>
+            this.visibleRows > 0 && this.visibleColumns > 0 && cell.Column >= this.skippedColumns &&
+            cell.Column < this.columns!.Count && cell.Row >= 0 && cell.Row < this.rows!.Count);
+
+        private IEnumerable<GridCell> VisibleCells => this.ReachableCells.Where(cell =>
+            cell.Column >= this.LeftColumn && cell.Column < this.LeftColumn + this.visibleColumns &&
+            cell.Row >= this.rows!.FirstVisibleIndex && cell.Row < this.rows.FirstVisibleIndex + this.visibleRows);
         private uint? pointerId;
         private bool vertical;
         private double lineIndex;
@@ -55,7 +70,19 @@ namespace PersonalEventsBuilder.Controls {
             this.GridLayout = new GridLayout();
             this.Loaded += (_, _) => this.Observe(this.GridLayout);
             this.Unloaded += (_, _) => this.Observe(null);
+            this.Surface.Tapped += this.SelectNearest;
             this.Surface.PointerPressed += this.StartDrag;
+            this.KeyDown += (_, args) => {
+                if (this.observedLayout?.Navigation.Move(this, args.Key) == true) {
+                    args.Handled = true;
+                }
+            };
+            this.LostFocus += (_, _) => {
+                if (this.FocusState != FocusState.Unfocused) {
+                    return;
+                }
+                this.observedLayout?.Navigation.Release(this);
+            };
             this.Surface.PointerWheelChanged += (_, args) => {
                 int delta = args.GetCurrentPoint(this.Surface).Properties.MouseWheelDelta;
                 if (delta != 0 && this.rows is { } axis) {
@@ -65,7 +92,11 @@ namespace PersonalEventsBuilder.Controls {
                 }
             };
             this.Surface.PointerMoved += this.MoveDrag;
-            this.Surface.PointerReleased += (_, args) => this.Surface.ReleasePointerCapture(args.Pointer);
+            this.Surface.PointerReleased += (_, args) => {
+                if (this.pointerId == args.Pointer.PointerId) {
+                    this.Surface.ReleasePointerCapture(args.Pointer);
+                }
+            };
             this.Surface.PointerCaptureLost += (_, args) => {
                 if (this.pointerId == args.Pointer.PointerId) {
                     this.pointerId = null;
@@ -86,10 +117,12 @@ namespace PersonalEventsBuilder.Controls {
 
         private void Observe(GridLayout? layout) {
             if (this.observedLayout is { } previous) {
+                previous.Navigation.Remove(this);
                 previous.AxesChanged -= this.ObserveAxes;
             }
             this.observedLayout = layout;
             if (layout is not null) {
+                layout.Navigation.Register(this);
                 layout.AxesChanged += this.ObserveAxes;
             }
             this.ObserveAxes();
@@ -123,8 +156,10 @@ namespace PersonalEventsBuilder.Controls {
             this.Lines.Data = null;
             this.Labels.Children.Clear();
             this.visibleColumns = 0;
+            this.visibleRows = 0;
             var geometry = new GeometryGroup();
             if (this.columns is not { } columns || this.rows is not { } rows) {
+                this.UpdateTargets();
                 this.ViewportChanged?.Invoke();
                 return;
             }
@@ -134,7 +169,9 @@ namespace PersonalEventsBuilder.Controls {
             int remaining = Math.Max(0, columns.Count - columns.FirstVisibleIndex - this.skippedColumns);
             this.visibleColumns = Math.Min(remaining, columns.Capacity(this.Surface.ActualWidth, this.gridLeft));
             int visibleRows = rows.VisibleCount(this.Surface.ActualHeight, 0);
+            this.visibleRows = visibleRows;
             this.gridHeight = visibleRows * rows.Step;
+            this.UpdateTargets();
             this.ViewportChanged?.Invoke();
             if (this.visibleColumns == 0 || this.gridHeight <= 0) {
                 return;
@@ -158,6 +195,63 @@ namespace PersonalEventsBuilder.Controls {
                 geometry.Children.Add(new LineGeometry { StartPoint = new Point(this.gridLeft, y), EndPoint = new Point(right, y) });
             }
             this.Lines.Data = geometry;
+        }
+
+        internal void UpdateTargets() {
+            var cells = this.VisibleCells.ToArray();
+            int count = cells.Length;
+            var children = this.Targets.Children;
+            while (children.Count > count) {
+                children.RemoveAt(children.Count - 1);
+            }
+            if (count == 0 || this.columns is not { } columns || this.rows is not { } rows) {
+                return;
+            }
+
+            for (int i = 0; i < count; i++) {
+                if (i == children.Count) {
+                    var item = this.TargetTemplate is null ? new GridPoint() : this.TargetTemplate.LoadContent();
+                    if (item is not FrameworkElement element || element is not IGridNavigationTarget) {
+                        throw new InvalidOperationException("The grid target template must contain a FrameworkElement implementing IGridNavigationTarget.");
+                    }
+                    children.Add(element);
+                }
+
+                var target = (FrameworkElement)children[i];
+                var cell = cells[i];
+                int x = cell.Column - this.LeftColumn;
+                int y = cell.Row - rows.FirstVisibleIndex;
+                target.Width = columns.Step;
+                target.Height = rows.Step;
+                Canvas.SetLeft(target, this.gridLeft + x * columns.Step);
+                Canvas.SetTop(target, y * rows.Step);
+                ((IGridNavigationTarget)target).UpdateNavigationState(cell.Column, cell.Row, this.observedLayout!.Navigation.IsActive(this, cell));
+            }
+        }
+
+        private void SelectNearest(object sender, TappedRoutedEventArgs args) {
+            var point = args.GetPosition(this.Surface);
+            if (this.visibleColumns == 0 || this.visibleRows == 0
+                || this.columns is not { } columns || this.rows is not { } rows) {
+                return;
+            }
+
+            var nearest = this.VisibleCells.MinBy(cell => {
+                double dx = this.gridLeft + (cell.Column - this.LeftColumn + 0.5) * columns.Step - point.X;
+                double dy = (cell.Row - rows.FirstVisibleIndex + 0.5) * rows.Step - point.Y;
+                return dx * dx + dy * dy;
+            });
+            if (nearest is not null) {
+                args.Handled = true;
+                this.observedLayout!.Navigation.Select(this, nearest);
+            }
+        }
+
+        internal void Reveal(GridCell cell) {
+            int left = this.LeftColumn;
+            int top = this.rows!.FirstVisibleIndex;
+            this.ScrollColumns(cell.Column - Math.Clamp(cell.Column, left, left + this.visibleColumns - 1));
+            this.ScrollRows(cell.Row - Math.Clamp(cell.Row, top, top + this.visibleRows - 1));
         }
 
         private void StartDrag(object sender, PointerRoutedEventArgs args) {

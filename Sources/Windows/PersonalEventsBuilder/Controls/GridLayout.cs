@@ -4,6 +4,8 @@ using Microsoft.UI.Xaml;
 
 namespace PersonalEventsBuilder.Controls {
     public sealed class GridLayout : DependencyObject {
+        public GridNavigation Navigation { get; set; } = new();
+        public int NavigationOrder { get; set; }
         public GridAxis Columns {
             get => this.columns;
             set => this.Replace(ref this.columns, value);

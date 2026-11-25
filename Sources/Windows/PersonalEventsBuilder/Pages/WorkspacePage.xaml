@@ -8,18 +8,22 @@
       NavigationCacheMode="Required">
     <layout:WorkspaceHost>
         <layout:WorkspaceHost.Resources>
+            <controls:GridNavigation x:Key="EventNavigation" />
             <controls:GridAxis x:Key="EventColumns"
                                Step="116"
                                Count="24" />
             <controls:GridLayout x:Key="FormGrid"
-                                 Columns="{StaticResource EventColumns}">
+                                 Columns="{StaticResource EventColumns}"
+                                 Navigation="{StaticResource EventNavigation}">
                 <controls:GridLayout.Rows>
                     <controls:GridAxis Step="40"
                                        Count="6" />
                 </controls:GridLayout.Rows>
             </controls:GridLayout>
             <controls:GridLayout x:Key="CandidatesGrid"
-                                 Columns="{StaticResource EventColumns}">
+                                 NavigationOrder="1"
+                                 Columns="{StaticResource EventColumns}"
+                                 Navigation="{StaticResource EventNavigation}">
                 <controls:GridLayout.Rows>
                     <controls:GridAxis Step="28"
                                        Count="30" />
@@ -72,7 +76,7 @@
                     <layout:Zone Size="3*"
                                  Direction="Columns">
                         <layout:Zone Size="160"
-                                     MinSize="40"
+                                     MinSize="8"
                                      Style="{StaticResource ZonePanelStyle}" />
                         <layout:Splitter />
                         <layout:Zone MinSize="120"
