@@ -14,6 +14,7 @@ namespace PersonalEventsBuilder.Controls {
         private readonly Canvas cells = new();
         private readonly string[][] values;
         private readonly Dictionary<GridAddress, CandidateCell> visibleCells = [];
+        private readonly Stack<CandidateCell> recycledCells = new();
         private GridAddress? active;
         public GridArea Bounds { get; }
 
@@ -44,14 +45,17 @@ namespace PersonalEventsBuilder.Controls {
 
         public void ArrangeCells(GridArea visible, double width, double height) {
             foreach (var address in this.visibleCells.Keys.Where(address => !visible.Contains(address)).ToArray()) {
-                this.cells.Children.Remove(this.visibleCells[address]);
+                var released = this.visibleCells[address];
                 this.visibleCells.Remove(address);
+                this.cells.Children.Remove(released);
+                released.DataContext = null;
+                this.recycledCells.Push(released);
             }
             for (int row = visible.Row; row < visible.Bottom; row++) {
                 for (int column = visible.Column; column < visible.Right; column++) {
                     var address = new GridAddress(column, row);
                     if (!this.visibleCells.TryGetValue(address, out var cell)) {
-                        cell = new CandidateCell();
+                        cell = this.recycledCells.TryPop(out var recycled) ? recycled : new CandidateCell();
                         cell.DataContext = this.values[row - this.Bounds.Row][column - this.Bounds.Column];
                         cell.SetSelected(address == this.active);
                         this.visibleCells.Add(address, cell);
