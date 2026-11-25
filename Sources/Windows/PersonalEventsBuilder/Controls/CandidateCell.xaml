@@ -1,0 +1,21 @@
+<UserControl x:Class="PersonalEventsBuilder.Controls.CandidateCell"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             IsHitTestVisible="False"
+             IsTabStop="False">
+    <Border Background="{StaticResource PanelBrush}"
+            BorderBrush="{StaticResource ZoneSplitterBrush}"
+            BorderThickness="0.5">
+        <Grid>
+            <TextBlock Margin="5,0"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       Text="{Binding}"
+                       TextTrimming="CharacterEllipsis" />
+            <Border x:Name="Selection"
+                    BorderBrush="#F3AF61"
+                    BorderThickness="2"
+                    Visibility="Collapsed" />
+        </Grid>
+    </Border>
+</UserControl>

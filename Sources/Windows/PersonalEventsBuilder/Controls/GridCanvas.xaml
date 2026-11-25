@@ -4,15 +4,22 @@
              IsTabStop="True">
     <Grid x:Name="Surface"
           Background="Transparent">
-        <Canvas IsHitTestVisible="False">
+        <Canvas>
             <Canvas.Clip>
                 <RectangleGeometry x:Name="ViewportClip" />
             </Canvas.Clip>
             <Path x:Name="Lines"
                   Stroke="{StaticResource ZoneSplitterBrush}"
-                  StrokeThickness="1" />
+                  StrokeThickness="1"
+                  IsHitTestVisible="False" />
             <Canvas x:Name="Targets" />
-            <Canvas x:Name="Labels" />
+            <Border x:Name="Cursor"
+                    BorderBrush="{ThemeResource SystemControlHighlightAccentBrush}"
+                    BorderThickness="2"
+                    IsHitTestVisible="False"
+                    Visibility="Collapsed" />
+            <Canvas x:Name="Labels"
+                    IsHitTestVisible="False" />
         </Canvas>
     </Grid>
 </UserControl>

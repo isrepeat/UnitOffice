@@ -22,8 +22,6 @@ namespace PersonalEventsBuilder.Controls {
             new PropertyMetadata(null, OnLayoutChanged)
         );
 
-        public DataTemplate? TargetTemplate { get; set; }
-
         public bool CanScrollLeft => this.columnWindow.Slots > 0 && this.LeftColumn > 0;
         public bool CanScrollRight => this.columns is { } axis && this.columnWindow.Slots > 0 && this.LeftColumn + this.visibleColumns < axis.Count;
 
@@ -40,16 +38,22 @@ namespace PersonalEventsBuilder.Controls {
         private double gridLeft => this.columnWindow.Left;
         private int visibleColumns => this.columnWindow.Count;
         private int visibleRows;
-        internal GridCell[] Cells { get; set; } = [];
         internal int NavigationOrder => this.observedLayout?.NavigationOrder ?? 0;
         private int LeftColumn => this.columnWindow.First;
-        internal IEnumerable<GridCell> ReachableCells => this.Cells.Where(cell =>
-            this.visibleRows > 0 && this.visibleColumns > 0 && cell.Column >= 0 &&
-            cell.Column < this.columns!.Count && cell.Row >= 0 && cell.Row < this.rows!.Count);
-
-        private IEnumerable<GridCell> VisibleCells => this.ReachableCells.Where(cell =>
-            cell.Column + 1 > this.displayColumn && cell.Column < this.displayColumn + this.columnWindow.Slots &&
-            cell.Row + 1 > this.displayRow && cell.Row < this.displayRow + this.drawingBounds.Height / this.rows!.Step);
+        private readonly List<IGridNavigationTarget> regions = [];
+        private GridAddress? activeAddress;
+        private IGridNavigationTarget? activeTarget;
+        internal GridArea GridBounds => this.visibleColumns > 0 && this.visibleRows > 0
+            ? new(0, 0, this.columns!.Count, this.rows!.Count) : default;
+        private GridArea VisibleArea {
+            get {
+                int left = (int)Math.Floor(this.displayColumn);
+                int top = (int)Math.Floor(this.displayRow);
+                int right = (int)Math.Ceiling(this.displayColumn + this.columnWindow.Slots);
+                int bottom = (int)Math.Ceiling(this.displayRow + this.drawingBounds.Height / this.rows!.Step);
+                return this.GridBounds.Intersect(new(left, top, right - left, bottom - top));
+            }
+        }
         private Rect drawingBounds;
         private double displayColumn;
         private double displayRow;
@@ -75,14 +79,18 @@ namespace PersonalEventsBuilder.Controls {
             this.Unloaded += (_, _) => this.Observe(null);
             this.Surface.Tapped += this.SelectNearest;
             this.Surface.PointerPressed += this.StartDrag;
-            this.KeyDown += (_, args) => {
+            this.PreviewKeyDown += (_, args) => {
                 if (this.observedLayout?.Navigation.Move(this, args.Key) == true) {
                     args.Handled = true;
                 }
             };
             this.LostFocus += (_, _) => {
-                if (this.FocusState != FocusState.Unfocused) {
-                    return;
+                var focused = this.XamlRoot is null ? null : FocusManager.GetFocusedElement(this.XamlRoot) as DependencyObject;
+                while (focused is not null) {
+                    if (focused == this) {
+                        return;
+                    }
+                    focused = VisualTreeHelper.GetParent(focused);
                 }
                 this.observedLayout?.Navigation.Release(this);
             };
@@ -189,7 +197,7 @@ namespace PersonalEventsBuilder.Controls {
             int bottom = Math.Min(rows.Count, (int)Math.Ceiling(this.displayRow + this.drawingBounds.Height / rows.Step));
             for (int column = first; column <= end; column++) {
                 double x = left + (column - first) * step;
-                if (column < end) {
+                if (column < end && this.regions.Count == 0) {
                     var label = new TextBlock { Text = (column + 1).ToString() };
                     Canvas.SetLeft(label, x + 3);
                     this.Labels.Children.Add(label);
@@ -203,61 +211,114 @@ namespace PersonalEventsBuilder.Controls {
             this.Lines.Data = geometry;
         }
 
-        internal void UpdateTargets() {
-            var cells = this.VisibleCells.ToArray();
-            int count = cells.Length;
-            var children = this.Targets.Children;
-            while (children.Count > count) {
-                children.RemoveAt(children.Count - 1);
+        internal void Register<T>(T region) where T : FrameworkElement, IGridNavigationTarget {
+            if (this.regions.Any(other => !region.Bounds.Intersect(other.Bounds).IsEmpty)) {
+                throw new ArgumentException("Grid regions must not overlap.", nameof(region));
             }
-            if (count == 0 || this.columns is not { } columns || this.rows is not { } rows) {
+            this.regions.Add(region);
+            this.Targets.Children.Add(region);
+            this.UpdateTargets();
+        }
+
+        private IGridNavigationTarget? Owner(GridAddress address) => this.regions.FirstOrDefault(region => region.Bounds.Contains(address));
+
+        internal GridArea FocusArea(GridAddress address) => this.Owner(address)?.FocusArea(address) ?? new(address.Column, address.Row, 1, 1);
+
+        internal GridAddress? FindAddress(GridArea search, GridAddress desired, bool byRow) {
+            search = search.Intersect(this.GridBounds);
+            if (search.IsEmpty) {
+                return null;
+            }
+            if (this.regions.Count == 0) {
+                return search.Closest(desired);
+            }
+
+            GridAddress? best = null;
+            (double, double, int) bestScore = (double.PositiveInfinity, double.PositiveInfinity, int.MaxValue);
+            foreach (var region in this.regions) {
+                var intersection = search.Intersect(region.Bounds);
+                if (intersection.IsEmpty) {
+                    continue;
+                }
+                var hit = intersection.Closest(desired);
+                var address = region.FocusAddress(hit);
+                if (!this.GridBounds.Contains(address)) {
+                    continue;
+                }
+                double dx = Math.Abs(hit.Column - desired.Column);
+                double dy = Math.Abs(hit.Row - desired.Row);
+                var score = byRow ? (dy, dx, hit.Column) : (dx * dx + dy * dy, dy, hit.Column);
+                if (score.CompareTo(bestScore) < 0) {
+                    bestScore = score;
+                    best = address;
+                }
+            }
+            return best;
+        }
+
+        internal void SetActiveAddress(GridAddress? address) {
+            var target = address is { } cell ? this.Owner(cell) : null;
+            if (this.activeTarget != target) {
+                this.activeTarget?.SetActiveAddress(null);
+            }
+            this.activeAddress = address;
+            this.activeTarget = target;
+            target?.SetActiveAddress(address);
+            this.UpdateCursor();
+        }
+
+        private void UpdateCursor() {
+            this.Cursor.Visibility = Visibility.Collapsed;
+            if (this.activeTarget is null && this.activeAddress is { } address && this.columns is { } columns && this.rows is { } rows) {
+                this.Place(this.Cursor, new(address.Column, address.Row, 1, 1), columns.Step, rows.Step);
+                this.Cursor.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void Place(FrameworkElement element, GridArea area, double width, double height) {
+            element.Width = width * area.Width;
+            element.Height = height * area.Height;
+            Canvas.SetLeft(element, this.drawingBounds.X + (area.Column - this.displayColumn) * width);
+            Canvas.SetTop(element, (area.Row - this.displayRow) * height);
+        }
+
+        private void UpdateTargets() {
+            if (this.columns is not { } columns || this.rows is not { } rows) {
                 return;
             }
-
-            for (int i = 0; i < count; i++) {
-                if (i == children.Count) {
-                    var item = this.TargetTemplate is null ? new GridPoint() : this.TargetTemplate.LoadContent();
-                    if (item is not FrameworkElement element || element is not IGridNavigationTarget) {
-                        throw new InvalidOperationException("The grid target template must contain a FrameworkElement implementing IGridNavigationTarget.");
-                    }
-                    children.Add(element);
+            var visible = this.VisibleArea;
+            foreach (var region in this.regions) {
+                this.Place((FrameworkElement)region, region.Bounds, columns.Step, rows.Step);
+                if (region is IGridViewportContent content) {
+                    content.ArrangeCells(visible.Intersect(region.Bounds), columns.Step, rows.Step);
                 }
-
-                var target = (FrameworkElement)children[i];
-                var cell = cells[i];
-                double x = cell.Column - this.displayColumn;
-                double y = cell.Row - this.displayRow;
-                target.Width = columns.Step;
-                target.Height = rows.Step;
-                Canvas.SetLeft(target, this.drawingBounds.X + x * columns.Step);
-                Canvas.SetTop(target, y * rows.Step);
-                ((IGridNavigationTarget)target).UpdateNavigationState(cell.Column, cell.Row, this.observedLayout!.Navigation.IsActive(this, cell));
             }
+            this.UpdateCursor();
         }
 
         private void SelectNearest(object sender, TappedRoutedEventArgs args) {
-            var point = args.GetPosition(this.Surface);
-            if (this.visibleColumns == 0 || this.visibleRows == 0
-                || this.columns is not { } columns || this.rows is not { } rows) {
+            if (this.GridBounds.IsEmpty) {
                 return;
             }
-
-            var nearest = this.VisibleCells.MinBy(cell => {
-                double dx = this.drawingBounds.X + (cell.Column - this.displayColumn + 0.5) * columns.Step - point.X;
-                double dy = (cell.Row - this.displayRow + 0.5) * rows.Step - point.Y;
-                return dx * dx + dy * dy;
-            });
-            if (nearest is not null) {
+            var point = args.GetPosition(this.Surface);
+            var hit = new GridAddress(
+                (int)Math.Floor(this.displayColumn + (point.X - this.drawingBounds.X) / this.columns!.Step),
+                (int)Math.Floor(this.displayRow + point.Y / this.rows!.Step)
+            );
+            if (this.FindAddress(this.VisibleArea, hit, byRow: false) is { } address) {
                 args.Handled = true;
-                this.observedLayout!.Navigation.Select(this, nearest);
+                this.observedLayout!.Navigation.Select(this, address);
             }
         }
 
-        internal void Reveal(GridCell cell) {
+        internal void Reveal(GridAddress address) {
+            var area = this.FocusArea(address);
             int left = this.LeftColumn;
             int top = this.rows!.FirstVisibleIndex;
-            this.ScrollColumns(cell.Column - Math.Clamp(cell.Column, left, left + this.visibleColumns - 1));
-            this.ScrollRows(cell.Row - Math.Clamp(cell.Row, top, top + this.visibleRows - 1));
+            int firstRow = Math.Max(area.Row, address.Row - this.visibleRows + 1);
+            int lastColumn = Math.Min(area.Right, area.Column + this.visibleColumns) - 1;
+            this.ScrollColumns(area.Column < left ? area.Column - left : Math.Max(0, lastColumn - (left + this.visibleColumns - 1)));
+            this.ScrollRows(firstRow < top ? firstRow - top : Math.Max(0, address.Row - (top + this.visibleRows - 1)));
         }
 
         private void StartDrag(object sender, PointerRoutedEventArgs args) {

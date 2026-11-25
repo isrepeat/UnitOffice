@@ -42,8 +42,11 @@
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\GridNavigation.cs" Link="Controls\GridNavigation.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\GridCanvas.xaml" Link="Controls\GridCanvas.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\GridCanvas.xaml.cs" Link="Controls\GridCanvas.xaml.cs" />
-    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\GridPoint.xaml" Link="Controls\GridPoint.xaml" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\GridPoint.xaml.cs" Link="Controls\GridPoint.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\FormInput.xaml" Link="Controls\FormInput.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\FormInput.xaml.cs" Link="Controls\FormInput.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\CandidateCell.xaml" Link="Controls\CandidateCell.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\CandidateCell.xaml.cs" Link="Controls\CandidateCell.xaml.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\CandidateGrid.cs" Link="Controls\CandidateGrid.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\IGridNavigationTarget.cs" Link="Controls\IGridNavigationTarget.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Layout\WorkspaceHost.cs" Link="UDK\WinUI\Layout\WorkspaceHost.cs" />
     <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\Strings\ru-RU\Resources.resw" Link="Localization\Strings\ru-RU\Resources.resw" />
