@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -38,7 +39,15 @@ namespace PersonalEventsBuilder.Layout {
 
             var grid = new Grid();
             var columns = zone.Direction == ZoneDirection.Columns;
+            Splitter? pending = null;
             foreach (var item in zone.Items) {
+                if (item is Splitter splitter) {
+                    if (grid.Children.Count == 0 || pending is not null) {
+                        throw new InvalidOperationException("A splitter must be placed between two zones.");
+                    }
+                    pending = splitter;
+                    continue;
+                }
                 if (item is not Zone child) {
                     throw new InvalidOperationException("A zone accepts child zones or a single view.");
                 }
@@ -46,15 +55,28 @@ namespace PersonalEventsBuilder.Layout {
                 int index = grid.Children.Count;
                 if (index > 0) {
                     AddTrack(grid, columns, new GridLength(zone.Spacing), 0, double.PositiveInfinity);
-                    FrameworkElement separator = zone.AllowResize ? CreateSplitter(grid, columns, index) : new Border();
-                    if (separator is Thumb thumb && child.LeadingSplitterStyle is { } style) {
-                        thumb.Style = style;
+                    FrameworkElement separator;
+                    if (pending is null) {
+                        separator = new Border {
+                            Background = (Brush)Application.Current.Resources["ZoneSplitterBrush"],
+                            IsHitTestVisible = false,
+                        };
+                    } else {
+                        var thumb = CreateSplitter(grid, columns, index);
+                        if (pending.Style is { } style) {
+                            thumb.Style = style;
+                        }
+                        separator = thumb;
+                        pending = null;
                     }
                     Place(grid, separator, columns, index++);
                 }
 
                 AddTrack(grid, columns, child.Size, child.MinSize, child.MaxSize);
                 Place(grid, Build(child), columns, index);
+            }
+            if (pending is not null) {
+                throw new InvalidOperationException("A splitter must be followed by a zone.");
             }
             return grid;
         }

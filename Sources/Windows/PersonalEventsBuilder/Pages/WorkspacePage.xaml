@@ -3,43 +3,63 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:layout="using:PersonalEventsBuilder.Layout"
       Style="{StaticResource WorkspacePageStyle}">
-    <layout:WorkspaceHost Padding="8">
+    <layout:WorkspaceHost>
         <layout:WorkspaceHost.Resources>
             <Style TargetType="Thumb"
                    BasedOn="{StaticResource ZoneSplitterStyle}" />
             <Style TargetType="TextBlock"
                    BasedOn="{StaticResource ZoneLabelStyle}" />
         </layout:WorkspaceHost.Resources>
-        <layout:Zone Direction="Columns"
-                     AllowResize="True"
-                     Spacing="10">
-            <layout:Zone Size="2*"
-                         MinSize="100"
-                         Direction="Rows"
-                         AllowResize="True"
-                         Spacing="10">
-                <layout:Zone Size="2*"
-                             MinSize="60"
-                             Style="{StaticResource ZonePanelStyle}">
-                    <TextBlock Text="1" />
-                </layout:Zone>
-                <layout:Zone MinSize="60"
-                             Direction="Columns"
-                             AllowResize="True"
-                             Spacing="10">
-                    <layout:Zone MinSize="45"
+        <layout:Zone Direction="Columns">
+            <layout:Zone Direction="Rows">
+                <layout:Zone Size="120"
+                             MinSize="48"
+                             Direction="Columns">
+                    <layout:Zone Size="*"
                                  Style="{StaticResource ZonePanelStyle}">
-                        <TextBlock Text="2" />
+                        <TextBlock Text="Прибытие" />
                     </layout:Zone>
-                    <layout:Zone MinSize="45"
+                    <layout:Splitter />
+                    <layout:Zone Size="*"
                                  Style="{StaticResource ZonePanelStyle}">
-                        <TextBlock Text="3" />
+                        <TextBlock Text="Убытие" />
+                    </layout:Zone>
+                    <layout:Zone Size="*"
+                                 Style="{StaticResource ZonePanelStyle}">
+                        <TextBlock Text="Изменение статуса" />
+                    </layout:Zone>
+                    <layout:Zone Size="120"
+                                 Style="{StaticResource ZonePanelStyle}">
+                        <TextBlock Text="Новое событие" />
+                    </layout:Zone>
+                    <layout:Splitter />
+                    <layout:Zone Size="1.4*"
+                                 Style="{StaticResource ZonePanelStyle}">
+                        <TextBlock Text="Превью Word" />
+                    </layout:Zone>
+                </layout:Zone>
+                <layout:Splitter />
+                <layout:Zone MinSize="96"
+                             Direction="Rows">
+                    <layout:Zone Size="2*"
+                                 Style="{StaticResource ZonePanelStyle}">
+                        <TextBlock Text="Форма события" />
+                    </layout:Zone>
+                    <layout:Zone Size="*"
+                                 Style="{StaticResource ZonePanelStyle}">
+                        <TextBlock Text="Сводка" />
+                    </layout:Zone>
+                    <layout:Zone Size="3*"
+                                 Style="{StaticResource ZonePanelStyle}">
+                        <TextBlock Text="Таблица кандидатов" />
                     </layout:Zone>
                 </layout:Zone>
             </layout:Zone>
-            <layout:Zone MinSize="80"
+            <layout:Splitter />
+            <layout:Zone Size="156"
+                         MinSize="100"
                          Style="{StaticResource ZonePanelStyle}">
-                <TextBlock Text="4" />
+                <TextBlock Text="Действия" />
             </layout:Zone>
         </layout:Zone>
     </layout:WorkspaceHost>
