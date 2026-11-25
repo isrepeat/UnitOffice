@@ -71,6 +71,10 @@
                     </layout:Zone>
                     <layout:Zone Size="3*"
                                  Direction="Columns">
+                        <layout:Zone Size="160"
+                                     MinSize="40"
+                                     Style="{StaticResource ZonePanelStyle}" />
+                        <layout:Splitter />
                         <layout:Zone MinSize="120"
                                      Style="{StaticResource ZonePanelStyle}">
                             <views:CandidatesTable GridLayout="{StaticResource CandidatesGrid}" />

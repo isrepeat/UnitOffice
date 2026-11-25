@@ -20,8 +20,8 @@ namespace PersonalEventsBuilder.Controls {
             new PropertyMetadata(null, OnLayoutChanged)
         );
 
-        public bool CanScrollLeft => this.columns is { FirstVisibleIndex: > 0 } && this.visibleColumns > 0;
-        public bool CanScrollRight => this.columns is { } axis && this.visibleColumns > 0 && axis.FirstVisibleIndex + this.visibleColumns < axis.Count;
+        public bool CanScrollLeft => this.columns is { FirstVisibleIndex: > 0 };
+        public bool CanScrollRight => this.columns is { } axis && this.visibleColumns > 0 && axis.FirstVisibleIndex + this.skippedColumns + this.visibleColumns < axis.Count;
 
         internal event Action? ViewportChanged;
         private readonly object columnViewport = new();
@@ -31,6 +31,8 @@ namespace PersonalEventsBuilder.Controls {
         private GridAxis? rows;
         private double gridHeight;
 
+        private double surfaceX;
+        private int skippedColumns;
         private double gridLeft;
         private int visibleColumns;
         private uint? pointerId;
@@ -40,6 +42,15 @@ namespace PersonalEventsBuilder.Controls {
 
         public GridCanvas() {
             this.InitializeComponent();
+            this.Surface.LayoutUpdated += (_, _) => {
+                if (this.columns is not null && this.Surface.XamlRoot is not null) {
+                    double x = this.Surface.TransformToVisual(null).TransformPoint(new Point()).X;
+                    if (x != this.surfaceX) {
+                        this.surfaceX = x;
+                        this.UpdateViewport();
+                    }
+                }
+            };
             this.Surface.SizeChanged += (_, _) => this.UpdateViewport();
             this.GridLayout = new GridLayout();
             this.Loaded += (_, _) => this.Observe(this.GridLayout);
@@ -69,7 +80,7 @@ namespace PersonalEventsBuilder.Controls {
             }
         }
 
-        public void ScrollColumns(int delta) => this.columns?.Scroll(delta, this.columns.Capacity(this.Surface.ActualWidth, this.columns.CenterOffset));
+        public void ScrollColumns(int delta) => this.columns?.Scroll(delta, Math.Min(this.columns.Count, this.skippedColumns + this.columns.Capacity(this.Surface.ActualWidth, this.gridLeft)));
 
         public void ScrollRows(int delta) => this.rows?.Scroll(delta, this.rows.Capacity(this.Surface.ActualHeight, 0));
 
@@ -103,7 +114,7 @@ namespace PersonalEventsBuilder.Controls {
         }
 
         private void UpdateViewport() {
-            this.columns?.SetViewport(this.columnViewport, this.Surface.ActualWidth);
+            this.columns?.SetViewport(this.columnViewport, this.Surface.ActualWidth, this.surfaceX);
             this.rows?.SetViewport(this.rowViewport, this.Surface.ActualHeight);
             this.Draw();
         }
@@ -117,8 +128,11 @@ namespace PersonalEventsBuilder.Controls {
                 this.ViewportChanged?.Invoke();
                 return;
             }
-            this.gridLeft = columns.CenterOffset;
-            this.visibleColumns = columns.VisibleCount(this.Surface.ActualWidth, this.gridLeft);
+            double origin = columns.Origin - this.surfaceX;
+            this.skippedColumns = (int)Math.Clamp(Math.Ceiling(-origin / columns.Step), 0, columns.Count);
+            this.gridLeft = origin + this.skippedColumns * columns.Step;
+            int remaining = Math.Max(0, columns.Count - columns.FirstVisibleIndex - this.skippedColumns);
+            this.visibleColumns = Math.Min(remaining, columns.Capacity(this.Surface.ActualWidth, this.gridLeft));
             int visibleRows = rows.VisibleCount(this.Surface.ActualHeight, 0);
             this.gridHeight = visibleRows * rows.Step;
             this.ViewportChanged?.Invoke();
@@ -130,7 +144,7 @@ namespace PersonalEventsBuilder.Controls {
             double right = this.gridLeft + gridWidth;
             this.Labels.Clip = new RectangleGeometry { Rect = new Rect(this.gridLeft, 0, gridWidth, this.gridHeight) };
             for (int i = 0; i < this.visibleColumns; i++) {
-                var label = new TextBlock { Text = (columns.FirstVisibleIndex + i + 1).ToString() };
+                var label = new TextBlock { Text = (columns.FirstVisibleIndex + this.skippedColumns + i + 1).ToString() };
                 Canvas.SetLeft(label, this.gridLeft + i * step + 3);
                 this.Labels.Children.Add(label);
             }
@@ -172,7 +186,7 @@ namespace PersonalEventsBuilder.Controls {
 
             this.pointerId = args.Pointer.PointerId;
             this.vertical = dx <= dy;
-            this.lineIndex = this.vertical ? column : row;
+            this.lineIndex = this.vertical ? this.skippedColumns + column : row;
             this.grabOffset = (this.vertical ? point.X : point.Y) - this.lineIndex * (this.vertical ? columns.Step : rows.Step);
             args.Handled = true;
         }

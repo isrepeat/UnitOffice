@@ -34,30 +34,32 @@ namespace PersonalEventsBuilder.Controls {
         }
         public int FirstVisibleIndex { get; private set; }
 
-        internal double CenterOffset { get; private set; }
+        internal double Origin { get; private set; }
 
-        private readonly Dictionary<object, double> lengths = new();
+        private readonly Dictionary<object, (double Start, double End)> viewports = new();
         private int count = 1;
         internal event Action? Changed;
 
-        internal void SetViewport(object owner, double length) {
+        internal void SetViewport(object owner, double length, double start = 0) {
             if (length <= 0) {
-                if (!this.lengths.Remove(owner)) {
+                if (!this.viewports.Remove(owner)) {
                     return;
                 }
             } else {
-                if (this.lengths.TryGetValue(owner, out var previous) && previous == length) {
+                if (this.viewports.TryGetValue(owner, out var previous) && previous == (start, start + length)) {
                     return;
                 }
-                this.lengths[owner] = length;
+                this.viewports[owner] = (start, start + length);
             }
             this.UpdateViewport();
         }
 
         private void UpdateViewport() {
-            // Выравниваем начало по широкой поверхности. Узкие показывают окно на той же сетке.
-            double width = this.lengths.Values.DefaultIfEmpty().Max();
-            this.CenterOffset = (width - this.Capacity(width, 0) * this.Step) / 2;
+            // Центрируем сетку один раз в общем диапазоне участвующих поверхностей.
+            double start = this.viewports.Values.Select(viewport => viewport.Start).DefaultIfEmpty().Min();
+            double end = this.viewports.Values.Select(viewport => viewport.End).DefaultIfEmpty().Max();
+            double width = end - start;
+            this.Origin = start + (width - this.Capacity(width, 0) * this.Step) / 2;
             this.FirstVisibleIndex = Math.Min(this.FirstVisibleIndex, Math.Max(0, this.Count - 1));
             this.Changed?.Invoke();
         }
