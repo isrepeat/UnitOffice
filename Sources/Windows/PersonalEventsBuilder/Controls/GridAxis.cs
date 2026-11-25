@@ -1,8 +1,10 @@
 using System;
 using System.Linq;
+using System.Diagnostics;
 using System.Collections.Generic;
 
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 
 namespace PersonalEventsBuilder.Controls {
     public sealed class GridAxis : DependencyObject {
@@ -35,6 +37,10 @@ namespace PersonalEventsBuilder.Controls {
         public int FirstVisibleIndex { get; private set; }
 
         internal readonly record struct ColumnWindow(int First, int Count, double Left, int Slot, int Slots);
+
+        internal double DisplayIndex { get; private set; }
+        private readonly Stopwatch animation = new();
+        private double animationStart;
 
         internal double Origin { get; private set; }
 
@@ -71,6 +77,7 @@ namespace PersonalEventsBuilder.Controls {
             }
             this.scrollPosition = Math.Clamp(this.scrollPosition, 0, Math.Max(0, this.Count - Math.Max(1, capacity)));
             this.FirstVisibleIndex = (int)Math.Floor(this.scrollPosition);
+            this.StopAnimation();
             this.previousCapacity = capacity;
             this.Changed?.Invoke();
         }
@@ -116,8 +123,30 @@ namespace PersonalEventsBuilder.Controls {
             if (index != this.FirstVisibleIndex) {
                 this.scrollPosition = index;
                 this.FirstVisibleIndex = index;
+                this.animationStart = this.DisplayIndex;
+                if (!this.animation.IsRunning) {
+                    CompositionTarget.Rendering += this.OnAnimationFrame;
+                }
+                this.animation.Restart();
                 this.Changed?.Invoke();
             }
+        }
+
+        private void OnAnimationFrame(object? sender, object args) {
+            double progress = Math.Min(1, this.animation.Elapsed.TotalMilliseconds / 150);
+            this.DisplayIndex = this.FirstVisibleIndex + (this.animationStart - this.FirstVisibleIndex) * Math.Pow(1 - progress, 3);
+            if (progress >= 1) {
+                this.StopAnimation();
+            }
+            this.Changed?.Invoke();
+        }
+
+        private void StopAnimation() {
+            if (this.animation.IsRunning) {
+                CompositionTarget.Rendering -= this.OnAnimationFrame;
+                this.animation.Reset();
+            }
+            this.DisplayIndex = this.FirstVisibleIndex;
         }
 
         internal const double MinimumStep = 8;

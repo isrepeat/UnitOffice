@@ -48,8 +48,11 @@ namespace PersonalEventsBuilder.Controls {
             cell.Column < this.columns!.Count && cell.Row >= 0 && cell.Row < this.rows!.Count);
 
         private IEnumerable<GridCell> VisibleCells => this.ReachableCells.Where(cell =>
-            cell.Column >= this.LeftColumn && cell.Column < this.LeftColumn + this.visibleColumns &&
-            cell.Row >= this.rows!.FirstVisibleIndex && cell.Row < this.rows.FirstVisibleIndex + this.visibleRows);
+            cell.Column + 1 > this.displayColumn && cell.Column < this.displayColumn + this.columnWindow.Slots &&
+            cell.Row + 1 > this.displayRow && cell.Row < this.displayRow + this.drawingBounds.Height / this.rows!.Step);
+        private Rect drawingBounds;
+        private double displayColumn;
+        private double displayRow;
         private uint? pointerId;
         private bool vertical;
         private double lineIndex;
@@ -167,28 +170,35 @@ namespace PersonalEventsBuilder.Controls {
             int visibleRows = rows.VisibleCount(this.Surface.ActualHeight, 0);
             this.visibleRows = visibleRows;
             this.gridHeight = visibleRows * rows.Step;
+            this.displayColumn = columns.DisplayIndex + this.columnWindow.Slot;
+            this.displayRow = rows.DisplayIndex;
+            double step = columns.Step;
+            this.drawingBounds = new Rect(columns.Origin - this.surfaceX + this.columnWindow.Slot * step, 0,
+                this.columnWindow.Slots * step, rows.Capacity(this.Surface.ActualHeight, 0) * rows.Step);
+            this.ViewportClip.Rect = this.drawingBounds;
             this.UpdateTargets();
             this.ViewportChanged?.Invoke();
             if (this.visibleColumns == 0 || this.gridHeight <= 0) {
                 return;
             }
-            double step = columns.Step;
-            double gridWidth = this.visibleColumns * step;
-            double right = this.gridLeft + gridWidth;
-            this.Labels.Clip = new RectangleGeometry { Rect = new Rect(this.gridLeft, 0, gridWidth, this.gridHeight) };
-            for (int i = 0; i < this.visibleColumns; i++) {
-                var label = new TextBlock { Text = (this.LeftColumn + i + 1).ToString() };
-                Canvas.SetLeft(label, this.gridLeft + i * step + 3);
-                this.Labels.Children.Add(label);
+            int first = Math.Max(0, (int)Math.Floor(this.displayColumn));
+            int end = Math.Min(columns.Count, (int)Math.Ceiling(this.displayColumn + this.columnWindow.Slots));
+            double left = this.drawingBounds.X + (first - this.displayColumn) * step;
+            double right = left + (end - first) * step;
+            int top = (int)Math.Floor(this.displayRow);
+            int bottom = Math.Min(rows.Count, (int)Math.Ceiling(this.displayRow + this.drawingBounds.Height / rows.Step));
+            for (int column = first; column <= end; column++) {
+                double x = left + (column - first) * step;
+                if (column < end) {
+                    var label = new TextBlock { Text = (column + 1).ToString() };
+                    Canvas.SetLeft(label, x + 3);
+                    this.Labels.Children.Add(label);
+                }
+                geometry.Children.Add(new LineGeometry { StartPoint = new Point(x, 0), EndPoint = new Point(x, (bottom - this.displayRow) * rows.Step) });
             }
-
-            for (int i = 0; i <= this.visibleColumns; i++) {
-                double x = this.gridLeft + i * step;
-                geometry.Children.Add(new LineGeometry { StartPoint = new Point(x, 0), EndPoint = new Point(x, this.gridHeight) });
-            }
-            for (int i = 1; i <= visibleRows; i++) {
-                double y = i * rows.Step;
-                geometry.Children.Add(new LineGeometry { StartPoint = new Point(this.gridLeft, y), EndPoint = new Point(right, y) });
+            for (int row = top + 1; row <= bottom; row++) {
+                double y = (row - this.displayRow) * rows.Step;
+                geometry.Children.Add(new LineGeometry { StartPoint = new Point(left, y), EndPoint = new Point(right, y) });
             }
             this.Lines.Data = geometry;
         }
@@ -215,11 +225,11 @@ namespace PersonalEventsBuilder.Controls {
 
                 var target = (FrameworkElement)children[i];
                 var cell = cells[i];
-                int x = cell.Column - this.LeftColumn;
-                int y = cell.Row - rows.FirstVisibleIndex;
+                double x = cell.Column - this.displayColumn;
+                double y = cell.Row - this.displayRow;
                 target.Width = columns.Step;
                 target.Height = rows.Step;
-                Canvas.SetLeft(target, this.gridLeft + x * columns.Step);
+                Canvas.SetLeft(target, this.drawingBounds.X + x * columns.Step);
                 Canvas.SetTop(target, y * rows.Step);
                 ((IGridNavigationTarget)target).UpdateNavigationState(cell.Column, cell.Row, this.observedLayout!.Navigation.IsActive(this, cell));
             }
@@ -233,8 +243,8 @@ namespace PersonalEventsBuilder.Controls {
             }
 
             var nearest = this.VisibleCells.MinBy(cell => {
-                double dx = this.gridLeft + (cell.Column - this.LeftColumn + 0.5) * columns.Step - point.X;
-                double dy = (cell.Row - rows.FirstVisibleIndex + 0.5) * rows.Step - point.Y;
+                double dx = this.drawingBounds.X + (cell.Column - this.displayColumn + 0.5) * columns.Step - point.X;
+                double dy = (cell.Row - this.displayRow + 0.5) * rows.Step - point.Y;
                 return dx * dx + dy * dy;
             });
             if (nearest is not null) {

@@ -2,15 +2,17 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              IsTabStop="True">
-    <Canvas x:Name="Surface"
-            Background="Transparent">
-        <Path x:Name="Lines"
-              Stroke="{StaticResource ZoneSplitterBrush}"
-              StrokeThickness="1"
-              IsHitTestVisible="False" />
-        <Canvas x:Name="Targets"
-                IsHitTestVisible="False" />
-        <Canvas x:Name="Labels"
-                IsHitTestVisible="False" />
-    </Canvas>
+    <Grid x:Name="Surface"
+          Background="Transparent">
+        <Canvas IsHitTestVisible="False">
+            <Canvas.Clip>
+                <RectangleGeometry x:Name="ViewportClip" />
+            </Canvas.Clip>
+            <Path x:Name="Lines"
+                  Stroke="{StaticResource ZoneSplitterBrush}"
+                  StrokeThickness="1" />
+            <Canvas x:Name="Targets" />
+            <Canvas x:Name="Labels" />
+        </Canvas>
+    </Grid>
 </UserControl>
