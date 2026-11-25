@@ -5,8 +5,72 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
-                <ResourceDictionary Source="ms-appx:///Controls/WorkspaceZones/WorkspaceResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <SolidColorBrush x:Key="WorkspaceBackgroundBrush"
+                             Color="#202020" />
+            <SolidColorBrush x:Key="PanelBrush"
+                             Color="#282828" />
+
+            <Style x:Key="WorkspacePageStyle"
+                   TargetType="Page">
+                <Setter Property="Background"
+                        Value="{StaticResource WorkspaceBackgroundBrush}" />
+                <Setter Property="RequestedTheme"
+                        Value="Dark" />
+            </Style>
+            <Style x:Key="ZoneLabelStyle"
+                   TargetType="TextBlock">
+                <Setter Property="HorizontalAlignment"
+                        Value="Center" />
+                <Setter Property="VerticalAlignment"
+                        Value="Center" />
+            </Style>
+            <SolidColorBrush x:Key="ZoneSplitterBrush"
+                             Color="#515151" />
+            <SolidColorBrush x:Key="ZoneSplitterHoverBrush"
+                             Color="#626262" />
+            <Style x:Key="ZoneSplitterStyle"
+                   TargetType="Thumb">
+                <Setter Property="Background"
+                        Value="{StaticResource ZoneSplitterBrush}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Thumb">
+                            <Grid Background="{TemplateBinding Background}">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal" />
+                                        <VisualState x:Name="PointerOver">
+                                            <VisualState.Setters>
+                                                <Setter Target="Highlight.Opacity"
+                                                        Value="1" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <VisualState.Setters>
+                                                <Setter Target="Highlight.Opacity"
+                                                        Value="1" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Disabled" />
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <Border x:Name="Highlight"
+                                        Background="{StaticResource ZoneSplitterHoverBrush}"
+                                        IsHitTestVisible="False"
+                                        Opacity="0" />
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="ZonePanelStyle"
+                   TargetType="Border">
+                <Setter Property="Margin"
+                        Value="5" />
+                <Setter Property="Background"
+                        Value="{StaticResource PanelBrush}" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

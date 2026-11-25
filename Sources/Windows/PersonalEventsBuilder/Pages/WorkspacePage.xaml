@@ -1,38 +1,46 @@
 <Page x:Class="PersonalEventsBuilder.Pages.WorkspacePage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:zones="using:PersonalEventsBuilder.Controls.WorkspaceZones"
-      DataContext="{x:Bind WorkspacePageViewModel}"
-      NavigationCacheMode="Required">
-    <Grid Background="#202020"
-          Padding="6"
-          RowSpacing="5"
-          ColumnSpacing="5">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="156" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-
-        <Grid ColumnSpacing="4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*" />
-                <ColumnDefinition Width="92" />
-                <ColumnDefinition Width="2.2*" />
-            </Grid.ColumnDefinitions>
-
-            <zones:ModeSelectorZone />
-            <zones:NewEventZone
-                                Grid.Column="1" />
-            <zones:WordPreviewZone Grid.Column="2" />
-        </Grid>
-
-        <zones:MainZone Grid.Row="1" />
-        <zones:ActionsZone
-                           Grid.Column="1"
-                           Grid.RowSpan="2" />
-    </Grid>
+      xmlns:layout="using:PersonalEventsBuilder.Layout"
+      Style="{StaticResource WorkspacePageStyle}">
+    <layout:WorkspaceHost Padding="8">
+        <layout:WorkspaceHost.Resources>
+            <Style TargetType="Thumb"
+                   BasedOn="{StaticResource ZoneSplitterStyle}" />
+            <Style TargetType="TextBlock"
+                   BasedOn="{StaticResource ZoneLabelStyle}" />
+        </layout:WorkspaceHost.Resources>
+        <layout:Zone Direction="Columns"
+                     AllowResize="True"
+                     Spacing="10">
+            <layout:Zone Size="2*"
+                         MinSize="100"
+                         Direction="Rows"
+                         AllowResize="True"
+                         Spacing="10">
+                <layout:Zone Size="2*"
+                             MinSize="60"
+                             Style="{StaticResource ZonePanelStyle}">
+                    <TextBlock Text="1" />
+                </layout:Zone>
+                <layout:Zone MinSize="60"
+                             Direction="Columns"
+                             AllowResize="True"
+                             Spacing="10">
+                    <layout:Zone MinSize="45"
+                                 Style="{StaticResource ZonePanelStyle}">
+                        <TextBlock Text="2" />
+                    </layout:Zone>
+                    <layout:Zone MinSize="45"
+                                 Style="{StaticResource ZonePanelStyle}">
+                        <TextBlock Text="3" />
+                    </layout:Zone>
+                </layout:Zone>
+            </layout:Zone>
+            <layout:Zone MinSize="80"
+                         Style="{StaticResource ZonePanelStyle}">
+                <TextBlock Text="4" />
+            </layout:Zone>
+        </layout:Zone>
+    </layout:WorkspaceHost>
 </Page>
