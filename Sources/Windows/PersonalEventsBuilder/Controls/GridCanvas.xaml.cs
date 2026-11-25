@@ -24,6 +24,8 @@ namespace PersonalEventsBuilder.Controls {
         public bool CanScrollRight => this.columns is { } axis && this.visibleColumns > 0 && axis.FirstVisibleIndex + this.visibleColumns < axis.Count;
 
         internal event Action? ViewportChanged;
+        private readonly object columnViewport = new();
+        private readonly object rowViewport = new();
         private GridLayout? observedLayout;
         private GridAxis? columns;
         private GridAxis? rows;
@@ -38,7 +40,7 @@ namespace PersonalEventsBuilder.Controls {
 
         public GridCanvas() {
             this.InitializeComponent();
-            this.Surface.SizeChanged += (_, _) => this.Draw();
+            this.Surface.SizeChanged += (_, _) => this.UpdateViewport();
             this.GridLayout = new GridLayout();
             this.Loaded += (_, _) => this.Observe(this.GridLayout);
             this.Unloaded += (_, _) => this.Observe(null);
@@ -67,9 +69,9 @@ namespace PersonalEventsBuilder.Controls {
             }
         }
 
-        public void ScrollColumns(int delta) => this.columns?.Scroll(delta, this.columns.Capacity(this.Surface.ActualWidth));
+        public void ScrollColumns(int delta) => this.columns?.Scroll(delta, this.columns.Capacity(this.Surface.ActualWidth, this.columns.CenterOffset));
 
-        public void ScrollRows(int delta) => this.rows?.Scroll(delta, this.rows.Capacity(this.Surface.ActualHeight));
+        public void ScrollRows(int delta) => this.rows?.Scroll(delta, this.rows.Capacity(this.Surface.ActualHeight, 0));
 
         private void Observe(GridLayout? layout) {
             if (this.observedLayout is { } previous) {
@@ -85,9 +87,11 @@ namespace PersonalEventsBuilder.Controls {
         private void ObserveAxes() {
             if (this.columns is not null) {
                 this.columns.Changed -= this.Draw;
+                this.columns.SetViewport(this.columnViewport, 0);
             }
             if (this.rows is not null) {
                 this.rows.Changed -= this.Draw;
+                this.rows.SetViewport(this.rowViewport, 0);
             }
             this.columns = this.observedLayout?.Columns;
             this.rows = this.observedLayout?.Rows;
@@ -95,6 +99,12 @@ namespace PersonalEventsBuilder.Controls {
                 this.columns.Changed += this.Draw;
                 this.rows.Changed += this.Draw;
             }
+            this.UpdateViewport();
+        }
+
+        private void UpdateViewport() {
+            this.columns?.SetViewport(this.columnViewport, this.Surface.ActualWidth);
+            this.rows?.SetViewport(this.rowViewport, this.Surface.ActualHeight);
             this.Draw();
         }
 
@@ -103,23 +113,20 @@ namespace PersonalEventsBuilder.Controls {
             this.Labels.Children.Clear();
             this.visibleColumns = 0;
             var geometry = new GeometryGroup();
-            double width = this.Surface.ActualWidth;
-            double height = this.Surface.ActualHeight;
             if (this.columns is not { } columns || this.rows is not { } rows) {
                 this.ViewportChanged?.Invoke();
                 return;
             }
-            this.visibleColumns = columns.Capacity(width);
-            columns.Scroll(0, this.visibleColumns);
-            rows.Scroll(0, rows.Capacity(height));
-            this.gridHeight = Math.Min(height, (rows.Count - rows.FirstVisibleIndex) * rows.Step);
+            this.gridLeft = columns.CenterOffset;
+            this.visibleColumns = columns.VisibleCount(this.Surface.ActualWidth, this.gridLeft);
+            int visibleRows = rows.VisibleCount(this.Surface.ActualHeight, 0);
+            this.gridHeight = visibleRows * rows.Step;
             this.ViewportChanged?.Invoke();
             if (this.visibleColumns == 0 || this.gridHeight <= 0) {
                 return;
             }
             double step = columns.Step;
             double gridWidth = this.visibleColumns * step;
-            this.gridLeft = (width - gridWidth) / 2;
             double right = this.gridLeft + gridWidth;
             this.Labels.Clip = new RectangleGeometry { Rect = new Rect(this.gridLeft, 0, gridWidth, this.gridHeight) };
             for (int i = 0; i < this.visibleColumns; i++) {
@@ -132,7 +139,8 @@ namespace PersonalEventsBuilder.Controls {
                 double x = this.gridLeft + i * step;
                 geometry.Children.Add(new LineGeometry { StartPoint = new Point(x, 0), EndPoint = new Point(x, this.gridHeight) });
             }
-            for (double y = rows.Step; y <= this.gridHeight; y += rows.Step) {
+            for (int i = 1; i <= visibleRows; i++) {
+                double y = i * rows.Step;
                 geometry.Children.Add(new LineGeometry { StartPoint = new Point(this.gridLeft, y), EndPoint = new Point(right, y) });
             }
             this.Lines.Data = geometry;
