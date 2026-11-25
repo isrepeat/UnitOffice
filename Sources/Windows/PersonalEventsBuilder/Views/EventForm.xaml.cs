@@ -1,17 +1,17 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-using GridScale = PersonalEventsBuilder.Controls.GridScale;
+using GridLayout = PersonalEventsBuilder.Controls.GridLayout;
 
 namespace PersonalEventsBuilder.Views {
     public sealed partial class EventForm : UserControl {
-        public GridScale? GridScale {
-            get => (GridScale?)this.GetValue(GridScaleProperty);
-            set => this.SetValue(GridScaleProperty, value);
+        public GridLayout? GridLayout {
+            get => (GridLayout?)this.GetValue(GridLayoutProperty);
+            set => this.SetValue(GridLayoutProperty, value);
         }
-        public static readonly DependencyProperty GridScaleProperty = DependencyProperty.Register(
-            nameof(GridScale),
-            typeof(GridScale),
+        public static readonly DependencyProperty GridLayoutProperty = DependencyProperty.Register(
+            nameof(GridLayout),
+            typeof(GridLayout),
             typeof(EventForm),
             new PropertyMetadata(null)
         );

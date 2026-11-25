@@ -37,7 +37,8 @@
     <ApplicationDefinition Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\App.xaml" Link="App.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\App.xaml.cs" Link="App.xaml.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Layout\Zone.cs" Link="UDK\WinUI\Layout\Zone.cs" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\GridScale.cs" Link="Controls\GridScale.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\GridAxis.cs" Link="Controls\GridAxis.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\GridLayout.cs" Link="Controls\GridLayout.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\GridCanvas.xaml" Link="Controls\GridCanvas.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\GridCanvas.xaml.cs" Link="Controls\GridCanvas.xaml.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Layout\WorkspaceHost.cs" Link="UDK\WinUI\Layout\WorkspaceHost.cs" />

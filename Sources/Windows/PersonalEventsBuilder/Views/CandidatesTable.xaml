@@ -2,9 +2,21 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:PersonalEventsBuilder.Controls">
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,*,Auto">
         <TextBlock Text="Таблица кандидатов" />
-        <controls:GridCanvas Grid.Row="1"
-                             GridScale="{x:Bind GridScale, Mode=OneWay}" />
+        <controls:GridCanvas x:Name="Surface"
+                             Grid.Row="1"
+                             GridLayout="{x:Bind GridLayout, Mode=OneWay}" />
+        <StackPanel Grid.Row="2"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="4">
+            <Button x:Name="Previous"
+                    Content="←"
+                    Click="OnPrevious" />
+            <Button x:Name="Next"
+                    Content="→"
+                    Click="OnNext" />
+        </StackPanel>
     </Grid>
 </UserControl>

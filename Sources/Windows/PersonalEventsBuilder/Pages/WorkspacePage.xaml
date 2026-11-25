@@ -8,8 +8,23 @@
       NavigationCacheMode="Required">
     <layout:WorkspaceHost>
         <layout:WorkspaceHost.Resources>
-            <controls:GridScale x:Key="EventGridScale"
-                                Step="48" />
+            <controls:GridAxis x:Key="EventColumns"
+                               Step="116"
+                               Count="24" />
+            <controls:GridLayout x:Key="FormGrid"
+                                 Columns="{StaticResource EventColumns}">
+                <controls:GridLayout.Rows>
+                    <controls:GridAxis Step="40"
+                                       Count="6" />
+                </controls:GridLayout.Rows>
+            </controls:GridLayout>
+            <controls:GridLayout x:Key="CandidatesGrid"
+                                 Columns="{StaticResource EventColumns}">
+                <controls:GridLayout.Rows>
+                    <controls:GridAxis Step="28"
+                                       Count="30" />
+                </controls:GridLayout.Rows>
+            </controls:GridLayout>
             <Style TargetType="Thumb"
                    BasedOn="{StaticResource ZoneSplitterStyle}" />
             <Style TargetType="TextBlock"
@@ -48,7 +63,7 @@
                              Direction="Rows">
                     <layout:Zone Size="2*"
                                  Style="{StaticResource ZonePanelStyle}">
-                        <views:EventForm GridScale="{StaticResource EventGridScale}" />
+                        <views:EventForm GridLayout="{StaticResource FormGrid}" />
                     </layout:Zone>
                     <layout:Zone Size="*"
                                  Style="{StaticResource ZonePanelStyle}">
@@ -56,7 +71,7 @@
                     </layout:Zone>
                     <layout:Zone Size="3*"
                                  Style="{StaticResource ZonePanelStyle}">
-                        <views:CandidatesTable GridScale="{StaticResource EventGridScale}" />
+                        <views:CandidatesTable GridLayout="{StaticResource CandidatesGrid}" />
                     </layout:Zone>
                 </layout:Zone>
             </layout:Zone>

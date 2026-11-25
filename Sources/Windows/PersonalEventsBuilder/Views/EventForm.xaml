@@ -5,6 +5,6 @@
     <Grid RowDefinitions="Auto,*">
         <TextBlock Text="Форма события" />
         <controls:GridCanvas Grid.Row="1"
-                             GridScale="{x:Bind GridScale, Mode=OneWay}" />
+                             GridLayout="{x:Bind GridLayout, Mode=OneWay}" />
     </Grid>
 </UserControl>

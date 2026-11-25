@@ -7,5 +7,7 @@
               Stroke="{StaticResource ZoneSplitterBrush}"
               StrokeThickness="1"
               IsHitTestVisible="False" />
+        <Canvas x:Name="Labels"
+                IsHitTestVisible="False" />
     </Canvas>
 </UserControl>
