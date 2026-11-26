@@ -1,0 +1,49 @@
+<UserControl x:Class="PersonalEventsBuilder.Views.PaletteEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Padding="12"
+          RowDefinitions="Auto,*"
+          RowSpacing="8">
+        <Grid ColumnDefinitions="*,Auto">
+            <TextBlock x:Uid="Tr_PaletteTitle"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource SubtitleTextBlockStyle}" />
+            <Button x:Name="CloseButton"
+                    x:Uid="Tr_PaletteClose"
+                    Grid.Column="1"
+                    Click="OnClose" />
+        </Grid>
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="8">
+                <ComboBox x:Name="Role"
+                          x:Uid="Tr_PaletteRole"
+                          HorizontalAlignment="Stretch"
+                          SelectionChanged="OnRoleChanged">
+                    <ComboBoxItem x:Uid="Tr_PaletteBackground" />
+                    <ComboBoxItem x:Uid="Tr_PaletteForm" />
+                    <ComboBoxItem x:Uid="Tr_PaletteButtons" />
+                    <ComboBoxItem x:Uid="Tr_PaletteAccent" />
+                </ComboBox>
+                <ColorPicker x:Name="Picker"
+                             HorizontalAlignment="Stretch"
+                             IsAlphaEnabled="False"
+                             ColorChanged="OnColorChanged" />
+                <Slider x:Name="Warmth"
+                        x:Uid="Tr_PaletteWarmth"
+                        Maximum="100"
+                        ValueChanged="OnToneChanged" />
+                <Slider x:Name="Difference"
+                        x:Uid="Tr_PaletteDifference"
+                        Maximum="24"
+                        ValueChanged="OnToneChanged" />
+                <Slider x:Name="Lines"
+                        x:Uid="Tr_PaletteLines"
+                        Maximum="55"
+                        ValueChanged="OnToneChanged" />
+                <Button x:Uid="Tr_PaletteReset"
+                        Click="OnReset" />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

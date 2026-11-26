@@ -76,6 +76,8 @@
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Pages\WorkspacePage.xaml" Link="Pages\WorkspacePage.xaml" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CommandPanel.xaml" Link="Views\CommandPanel.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CommandPanel.xaml.cs" Link="Views\CommandPanel.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\PaletteEditor.xaml" Link="Views\PaletteEditor.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\PaletteEditor.xaml.cs" Link="Views\PaletteEditor.xaml.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventForm.xaml" Link="Views\EventForm.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventForm.xaml.cs" Link="Views\EventForm.xaml.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTable.xaml" Link="Views\CandidatesTable.xaml" />

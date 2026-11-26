@@ -1,3 +1,5 @@
+using System;
+
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
@@ -14,7 +16,27 @@ namespace PersonalEventsBuilder.Pages {
             this.PreviewKeyDown += this.OnWorkspaceKeyDown;
         }
 
+        private void OnOpenPalette(object sender, RoutedEventArgs args) {
+            this.PaletteDrawer.OpenPaneLength = Math.Min(336, this.ActualWidth);
+            this.PaletteDrawer.IsPaneOpen = true;
+            this.Palette.FocusCloseButton();
+        }
+
+        private void OnClosePalette(object? sender, EventArgs args) => this.PaletteDrawer.IsPaneOpen = false;
+
+        private void OnPaletteClosed(SplitView sender, object args) {
+            this.Palette.Save();
+            this.PaletteButton.Focus(FocusState.Programmatic);
+        }
+
         private void OnWorkspaceKeyDown(object sender, KeyRoutedEventArgs args) {
+            if (this.PaletteDrawer.IsPaneOpen) {
+                if (args.Key == VirtualKey.Escape) {
+                    this.PaletteDrawer.IsPaneOpen = false;
+                    args.Handled = true;
+                }
+                return;
+            }
             if (args.Key is not (VirtualKey.Tab or VirtualKey.Left or VirtualKey.Right or VirtualKey.Up or VirtualKey.Down)) {
                 return;
             }

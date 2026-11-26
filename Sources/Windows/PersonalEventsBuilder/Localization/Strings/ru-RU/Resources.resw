@@ -76,4 +76,16 @@
   <data name="Tr_TreatmentToMedicalLeave.Text" xml:space="preserve"><value>Лечение → отпуск для лечения</value></data>
   <data name="Tr_MedicalLeaveToHospital.Text" xml:space="preserve"><value>Отпуск для лечения → лечение в больнице</value></data>
   <data name="Tr_AbsenceToAssignment.Text" xml:space="preserve"><value>СЗЧ → Командировка</value></data>
+  <data name="Tr_PaletteTitle.Text" xml:space="preserve"><value>Палитра</value></data>
+  <data name="Tr_PaletteClose.Content" xml:space="preserve"><value>Закрыть</value></data>
+  <data name="Tr_PaletteRole.Header" xml:space="preserve"><value>Цвет</value></data>
+  <data name="Tr_PaletteBackground.Content" xml:space="preserve"><value>Основа фона</value></data>
+  <data name="Tr_PaletteForm.Content" xml:space="preserve"><value>Основа формы</value></data>
+  <data name="Tr_PaletteButtons.Content" xml:space="preserve"><value>Основа кнопок</value></data>
+  <data name="Tr_PaletteAccent.Content" xml:space="preserve"><value>Акцент и фокус</value></data>
+  <data name="Tr_PaletteWarmth.Header" xml:space="preserve"><value>Теплота серого</value></data>
+  <data name="Tr_PaletteDifference.Header" xml:space="preserve"><value>Разница оттенков формы</value></data>
+  <data name="Tr_PaletteLines.Header" xml:space="preserve"><value>Контраст сетки</value></data>
+  <data name="Tr_PaletteReset.Content" xml:space="preserve"><value>Вернуть исходную палитру</value></data>
+  <data name="Tr_PaletteOpen.Content" xml:space="preserve"><value>Палитра</value></data>
 </root>
