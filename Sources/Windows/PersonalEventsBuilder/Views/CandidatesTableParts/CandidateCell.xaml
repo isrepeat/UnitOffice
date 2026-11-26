@@ -6,7 +6,7 @@
              IsHitTestVisible="False"
              IsTabStop="False">
     <Border Background="{StaticResource PanelBrush}"
-            BorderBrush="{StaticResource ZoneSplitterBrush}"
+            BorderBrush="{StaticResource GridLineBrush}"
             BorderThickness="0.5">
         <Grid>
             <TextBlock Margin="5,0"

@@ -8,7 +8,7 @@
         <Rectangle Style="{x:Bind FieldStyle}" />
         <TextBlock Margin="8,0"
                    VerticalAlignment="Center"
-                   Foreground="White"
+                   Foreground="#D7D5D2"
                    Text="{x:Bind Label}"
                    TextTrimming="CharacterEllipsis" />
         <Border x:Name="FocusFrame"

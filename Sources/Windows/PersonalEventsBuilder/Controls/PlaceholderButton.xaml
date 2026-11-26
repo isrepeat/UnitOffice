@@ -9,6 +9,9 @@
         VerticalAlignment="Stretch"
         HorizontalContentAlignment="Center"
         VerticalContentAlignment="Center"
+        Background="{StaticResource CommandBrush}"
+        BorderBrush="{StaticResource ZoneSplitterBrush}"
+        Foreground="{StaticResource WorkspaceAccentBrush}"
         CornerRadius="0">
     <Button.Template>
         <ControlTemplate TargetType="Button">
@@ -19,17 +22,17 @@
                         <VisualState x:Name="PointerOver">
                             <VisualState.Setters>
                                 <Setter Target="Presenter.Background"
-                                        Value="{ThemeResource ButtonBackgroundPointerOver}" />
+                                        Value="{StaticResource CommandHoverBrush}" />
                                 <Setter Target="Presenter.Foreground"
-                                        Value="{ThemeResource ButtonForegroundPointerOver}" />
+                                        Value="{StaticResource WorkspaceAccentBrush}" />
                             </VisualState.Setters>
                         </VisualState>
                         <VisualState x:Name="Pressed">
                             <VisualState.Setters>
                                 <Setter Target="Presenter.Background"
-                                        Value="{ThemeResource ButtonBackgroundPressed}" />
+                                        Value="{StaticResource LowerFieldBrush}" />
                                 <Setter Target="Presenter.Foreground"
-                                        Value="{ThemeResource ButtonForegroundPressed}" />
+                                        Value="{StaticResource WorkspaceAccentBrush}" />
                             </VisualState.Setters>
                         </VisualState>
                         <VisualState x:Name="Disabled">

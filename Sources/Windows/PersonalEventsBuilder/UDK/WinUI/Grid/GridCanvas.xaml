@@ -10,12 +10,12 @@
                 <RectangleGeometry x:Name="ViewportClip" />
             </Canvas.Clip>
             <Path x:Name="Lines"
-                  Stroke="{StaticResource ZoneSplitterBrush}"
+                  Stroke="{StaticResource GridLineBrush}"
                   StrokeThickness="1"
                   IsHitTestVisible="False" />
             <Canvas x:Name="Targets" />
             <Border x:Name="Cursor"
-                    BorderBrush="{ThemeResource SystemControlHighlightAccentBrush}"
+                    BorderBrush="{StaticResource WorkspaceAccentBrush}"
                     BorderThickness="2"
                     IsHitTestVisible="False"
                     Visibility="Collapsed" />

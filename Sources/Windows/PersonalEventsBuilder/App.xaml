@@ -7,14 +7,28 @@
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
             <SolidColorBrush x:Key="WorkspaceBackgroundBrush"
-                             Color="#202020" />
+                             Color="#282521" />
             <SolidColorBrush x:Key="PanelBrush"
-                             Color="#282828" />
+                             Color="#2D2A26" />
+            <SolidColorBrush x:Key="WorkspaceDeepBrush"
+                             Color="#201D19" />
+            <SolidColorBrush x:Key="WorkspaceAccentBrush"
+                             Color="#D9B287" />
+            <SolidColorBrush x:Key="PrimaryFieldBrush"
+                             Color="#383531" />
+            <SolidColorBrush x:Key="LowerFieldBrush"
+                             Color="#302D29" />
+            <SolidColorBrush x:Key="SideFieldBrush"
+                             Color="#403D39" />
+            <SolidColorBrush x:Key="CommandBrush"
+                             Color="#3C3935" />
+            <SolidColorBrush x:Key="CommandHoverBrush"
+                             Color="#46423D" />
 
             <Style x:Key="ActiveEntityFrameStyle"
                    TargetType="Border">
                 <Setter Property="BorderBrush"
-                        Value="#FFD28A" />
+                        Value="{StaticResource WorkspaceAccentBrush}" />
                 <Setter Property="BorderThickness"
                         Value="2" />
                 <Setter Property="IsHitTestVisible"
@@ -34,10 +48,12 @@
                 <Setter Property="VerticalAlignment"
                         Value="Center" />
             </Style>
+            <SolidColorBrush x:Key="GridLineBrush"
+                             Color="#413E3A" />
             <SolidColorBrush x:Key="ZoneSplitterBrush"
-                             Color="#515151" />
+                             Color="#33302C" />
             <SolidColorBrush x:Key="ZoneSplitterHoverBrush"
-                             Color="#626262" />
+                             Color="#4A4743" />
             <Style x:Key="ZoneSplitterStyle"
                    TargetType="Thumb">
                 <Setter Property="Background"

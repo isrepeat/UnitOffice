@@ -7,23 +7,23 @@
         <Style x:Key="PrimaryFieldStyle"
                TargetType="Rectangle">
             <Setter Property="Fill"
-                    Value="#253C58" />
+                    Value="{StaticResource PrimaryFieldBrush}" />
             <Setter Property="Stroke"
-                    Value="#709BC6" />
+                    Value="{StaticResource GridLineBrush}" />
         </Style>
         <Style x:Key="ExtensionFieldStyle"
                TargetType="Rectangle">
             <Setter Property="Fill"
-                    Value="#234438" />
+                    Value="{StaticResource LowerFieldBrush}" />
             <Setter Property="Stroke"
-                    Value="#75AB92" />
+                    Value="{StaticResource GridLineBrush}" />
         </Style>
         <Style x:Key="SideExtensionFieldStyle"
                TargetType="Rectangle">
             <Setter Property="Fill"
-                    Value="#694832" />
+                    Value="{StaticResource SideFieldBrush}" />
             <Setter Property="Stroke"
-                    Value="#BA8964" />
+                    Value="{StaticResource GridLineBrush}" />
         </Style>
         <parts:FormDefinition x:Key="Definition">
             <parts:FormGroup Placement="Primary"
