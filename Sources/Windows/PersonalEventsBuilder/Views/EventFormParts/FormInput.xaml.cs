@@ -24,8 +24,13 @@ namespace PersonalEventsBuilder.Views.EventFormParts {
         public FormInputViewModel ViewModel { get; } = new();
         public UDK.WinUI.Grid.GridArea Bounds { get; }
 
-        public FormInput(int column, int row, int width, string label) {
-            this.Bounds = new(column, row - 1, width, 2);
+        public string Label { get; }
+        public Style FieldStyle { get; }
+
+        public FormInput(UDK.WinUI.Grid.GridArea gridArea, string label, Style fieldStyle) {
+            this.Bounds = gridArea;
+            this.Label = label;
+            this.FieldStyle = fieldStyle;
             this.InitializeComponent();
             AutomationProperties.SetName(this, label);
             this.IsHitTestVisible = false;

@@ -1,3 +1,5 @@
+using System;
+
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -11,18 +13,34 @@ namespace PersonalEventsBuilder.Views {
             nameof(GridLayout),
             typeof(UDK.WinUI.Grid.GridLayout),
             typeof(EventForm),
-            new PropertyMetadata(null)
+            new PropertyMetadata(null, (sender, _) => ((EventForm)sender).UpdateGridSize())
         );
+
+        private int requiredRows;
+        private int requiredColumns;
 
         public EventForm() {
             this.InitializeComponent();
-            this.Surface.Register(new EventFormParts.FormInput(0, 1, 3, Localization.UiStrings.Get("Tr_WorkspacePerson")));
-            this.Surface.Register(new EventFormParts.FormInput(3, 1, 2, Localization.UiStrings.Get("Tr_WorkspaceRank")));
-            this.Surface.Register(new EventFormParts.FormInput(5, 1, 2, Localization.UiStrings.Get("Tr_WorkspaceDocumentNumber")));
-            this.Surface.Register(new EventFormParts.FormInput(7, 1, 2, Localization.UiStrings.Get("Tr_WorkspaceDocumentDate")));
-            this.Surface.Register(new EventFormParts.FormInput(0, 3, 3, Localization.UiStrings.Get("Tr_WorkspaceDestination")));
-            this.Surface.Register(new EventFormParts.FormInput(5, 3, 2, Localization.UiStrings.Get("Tr_WorkspaceDepartureDate")));
-            this.Surface.Register(new EventFormParts.FormInput(0, 5, 6, Localization.UiStrings.Get("Tr_WorkspaceNotes")));
+            var definition = (EventFormParts.FormDefinition)this.Resources["Definition"];
+            foreach (var placedFormField in definition.CreateLayout()) {
+                this.requiredRows = Math.Max(this.requiredRows, placedFormField.Bounds.Bottom);
+                this.requiredColumns = Math.Max(this.requiredColumns, placedFormField.Bounds.Right);
+                var styleKey = placedFormField.Group.Placement switch {
+                    EventFormParts.FormPlacement.Primary => "PrimaryFieldStyle",
+                    EventFormParts.FormPlacement.Left or EventFormParts.FormPlacement.Right => "SideExtensionFieldStyle",
+                    _ => "ExtensionFieldStyle"
+                };
+                var label = $"{Localization.UiStrings.Get(placedFormField.Group.LabelKey)} {placedFormField.Field.Id}";
+                this.Surface.Register(new EventFormParts.FormInput(placedFormField.Bounds, label, (Style)this.Resources[styleKey]));
+            }
+            this.UpdateGridSize();
+        }
+
+        private void UpdateGridSize() {
+            if (this.GridLayout is { } layout) {
+                layout.Rows.Count = Math.Max(layout.Rows.Count, this.requiredRows);
+                layout.Columns.Count = Math.Max(layout.Columns.Count, this.requiredColumns);
+            }
         }
     }
 }

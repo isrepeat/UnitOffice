@@ -44,6 +44,7 @@
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\GridCanvas.xaml.cs" Link="UDK\WinUI\Grid\GridCanvas.xaml.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventFormParts\FormInput.xaml" Link="Views\EventFormParts\FormInput.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventFormParts\FormInput.xaml.cs" Link="Views\EventFormParts\FormInput.xaml.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventFormParts\FormDefinition.cs" Link="Views\EventFormParts\FormDefinition.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTableParts\CandidateCell.xaml" Link="Views\CandidatesTableParts\CandidateCell.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTableParts\CandidateCell.xaml.cs" Link="Views\CandidatesTableParts\CandidateCell.xaml.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTableParts\CandidateGrid.cs" Link="Views\CandidatesTableParts\CandidateGrid.cs" />

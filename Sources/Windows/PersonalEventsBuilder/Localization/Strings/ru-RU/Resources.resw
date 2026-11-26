@@ -66,4 +66,6 @@
   <data name="Tr_WorkspaceDestination" xml:space="preserve"><value>Место</value></data>
   <data name="Tr_WorkspaceDepartureDate" xml:space="preserve"><value>Дата выезда</value></data>
   <data name="Tr_WorkspaceNotes" xml:space="preserve"><value>Примечание</value></data>
+  <data name="Tr_FormPrimary" xml:space="preserve"><value>Основная</value></data>
+  <data name="Tr_FormExtension" xml:space="preserve"><value>Расширение</value></data>
 </root>
