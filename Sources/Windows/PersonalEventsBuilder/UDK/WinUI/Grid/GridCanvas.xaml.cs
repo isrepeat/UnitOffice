@@ -10,7 +10,7 @@ using Microsoft.UI.Xaml.Controls;
 using Windows.Foundation;
 
 namespace UDK.WinUI.Grid {
-    public sealed partial class GridCanvas : UserControl {
+    public sealed partial class GridCanvas : UserControl, Navigation.INavigationSurface {
         public GridLayout? GridLayout {
             get => (GridLayout?)this.GetValue(GridLayoutProperty);
             set => this.SetValue(GridLayoutProperty, value);
@@ -222,9 +222,15 @@ namespace UDK.WinUI.Grid {
 
         private IGridNavigationTarget? Owner(GridAddress address) => this.regions.FirstOrDefault(region => region.Bounds.Contains(address));
 
+        GridArea Navigation.INavigationSurface.NavigationBounds => this.GridBounds;
+        IEnumerable<GridArea> Navigation.INavigationSurface.NavigationRegions => this.regions.Count == 0
+            ? new[] { this.GridBounds } : this.regions.Select(region => region.Bounds);
+
+        internal GridAddress ResolveAddress(GridAddress hit) => this.Owner(hit)?.FocusAddress(hit) ?? hit;
+
         internal GridArea FocusArea(GridAddress address) => this.Owner(address)?.FocusArea(address) ?? new(address.Column, address.Row, 1, 1);
 
-        internal GridAddress? FindAddress(GridArea search, GridAddress desired, bool byRow) {
+        private GridAddress? FindNearestCell(GridArea search, GridAddress desired) {
             search = search.Intersect(this.GridBounds);
             if (search.IsEmpty) {
                 return null;
@@ -241,16 +247,16 @@ namespace UDK.WinUI.Grid {
                     continue;
                 }
                 var hit = intersection.Closest(desired);
-                var address = region.FocusAddress(hit);
+                var address = this.ResolveAddress(hit);
                 if (!this.GridBounds.Contains(address)) {
                     continue;
                 }
                 double dx = Math.Abs(hit.Column - desired.Column);
                 double dy = Math.Abs(hit.Row - desired.Row);
-                var score = byRow ? (dy, dx, hit.Column) : (dx * dx + dy * dy, dy, hit.Column);
+                var score = (dx * dx + dy * dy, dy, hit.Column);
                 if (score.CompareTo(bestScore) < 0) {
                     bestScore = score;
-                    best = address;
+                    best = hit;
                 }
             }
             return best;
@@ -305,7 +311,7 @@ namespace UDK.WinUI.Grid {
                 (int)Math.Floor(this.displayColumn + (point.X - this.drawingBounds.X) / this.columns!.Step),
                 (int)Math.Floor(this.displayRow + point.Y / this.rows!.Step)
             );
-            if (this.FindAddress(this.VisibleArea, hit, byRow: false) is { } address) {
+            if (this.FindNearestCell(this.VisibleArea, hit) is { } address) {
                 args.Handled = true;
                 this.observedLayout!.Navigation.Select(this, address);
             }

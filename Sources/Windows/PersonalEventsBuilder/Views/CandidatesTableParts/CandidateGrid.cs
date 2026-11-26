@@ -18,6 +18,7 @@ namespace PersonalEventsBuilder.Views.CandidatesTableParts {
             this.values = values;
             this.Bounds = new(column, row, values.Length == 0 ? 0 : values[0].Length, values.Length);
             this.Content = this.cells;
+            this.UseSystemFocusVisuals = false;
             this.IsTabStop = false;
         }
 

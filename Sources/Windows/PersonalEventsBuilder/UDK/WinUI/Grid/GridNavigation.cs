@@ -2,20 +2,24 @@ using System.Linq;
 using System.Collections.Generic;
 
 using Microsoft.UI.Xaml;
+
 using Windows.System;
 
 namespace UDK.WinUI.Grid {
-    public sealed class GridNavigation : DependencyObject {
+    public sealed class GridNavigation : DependencyObject, UDK.WinUI.Navigation.IKeyboardNavigationArea {
         private readonly List<GridCanvas> surfaces = [];
         private GridCanvas? activeSurface;
-        private GridAddress activeAddress;
-        private int preferredColumn;
+        private GridCanvas? lastSurface;
+        private readonly Navigation.NavigationCoordinator coordinator = new();
 
         internal void Register(GridCanvas surface) => this.surfaces.Add(surface);
 
         internal void Remove(GridCanvas surface) {
             this.surfaces.Remove(surface);
             this.Release(surface);
+            if (this.lastSurface == surface) {
+                this.lastSurface = null;
+            }
         }
 
         internal void Release(GridCanvas surface) {
@@ -25,7 +29,7 @@ namespace UDK.WinUI.Grid {
             }
         }
 
-        internal void Select(GridCanvas surface, GridAddress address, bool preserveColumn = false) {
+        internal void Select(GridCanvas surface, GridAddress address, VirtualKey? move = null, bool restore = false) {
             if (!surface.Focus(FocusState.Programmatic)) {
                 return;
             }
@@ -33,38 +37,51 @@ namespace UDK.WinUI.Grid {
                 this.activeSurface?.SetActiveAddress(null);
             }
             this.activeSurface = surface;
-            this.activeAddress = address;
-            if (!preserveColumn) {
-                this.preferredColumn = address.Column;
+            this.lastSurface = surface;
+            if (move is { } key) {
+                this.coordinator.CommitMove(address, key);
+            } else if (!restore) {
+                this.coordinator.Remember(address);
             }
             surface.Reveal(address);
-            surface.SetActiveAddress(address);
+            surface.SetActiveAddress(surface.ResolveAddress(address));
+        }
+
+        public bool FocusArea() {
+            if (this.lastSurface is { } previous && previous.GridBounds.Contains(this.coordinator.EntryCell)) {
+                this.Select(previous, this.coordinator.EntryCell, restore: true);
+                return this.activeSurface == previous;
+            }
+            foreach (var surface in this.surfaces.OrderBy(item => item.NavigationOrder)) {
+                if (this.coordinator.FindEntry(surface, forward: true) is { } first) {
+                    this.Select(surface, first);
+                    return this.activeSurface == surface;
+                }
+            }
+            return false;
+        }
+
+        public void MoveFocus(VirtualKey direction) {
+            if (this.activeSurface is { } surface) {
+                this.Move(surface, direction);
+            } else {
+                this.FocusArea();
+            }
         }
 
         internal bool Move(GridCanvas surface, VirtualKey key) {
             if (this.activeSurface != surface || key is not (VirtualKey.Left or VirtualKey.Right or VirtualKey.Up or VirtualKey.Down)) {
                 return false;
             }
-            var area = surface.FocusArea(this.activeAddress);
-            var grid = surface.GridBounds;
-            bool horizontal = key is VirtualKey.Left or VirtualKey.Right;
+            var area = surface.FocusArea(this.coordinator.EntryCell);
             int direction = key is VirtualKey.Left or VirtualKey.Up ? -1 : 1;
-            var search = key switch {
-                VirtualKey.Left => new GridArea(0, this.activeAddress.Row, area.Column, 1),
-                VirtualKey.Right => new GridArea(area.Right, this.activeAddress.Row, grid.Right - area.Right, 1),
-                VirtualKey.Up => new GridArea(0, 0, grid.Width, area.Row),
-                _ => new GridArea(0, area.Bottom, grid.Width, grid.Bottom - area.Bottom)
-            };
-            var desired = new GridAddress(horizontal ? this.activeAddress.Column : this.preferredColumn, this.activeAddress.Row);
-            if (surface.FindAddress(search, desired, byRow: !horizontal) is { } next) {
-                this.Select(surface, next, preserveColumn: !horizontal);
-            } else if (!horizontal) {
+            if (this.coordinator.FindNext(surface, area, key) is { } next) {
+                this.Select(surface, next, key);
+            } else if (key is VirtualKey.Up or VirtualKey.Down) {
                 foreach (var candidate in this.surfaces.Where(item => (item.NavigationOrder - surface.NavigationOrder) * direction > 0)
                     .OrderBy(item => item.NavigationOrder * direction)) {
-                    var bounds = candidate.GridBounds;
-                    var edge = new GridAddress(this.preferredColumn, direction > 0 ? 0 : bounds.Bottom - 1);
-                    if (candidate.FindAddress(bounds, edge, byRow: true) is { } entry) {
-                        this.Select(candidate, entry, preserveColumn: true);
+                    if (this.coordinator.FindEntry(candidate, direction > 0) is { } entry) {
+                        this.Select(candidate, entry, key);
                         break;
                     }
                 }

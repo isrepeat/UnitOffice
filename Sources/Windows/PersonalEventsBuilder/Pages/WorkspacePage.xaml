@@ -1,23 +1,13 @@
 <Page x:Class="PersonalEventsBuilder.Pages.WorkspacePage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:controls="using:PersonalEventsBuilder.Controls"
       xmlns:layout="using:UDK.WinUI.Layout"
       xmlns:views="using:PersonalEventsBuilder.Views"
       xmlns:grid="using:UDK.WinUI.Grid"
       Style="{StaticResource WorkspacePageStyle}"
       NavigationCacheMode="Required">
-    <layout:WorkspaceHost>
+    <layout:WorkspaceHost x:Name="Workspace">
         <layout:WorkspaceHost.Resources>
-            <ControlTemplate x:Key="ButtonColumnTemplate"
-                             TargetType="ContentControl">
-                <StackPanel Spacing="3">
-                    <controls:PlaceholderButton x:Uid="Tr_PlaceholderButton1" />
-                    <controls:PlaceholderButton x:Uid="Tr_PlaceholderButton2" />
-                    <controls:PlaceholderButton x:Uid="Tr_PlaceholderButton3" />
-                    <controls:PlaceholderButton x:Uid="Tr_PlaceholderButton4" />
-                </StackPanel>
-            </ControlTemplate>
             <grid:GridNavigation x:Key="EventNavigation" />
             <grid:GridAxis x:Key="EventColumns"
                            Step="116"
@@ -51,67 +41,7 @@
                              Direction="Columns">
                     <layout:Zone Size="1.44*"
                                  Style="{StaticResource ZonePanelStyle}">
-                        <Grid Margin="4"
-                              RowDefinitions="Auto,*"
-                              RowSpacing="3">
-                            <Grid ColumnDefinitions="*,*,*"
-                                  ColumnSpacing="6">
-                                <TextBlock Text="Прибытие" />
-                                <TextBlock Grid.Column="1"
-                                           Text="Убытие" />
-                                <TextBlock Grid.Column="2"
-                                           Text="Изменение статуса" />
-                            </Grid>
-                            <ScrollViewer Grid.Row="1"
-                                          HorizontalContentAlignment="Stretch"
-                                          HorizontalScrollMode="Disabled"
-                                          HorizontalScrollBarVisibility="Disabled"
-                                          VerticalScrollMode="Enabled"
-                                          VerticalScrollBarVisibility="Hidden">
-                                <Grid ColumnDefinitions="*,*,*"
-                                      ColumnSpacing="6">
-                                    <ContentControl IsTabStop="False"
-                                                    Template="{StaticResource ButtonColumnTemplate}" />
-                                    <ContentControl Grid.Column="1"
-                                                    IsTabStop="False"
-                                                    Template="{StaticResource ButtonColumnTemplate}" />
-                                    <Grid Grid.Column="2"
-                                          RowDefinitions="75,75"
-                                          ColumnDefinitions="*,*"
-                                          RowSpacing="3"
-                                          ColumnSpacing="3">
-                                        <controls:PlaceholderButton Height="Auto">
-                                            <TextBlock x:Uid="Tr_ExtendMedicalLeave"
-                                                       FontSize="12"
-                                                       TextAlignment="Center"
-                                                       TextWrapping="Wrap" />
-                                        </controls:PlaceholderButton>
-                                        <controls:PlaceholderButton Grid.Column="1"
-                                                                    Height="Auto">
-                                            <TextBlock x:Uid="Tr_TreatmentToMedicalLeave"
-                                                       FontSize="12"
-                                                       TextAlignment="Center"
-                                                       TextWrapping="Wrap" />
-                                        </controls:PlaceholderButton>
-                                        <controls:PlaceholderButton Grid.Row="1"
-                                                                    Height="Auto">
-                                            <TextBlock x:Uid="Tr_MedicalLeaveToHospital"
-                                                       FontSize="12"
-                                                       TextAlignment="Center"
-                                                       TextWrapping="Wrap" />
-                                        </controls:PlaceholderButton>
-                                        <controls:PlaceholderButton Grid.Row="1"
-                                                                    Grid.Column="1"
-                                                                    Height="Auto">
-                                            <TextBlock x:Uid="Tr_AbsenceToAssignment"
-                                                       FontSize="12"
-                                                       TextAlignment="Center"
-                                                       TextWrapping="Wrap" />
-                                        </controls:PlaceholderButton>
-                                    </Grid>
-                                </Grid>
-                            </ScrollViewer>
-                        </Grid>
+                        <views:CommandPanel x:Name="Commands" />
                     </layout:Zone>
                     <layout:Splitter />
                     <layout:Zone Size="149"

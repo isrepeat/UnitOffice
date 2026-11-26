@@ -11,6 +11,15 @@
             <SolidColorBrush x:Key="PanelBrush"
                              Color="#282828" />
 
+            <Style x:Key="ActiveEntityFrameStyle"
+                   TargetType="Border">
+                <Setter Property="BorderBrush"
+                        Value="#FFD28A" />
+                <Setter Property="BorderThickness"
+                        Value="2" />
+                <Setter Property="IsHitTestVisible"
+                        Value="False" />
+            </Style>
             <Style x:Key="WorkspacePageStyle"
                    TargetType="Page">
                 <Setter Property="Background"

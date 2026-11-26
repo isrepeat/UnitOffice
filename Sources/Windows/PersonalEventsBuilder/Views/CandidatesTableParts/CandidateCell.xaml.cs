@@ -1,4 +1,3 @@
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace PersonalEventsBuilder.Views.CandidatesTableParts {
@@ -7,8 +6,6 @@ namespace PersonalEventsBuilder.Views.CandidatesTableParts {
             this.InitializeComponent();
         }
 
-        internal void SetSelected(bool isActive) {
-            this.Selection.Visibility = isActive ? Visibility.Visible : Visibility.Collapsed;
-        }
+        internal void SetSelected(bool isActive) => States.NavigationFocus.SetActive(this.FocusFrame, isActive);
     }
 }

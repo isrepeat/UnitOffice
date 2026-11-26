@@ -1,29 +1,18 @@
 <UserControl x:Class="PersonalEventsBuilder.Views.EventFormParts.FormInput"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+
+             UseSystemFocusVisuals="False"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              IsTabStop="False">
     <Grid Margin="3">
-        <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup>
-                <VisualState x:Name="Active">
-                    <VisualState.StateTriggers>
-                        <StateTrigger IsActive="{x:Bind ViewModel.IsActive, Mode=OneWay}" />
-                    </VisualState.StateTriggers>
-                    <VisualState.Setters>
-                        <Setter Target="FieldRectangle.Stroke"
-                                Value="#FFD28A" />
-                        <Setter Target="FieldRectangle.StrokeThickness"
-                                Value="3" />
-                    </VisualState.Setters>
-                </VisualState>
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
-        <Rectangle x:Name="FieldRectangle"
-                   Style="{x:Bind FieldStyle}" />
+        <Rectangle Style="{x:Bind FieldStyle}" />
         <TextBlock Margin="8,0"
                    VerticalAlignment="Center"
                    Foreground="White"
                    Text="{x:Bind Label}"
                    TextTrimming="CharacterEllipsis" />
+        <Border x:Name="FocusFrame"
+                Style="{StaticResource ActiveEntityFrameStyle}"
+                Visibility="Collapsed" />
     </Grid>
 </UserControl>

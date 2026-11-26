@@ -1,5 +1,7 @@
 <UserControl x:Class="PersonalEventsBuilder.Views.CandidatesTableParts.CandidateCell"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+
+             UseSystemFocusVisuals="False"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              IsHitTestVisible="False"
              IsTabStop="False">
@@ -12,9 +14,8 @@
                        VerticalAlignment="Center"
                        Text="{Binding}"
                        TextTrimming="CharacterEllipsis" />
-            <Border x:Name="Selection"
-                    BorderBrush="#F3AF61"
-                    BorderThickness="2"
+            <Border x:Name="FocusFrame"
+                    Style="{StaticResource ActiveEntityFrameStyle}"
                     Visibility="Collapsed" />
         </Grid>
     </Border>
