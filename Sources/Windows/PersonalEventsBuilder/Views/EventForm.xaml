@@ -69,7 +69,8 @@
         </parts:FormDefinition>
     </UserControl.Resources>
     <Grid RowDefinitions="Auto,*">
-        <TextBlock Text="Форма события" />
+        <TextBlock Foreground="{StaticResource WorkspaceTextBrush}"
+                   Text="Форма события" />
         <grid:GridCanvas x:Name="Surface"
                          Grid.Row="1"
                          GridLayout="{x:Bind GridLayout, Mode=OneWay}" />

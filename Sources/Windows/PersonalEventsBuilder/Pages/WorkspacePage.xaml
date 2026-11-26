@@ -60,7 +60,7 @@
                         <layout:Splitter />
                         <layout:Zone Size="*"
                                      Style="{StaticResource ZonePanelStyle}">
-                            <TextBlock Text="Превью Word" />
+                            <views:WordPreview />
                         </layout:Zone>
                     </layout:Zone>
                     <layout:Splitter />

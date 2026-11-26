@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:grid="using:UDK.WinUI.Grid">
     <Grid RowDefinitions="Auto,*,Auto">
-        <TextBlock Text="Таблица кандидатов" />
+        <TextBlock Foreground="{StaticResource WorkspaceTextBrush}"
+                   Text="Таблица кандидатов" />
         <grid:GridCanvas x:Name="Surface"
                           Grid.Row="1"
                           GridLayout="{x:Bind GridLayout, Mode=OneWay}" />

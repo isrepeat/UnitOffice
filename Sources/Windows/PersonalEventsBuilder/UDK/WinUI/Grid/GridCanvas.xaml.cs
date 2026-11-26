@@ -73,7 +73,11 @@ namespace UDK.WinUI.Grid {
                     }
                 }
             };
-            this.Surface.SizeChanged += (_, _) => this.UpdateViewport();
+            this.Surface.SizeChanged += (_, args) => {
+                this.Targets.Width = args.NewSize.Width;
+                this.Targets.Height = args.NewSize.Height;
+                this.UpdateViewport();
+            };
             this.GridLayout = new GridLayout();
             this.Loaded += (_, _) => this.Observe(this.GridLayout);
             this.Unloaded += (_, _) => this.Observe(null);

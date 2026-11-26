@@ -78,14 +78,18 @@
   <data name="Tr_AbsenceToAssignment.Text" xml:space="preserve"><value>СЗЧ → Відрядження</value></data>
   <data name="Tr_PaletteTitle.Text" xml:space="preserve"><value>Палітра</value></data>
   <data name="Tr_PaletteClose.Content" xml:space="preserve"><value>Закрити</value></data>
-  <data name="Tr_PaletteRole.Header" xml:space="preserve"><value>Колір</value></data>
-  <data name="Tr_PaletteBackground.Content" xml:space="preserve"><value>Основа тла</value></data>
-  <data name="Tr_PaletteForm.Content" xml:space="preserve"><value>Основа форми</value></data>
-  <data name="Tr_PaletteButtons.Content" xml:space="preserve"><value>Основа кнопок</value></data>
-  <data name="Tr_PaletteAccent.Content" xml:space="preserve"><value>Акцент і фокус</value></data>
-  <data name="Tr_PaletteWarmth.Header" xml:space="preserve"><value>Теплота сірого</value></data>
+  <data name="Tr_PaletteProfiles.Header" xml:space="preserve"><value>Профіль</value></data>
+  <data name="Tr_PaletteName.PlaceholderText" xml:space="preserve"><value>Назва нового профілю</value></data>
+  <data name="Tr_PaletteCreate.Content" xml:space="preserve"><value>Створити</value></data>
+  <data name="Tr_PaletteResources.Text" xml:space="preserve"><value>Пензлі палітри</value></data>
+  <data name="Tr_PaletteDefaultName" xml:space="preserve"><value>Основний</value></data>
   <data name="Tr_PaletteDifference.Header" xml:space="preserve"><value>Різниця відтінків форми</value></data>
   <data name="Tr_PaletteLines.Header" xml:space="preserve"><value>Контраст сітки</value></data>
   <data name="Tr_PaletteReset.Content" xml:space="preserve"><value>Відновити початкову палітру</value></data>
   <data name="Tr_PaletteOpen.Content" xml:space="preserve"><value>Палітра</value></data>
+  <data name="Tr_PaletteScheme.Header" xml:space="preserve"><value>Палітра</value></data>
+  <data name="Tr_PaletteWarm.Content" xml:space="preserve"><value>Теплий графіт</value></data>
+  <data name="Tr_PaletteGraphite.Content" xml:space="preserve"><value>Нейтральний графіт</value></data>
+  <data name="Tr_PaletteSlate.Content" xml:space="preserve"><value>Холодний сланець</value></data>
+  <data name="Tr_PaletteBrightness.Header" xml:space="preserve"><value>Яскравість тла</value></data>
 </root>

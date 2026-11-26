@@ -7,23 +7,38 @@
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
             <SolidColorBrush x:Key="WorkspaceBackgroundBrush"
-                             Color="#282521" />
+                             Color="#28241F" />
             <SolidColorBrush x:Key="PanelBrush"
-                             Color="#2D2A26" />
+                             Color="#2D2924" />
             <SolidColorBrush x:Key="WorkspaceDeepBrush"
-                             Color="#201D19" />
+                             Color="#201C17" />
             <SolidColorBrush x:Key="WorkspaceAccentBrush"
                              Color="#D9B287" />
             <SolidColorBrush x:Key="PrimaryFieldBrush"
-                             Color="#383531" />
+                             Color="#38332E" />
             <SolidColorBrush x:Key="LowerFieldBrush"
-                             Color="#302D29" />
+                             Color="#27221D" />
             <SolidColorBrush x:Key="SideFieldBrush"
-                             Color="#403D39" />
+                             Color="#49443F" />
             <SolidColorBrush x:Key="CommandBrush"
-                             Color="#3C3935" />
-            <SolidColorBrush x:Key="CommandHoverBrush"
-                             Color="#46423D" />
+                             Color="#3E3934" />
+            <SolidColorBrush x:Key="CommandTextBrush"
+                             Color="#D9B287" />
+            <SolidColorBrush x:Key="WorkspaceTextBrush"
+                             Color="#D7D5D2" />
+            <SolidColorBrush x:Key="HoverOverlayBrush"
+                             Color="#0DFFFFFF" />
+            <ScalarTransition x:Key="HoverTransition"
+                              Duration="0:0:0.14" />
+            <Style x:Key="HoverLayerStyle"
+                   TargetType="Border">
+                <Setter Property="Background"
+                        Value="{StaticResource HoverOverlayBrush}" />
+                <Setter Property="IsHitTestVisible"
+                        Value="False" />
+                <Setter Property="Opacity"
+                        Value="0" />
+            </Style>
 
             <Style x:Key="ActiveEntityFrameStyle"
                    TargetType="Border">
@@ -38,6 +53,8 @@
                    TargetType="Page">
                 <Setter Property="Background"
                         Value="{StaticResource WorkspaceBackgroundBrush}" />
+                <Setter Property="Foreground"
+                        Value="{StaticResource WorkspaceTextBrush}" />
                 <Setter Property="RequestedTheme"
                         Value="Dark" />
             </Style>
@@ -49,11 +66,11 @@
                         Value="Center" />
             </Style>
             <SolidColorBrush x:Key="GridLineBrush"
-                             Color="#413E3A" />
+                             Color="#3F3B36" />
             <SolidColorBrush x:Key="ZoneSplitterBrush"
-                             Color="#33302C" />
+                             Color="#332F2A" />
             <SolidColorBrush x:Key="ZoneSplitterHoverBrush"
-                             Color="#4A4743" />
+                             Color="#4A4641" />
             <Style x:Key="ZoneSplitterStyle"
                    TargetType="Thumb">
                 <Setter Property="Background"

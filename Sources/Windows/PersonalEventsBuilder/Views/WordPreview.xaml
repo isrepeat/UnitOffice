@@ -1,0 +1,22 @@
+<UserControl x:Class="PersonalEventsBuilder.Views.WordPreview"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:controls="using:PersonalEventsBuilder.Controls"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             IsTabStop="False">
+    <Grid Margin="7"
+          RowDefinitions="Auto,*"
+          RowSpacing="4">
+        <TextBlock x:Uid="Tr_WordPreviewHeading"
+                   HorizontalAlignment="Left"
+                   FontWeight="SemiBold"
+                   Foreground="{StaticResource WorkspaceTextBrush}" />
+        <Border Grid.Row="1"
+                Padding="10"
+                Background="{StaticResource WorkspaceDeepBrush}"
+                BorderBrush="{StaticResource GridLineBrush}"
+                BorderThickness="1">
+            <controls:PlaceholderLines LineWidths="30,55"
+                                       VerticalAlignment="Top" />
+        </Border>
+    </Grid>
+</UserControl>

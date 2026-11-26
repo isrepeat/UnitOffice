@@ -64,6 +64,7 @@
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\MainWindow.xaml" Link="MainWindow.xaml" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\PlaceholderButton.xaml" Link="Controls\PlaceholderButton.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\PlaceholderButton.xaml.cs" Link="Controls\PlaceholderButton.xaml.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\PlaceholderLines.cs" Link="Controls\PlaceholderLines.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\States\NavigationFocus.cs" Link="States\NavigationFocus.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WindowTitleBar.xaml" Link="Controls\WindowTitleBar.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WindowTitleBar.xaml.cs" Link="Controls\WindowTitleBar.xaml.cs" />
@@ -75,6 +76,8 @@
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\MainWindow.xaml.cs" Link="MainWindow.xaml.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Pages\WorkspacePage.xaml" Link="Pages\WorkspacePage.xaml" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CommandPanel.xaml" Link="Views\CommandPanel.xaml" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\WordPreview.xaml" Link="Views\WordPreview.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\WordPreview.xaml.cs" Link="Views\WordPreview.xaml.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CommandPanel.xaml.cs" Link="Views\CommandPanel.xaml.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\PaletteEditor.xaml" Link="Views\PaletteEditor.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\PaletteEditor.xaml.cs" Link="Views\PaletteEditor.xaml.cs" />

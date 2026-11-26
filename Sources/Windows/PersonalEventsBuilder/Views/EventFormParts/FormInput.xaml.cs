@@ -15,7 +15,8 @@ namespace PersonalEventsBuilder.Views.EventFormParts {
             this.FieldStyle = fieldStyle;
             this.InitializeComponent();
             AutomationProperties.SetName(this, label);
-            this.IsHitTestVisible = false;
+            this.PointerEntered += (_, _) => this.HoverLayer.Opacity = 1;
+            this.PointerExited += (_, _) => this.HoverLayer.Opacity = 0;
         }
 
         public UDK.WinUI.Grid.GridAddress FocusAddress(UDK.WinUI.Grid.GridAddress address) => new(this.Bounds.Column, this.Bounds.Bottom - 1);
@@ -23,7 +24,6 @@ namespace PersonalEventsBuilder.Views.EventFormParts {
 
         public void SetActiveAddress(UDK.WinUI.Grid.GridAddress? address) {
             States.NavigationFocus.SetActive(this.FocusFrame, address.HasValue);
-            this.IsHitTestVisible = address.HasValue;
             this.IsTabStop = address.HasValue;
             if (address.HasValue) {
                 this.Focus(FocusState.Programmatic);

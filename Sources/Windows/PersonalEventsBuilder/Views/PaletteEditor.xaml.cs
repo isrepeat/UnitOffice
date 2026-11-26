@@ -1,5 +1,6 @@
 using System;
-using System.Globalization;
+using System.Linq;
+using System.Collections.Generic;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
@@ -11,40 +12,49 @@ using Windows.UI;
 namespace PersonalEventsBuilder.Views {
     public sealed partial class PaletteEditor : UserControl {
         public event EventHandler? CloseRequested;
-        private const string DefaultPalette = "232323,333333,373737,D9B287,37,8,20";
+        private const string DefaultPalette = "v2,warm,0,17,18";
         private const string SettingsKey = "WorkspacePalette";
-        private readonly Color[] colors = new Color[4];
-        private bool updating;
+        private const string ProfileFolder = "PaletteProfiles";
+        private const string ActiveKey = "ActivePaletteProfile";
+        private bool updating = true;
 
         public PaletteEditor() {
             this.InitializeComponent();
-            this.Role.SelectedIndex = 0;
-            if (!this.LoadPalette(Helpers.UserSettings.Read(SettingsKey, DefaultPalette))) {
-                this.LoadPalette(DefaultPalette);
+            var names = Helpers.UserSettings.Names(ProfileFolder);
+            if (names.Length == 0) {
+                string initial = Localization.UiStrings.Get("Tr_PaletteDefaultName");
+                if (!this.LoadPalette(Helpers.UserSettings.Read(SettingsKey, DefaultPalette))) {
+                    this.LoadPalette(DefaultPalette);
+                }
+                Helpers.UserSettings.Write(ProfileFolder, initial, this.SerializePalette());
+                names = [initial];
             }
+            foreach (var name in names.OrderBy(name => name, StringComparer.CurrentCultureIgnoreCase)) {
+                this.Profiles.Items.Add(name);
+            }
+            var selected = Helpers.UserSettings.Read(ActiveKey, names[0]);
+            this.Profiles.SelectedItem = this.Profiles.Items.Contains(selected) ? selected : names[0];
         }
 
         private bool LoadPalette(string value) {
             var parts = value.Split(',');
-            if (parts.Length != 7) {
+            bool legacy = parts.Length is 7 or 16;
+            if (!legacy && (parts.Length != 5 || parts[0] != "v2")) {
                 return false;
             }
-            for (int i = 0; i < this.colors.Length; i++) {
-                if (parts[i].Length != 6 || !uint.TryParse(parts[i], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uint rgb)) {
-                    return false;
-                }
-                this.colors[i] = Color.FromArgb(255, (byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb);
-            }
-            if (!int.TryParse(parts[4], out int warmth) || warmth is < 0 or > 100 ||
-                !int.TryParse(parts[5], out int difference) || difference is < 0 or > 24 ||
-                !int.TryParse(parts[6], out int lines) || lines is < 0 or > 55) {
+            string scheme = legacy ? "warm" : parts[1];
+            var item = this.Scheme.Items.Cast<ComboBoxItem>().FirstOrDefault(item => Equals(item.Tag, scheme));
+            string brightnessValue = legacy ? (parts.Length == 16 ? parts[7] : "0") : parts[2];
+            if (item == null || !int.TryParse(brightnessValue, out int brightness) || brightness is < -20 or > 35 ||
+                !int.TryParse(parts[legacy ? 5 : 3], out int difference) || difference is < 0 or > 24 ||
+                !int.TryParse(parts[legacy ? 6 : 4], out int lines) || lines is < 0 or > 55) {
                 return false;
             }
             this.updating = true;
-            this.Warmth.Value = warmth;
+            this.Scheme.SelectedItem = item;
+            this.Brightness.Value = brightness;
             this.Difference.Value = difference;
             this.Lines.Value = lines;
-            this.Picker.Color = this.colors[this.Role.SelectedIndex];
             this.updating = false;
             this.Apply();
             return true;
@@ -52,56 +62,96 @@ namespace PersonalEventsBuilder.Views {
 
         internal void FocusCloseButton() => this.CloseButton.Focus(FocusState.Keyboard);
 
-        internal void Save() {
-            string[] hex = Array.ConvertAll(this.colors, color => $"{color.R:X2}{color.G:X2}{color.B:X2}");
-            Helpers.UserSettings.Write(SettingsKey, $"{string.Join(",", hex)},{(int)this.Warmth.Value},{(int)this.Difference.Value},{(int)this.Lines.Value}");
+        private string SerializePalette() {
+            return $"v2,{((ComboBoxItem)this.Scheme.SelectedItem).Tag},{(int)this.Brightness.Value},{(int)this.Difference.Value},{(int)this.Lines.Value}";
         }
 
-        private void OnRoleChanged(object sender, SelectionChangedEventArgs args) {
-            if (this.Role.SelectedIndex >= 0) {
-                this.updating = true;
-                this.Picker.Color = this.colors[this.Role.SelectedIndex];
-                this.updating = false;
+        private void OnSchemeChanged(object sender, SelectionChangedEventArgs args) {
+            if (!this.updating && this.Scheme.SelectedItem != null) {
+                this.Apply();
+                this.SaveCurrent();
             }
         }
 
-        private void OnColorChanged(ColorPicker sender, ColorChangedEventArgs args) {
-            if (this.updating || this.Role.SelectedIndex < 0) {
-                return;
+        private void SaveCurrent() {
+            if (this.Profiles.SelectedItem is string name) {
+                Helpers.UserSettings.Write(ProfileFolder, name, this.SerializePalette());
             }
-            this.colors[this.Role.SelectedIndex] = args.NewColor;
-            this.Apply();
+        }
+
+        private void OnProfileChanged(object sender, SelectionChangedEventArgs args) {
+            if (this.Profiles.SelectedItem is string name) {
+                if (!this.LoadPalette(Helpers.UserSettings.Read(ProfileFolder, name, DefaultPalette))) {
+                    this.LoadPalette(DefaultPalette);
+                }
+                Helpers.UserSettings.Write(ActiveKey, name);
+            }
+        }
+
+        private void OnNameChanged(object sender, TextChangedEventArgs args) {
+            string name = this.ProfileName.Text.Trim();
+            this.CreateButton.IsEnabled = name.Length > 0 && !this.Profiles.Items.Cast<string>().Contains(name, StringComparer.OrdinalIgnoreCase);
+        }
+
+        private void OnCreate(object sender, RoutedEventArgs args) {
+            string name = this.ProfileName.Text.Trim();
+            Helpers.UserSettings.Write(ProfileFolder, name, this.SerializePalette());
+            this.Profiles.Items.Add(name);
+            this.Profiles.SelectedItem = name;
+            this.ProfileName.Text = "";
         }
 
         private void OnToneChanged(object sender, RangeBaseValueChangedEventArgs args) {
-            if (!this.updating && this.Lines != null && this.Role.SelectedIndex >= 0) {
-                this.Apply();
+            if (!this.updating) {
+                this.Apply((Slider)sender);
+                this.SaveCurrent();
             }
         }
 
-        private void Apply() {
-            void Set(string key, Color color) => ((SolidColorBrush)Application.Current.Resources[key]).Color = color;
-            Color Tone(int role, double delta) {
-                byte Channel(byte channel, double weight) =>
-                    (byte)Math.Clamp(Math.Floor(channel + delta + weight * this.Warmth.Value + 0.5), 0, 255);
-                var color = this.colors[role];
-                return Color.FromArgb(255, Channel(color.R, 0.13), Channel(color.G, 0.045), Channel(color.B, -0.055));
+        private void Apply(Slider? changed = null) {
+            var names = new List<string>();
+            var values = new List<string>();
+            void Set(string key, Color color, params Slider[] parameters) {
+                var brush = (SolidColorBrush)Application.Current.Resources[key];
+                if (changed == null || parameters.Contains(changed)) {
+                    names.Add(key);
+                    values.Add(color.A == 255 ? $"#{color.R:X2}{color.G:X2}{color.B:X2}" : $"#{color.A:X2}{color.R:X2}{color.G:X2}{color.B:X2}");
+                }
+                brush.Color = color;
             }
-            Set("WorkspaceBackgroundBrush", Tone(0, 0));
-            Set("PanelBrush", Tone(0, 5));
-            Set("WorkspaceDeepBrush", Tone(0, -8));
-            Set("GridLineBrush", Tone(0, 5 + this.Lines.Value));
-            Set("ZoneSplitterBrush", Tone(0, 11));
-            Set("ZoneSplitterHoverBrush", Tone(0, 34));
-            Set("PrimaryFieldBrush", Tone(1, 0));
-            Set("LowerFieldBrush", Tone(1, -this.Difference.Value));
-            Set("SideFieldBrush", Tone(1, this.Difference.Value));
-            Set("CommandBrush", Tone(2, 0));
-            Set("CommandHoverBrush", Tone(2, 10));
-            Set("WorkspaceAccentBrush", this.colors[3]);
+            var (surface, field, command, accent, foreground) = ((ComboBoxItem)this.Scheme.SelectedItem).Tag switch {
+                "graphite" => (0x222222, 0x323232, 0x373737, 0xC4C4C4, 0xDADADA),
+                "slate" => (0x202429, 0x303439, 0x35393E, 0xA8C3D7, 0xD7DFE5),
+                _ => (0x28241F, 0x38332E, 0x3E3934, 0xD9B287, 0xD7D5D2)
+            };
+            Color Shade(int rgb, int offset = 0) {
+                byte Channel(int shift) => (byte)Math.Clamp(((rgb >> shift) & 255) + offset, 0, 255);
+                return Color.FromArgb(255, Channel(16), Channel(8), Channel(0));
+            }
+            Color Tone(int offset) => Shade(surface, (int)this.Brightness.Value + offset);
+            Set("WorkspaceBackgroundBrush", Tone(0), this.Brightness);
+            Set("PanelBrush", Tone(5), this.Brightness);
+            Set("WorkspaceDeepBrush", Tone(-8), this.Brightness);
+            Set("GridLineBrush", Tone(5 + (int)this.Lines.Value), this.Brightness, this.Lines);
+            Set("ZoneSplitterBrush", Tone(11), this.Brightness);
+            Set("ZoneSplitterHoverBrush", Tone(34), this.Brightness);
+            Set("PrimaryFieldBrush", Shade(field, (int)this.Brightness.Value), this.Brightness);
+            Set("LowerFieldBrush", Shade(field, (int)this.Brightness.Value - (int)this.Difference.Value), this.Brightness, this.Difference);
+            Set("SideFieldBrush", Shade(field, (int)this.Brightness.Value + (int)this.Difference.Value), this.Brightness, this.Difference);
+            Set("CommandBrush", Shade(command, (int)this.Brightness.Value), this.Brightness);
+            Set("WorkspaceAccentBrush", Shade(accent));
+            Set("WorkspaceTextBrush", Shade(foreground));
+            Set("CommandTextBrush", Shade(accent));
+            if (names.Count > 0) {
+                this.BrushNames.Text = string.Join(Environment.NewLine, names);
+                this.BrushValues.Text = string.Join(Environment.NewLine, values);
+            }
         }
 
-        private void OnReset(object sender, RoutedEventArgs args) => this.LoadPalette(DefaultPalette);
+        private void OnReset(object sender, RoutedEventArgs args) {
+            this.LoadPalette(DefaultPalette);
+            this.SaveCurrent();
+        }
 
         private void OnClose(object sender, RoutedEventArgs args) => this.CloseRequested?.Invoke(this, EventArgs.Empty);
     }

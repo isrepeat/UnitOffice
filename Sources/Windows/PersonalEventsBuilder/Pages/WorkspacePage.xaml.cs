@@ -25,7 +25,6 @@ namespace PersonalEventsBuilder.Pages {
         private void OnClosePalette(object? sender, EventArgs args) => this.PaletteDrawer.IsPaneOpen = false;
 
         private void OnPaletteClosed(SplitView sender, object args) {
-            this.Palette.Save();
             this.PaletteButton.Focus(FocusState.Programmatic);
         }
 

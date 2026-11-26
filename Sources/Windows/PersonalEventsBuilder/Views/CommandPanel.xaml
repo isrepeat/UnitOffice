@@ -9,10 +9,13 @@
           RowSpacing="3">
         <Grid ColumnDefinitions="*,*,*"
               ColumnSpacing="6">
-            <TextBlock Text="Прибытие" />
-            <TextBlock Grid.Column="1"
+            <TextBlock Foreground="{StaticResource WorkspaceTextBrush}"
+                   Text="Прибытие" />
+            <TextBlock Foreground="{StaticResource WorkspaceTextBrush}"
+                   Grid.Column="1"
                        Text="Убытие" />
-            <TextBlock Grid.Column="2"
+            <TextBlock Foreground="{StaticResource WorkspaceTextBrush}"
+                   Grid.Column="2"
                        Text="Изменение статуса" />
         </Grid>
         <ScrollViewer Grid.Row="1"
@@ -53,6 +56,7 @@
                 <controls:PlaceholderButton Grid.Row="0"
                                             Grid.Column="2"
                                             Grid.RowSpan="2"
+                                            PlaceholderLines_LineWidths="33,57"
                                             Height="Auto">
                     <TextBlock x:Uid="Tr_ExtendMedicalLeave"
                                FontSize="12"
@@ -62,6 +66,7 @@
                 <controls:PlaceholderButton Grid.Row="0"
                                             Grid.Column="3"
                                             Grid.RowSpan="2"
+                                            PlaceholderLines_LineWidths="33,57"
                                             Height="Auto">
                     <TextBlock x:Uid="Tr_TreatmentToMedicalLeave"
                                FontSize="12"
@@ -71,6 +76,7 @@
                 <controls:PlaceholderButton Grid.Row="2"
                                             Grid.Column="2"
                                             Grid.RowSpan="2"
+                                            PlaceholderLines_LineWidths="33,57"
                                             Height="Auto">
                     <TextBlock x:Uid="Tr_MedicalLeaveToHospital"
                                FontSize="12"
@@ -80,6 +86,7 @@
                 <controls:PlaceholderButton Grid.Row="2"
                                             Grid.Column="3"
                                             Grid.RowSpan="2"
+                                            PlaceholderLines_LineWidths="33,57"
                                             Height="Auto">
                     <TextBlock x:Uid="Tr_AbsenceToAssignment"
                                FontSize="12"
