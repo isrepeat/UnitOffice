@@ -9,7 +9,7 @@ using Microsoft.UI.Xaml.Controls;
 
 using Windows.Foundation;
 
-namespace PersonalEventsBuilder.Controls {
+namespace UDK.WinUI.Grid {
     public sealed partial class GridCanvas : UserControl {
         public GridLayout? GridLayout {
             get => (GridLayout?)this.GetValue(GridLayoutProperty);

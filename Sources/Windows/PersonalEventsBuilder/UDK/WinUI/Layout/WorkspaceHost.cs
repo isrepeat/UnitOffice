@@ -7,6 +7,8 @@ using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 
+using XamlGrid = Microsoft.UI.Xaml.Controls.Grid;
+
 namespace UDK.WinUI.Layout {
     [ContentProperty(Name = nameof(Root))]
     public sealed class WorkspaceHost : UserControl {
@@ -37,7 +39,7 @@ namespace UDK.WinUI.Layout {
                 return content;
             }
 
-            var grid = new Grid();
+            var grid = new XamlGrid();
             var columns = zone.Direction == ZoneDirection.Columns;
             Splitter? pending = null;
             foreach (var item in zone.Items) {
@@ -81,7 +83,7 @@ namespace UDK.WinUI.Layout {
             return grid;
         }
 
-        private static void AddTrack(Grid grid, bool columns, GridLength size, double min, double max) {
+        private static void AddTrack(XamlGrid grid, bool columns, GridLength size, double min, double max) {
             if (columns) {
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = size, MinWidth = min, MaxWidth = max });
             } else {
@@ -89,16 +91,16 @@ namespace UDK.WinUI.Layout {
             }
         }
 
-        private static void Place(Grid grid, FrameworkElement element, bool columns, int index) {
+        private static void Place(XamlGrid grid, FrameworkElement element, bool columns, int index) {
             if (columns) {
-                Grid.SetColumn(element, index);
+                XamlGrid.SetColumn(element, index);
             } else {
-                Grid.SetRow(element, index);
+                XamlGrid.SetRow(element, index);
             }
             grid.Children.Add(element);
         }
 
-        private static Thumb CreateSplitter(Grid grid, bool columns, int index) {
+        private static Thumb CreateSplitter(XamlGrid grid, bool columns, int index) {
             var thumb = new Thumb {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,

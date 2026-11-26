@@ -3,32 +3,32 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:layout="using:UDK.WinUI.Layout"
       xmlns:views="using:PersonalEventsBuilder.Views"
-      xmlns:controls="using:PersonalEventsBuilder.Controls"
+      xmlns:grid="using:UDK.WinUI.Grid"
       Style="{StaticResource WorkspacePageStyle}"
       NavigationCacheMode="Required">
     <layout:WorkspaceHost>
         <layout:WorkspaceHost.Resources>
-            <controls:GridNavigation x:Key="EventNavigation" />
-            <controls:GridAxis x:Key="EventColumns"
-                               Step="116"
-                               Count="24" />
-            <controls:GridLayout x:Key="FormGrid"
-                                 Columns="{StaticResource EventColumns}"
-                                 Navigation="{StaticResource EventNavigation}">
-                <controls:GridLayout.Rows>
-                    <controls:GridAxis Step="40"
-                                       Count="6" />
-                </controls:GridLayout.Rows>
-            </controls:GridLayout>
-            <controls:GridLayout x:Key="CandidatesGrid"
-                                 NavigationOrder="1"
-                                 Columns="{StaticResource EventColumns}"
-                                 Navigation="{StaticResource EventNavigation}">
-                <controls:GridLayout.Rows>
-                    <controls:GridAxis Step="28"
-                                       Count="30" />
-                </controls:GridLayout.Rows>
-            </controls:GridLayout>
+            <grid:GridNavigation x:Key="EventNavigation" />
+            <grid:GridAxis x:Key="EventColumns"
+                           Step="116"
+                           Count="24" />
+            <grid:GridLayout x:Key="FormGrid"
+                             Columns="{StaticResource EventColumns}"
+                             Navigation="{StaticResource EventNavigation}">
+                <grid:GridLayout.Rows>
+                    <grid:GridAxis Step="40"
+                                   Count="6" />
+                </grid:GridLayout.Rows>
+            </grid:GridLayout>
+            <grid:GridLayout x:Key="CandidatesGrid"
+                             NavigationOrder="1"
+                             Columns="{StaticResource EventColumns}"
+                             Navigation="{StaticResource EventNavigation}">
+                <grid:GridLayout.Rows>
+                    <grid:GridAxis Step="28"
+                                   Count="30" />
+                </grid:GridLayout.Rows>
+            </grid:GridLayout>
             <Style TargetType="Thumb"
                    BasedOn="{StaticResource ZoneSplitterStyle}" />
             <Style TargetType="TextBlock"

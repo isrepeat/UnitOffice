@@ -1,8 +1,6 @@
 using System;
 
-namespace PersonalEventsBuilder.Controls {
-    public readonly record struct GridAddress(int Column, int Row);
-
+namespace UDK.WinUI.Grid {
     public readonly record struct GridArea(int Column, int Row, int Width, int Height) {
         public int Right => this.Column + this.Width;
         public int Bottom => this.Row + this.Height;
@@ -20,12 +18,5 @@ namespace PersonalEventsBuilder.Controls {
             int top = Math.Max(this.Row, other.Row);
             return new(left, top, Math.Min(this.Right, other.Right) - left, Math.Min(this.Bottom, other.Bottom) - top);
         }
-    }
-
-    public interface IGridNavigationTarget {
-        GridArea Bounds { get; }
-        GridAddress FocusAddress(GridAddress address);
-        GridArea FocusArea(GridAddress address);
-        void SetActiveAddress(GridAddress? address);
     }
 }

@@ -1,19 +1,15 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-using PersonalEventsBuilder.Controls;
-
-using GridLayout = PersonalEventsBuilder.Controls.GridLayout;
-
 namespace PersonalEventsBuilder.Views {
     public sealed partial class CandidatesTable : UserControl {
-        public GridLayout? GridLayout {
-            get => (GridLayout?)this.GetValue(GridLayoutProperty);
+        public UDK.WinUI.Grid.GridLayout? GridLayout {
+            get => (UDK.WinUI.Grid.GridLayout?)this.GetValue(GridLayoutProperty);
             set => this.SetValue(GridLayoutProperty, value);
         }
         public static readonly DependencyProperty GridLayoutProperty = DependencyProperty.Register(
             nameof(GridLayout),
-            typeof(GridLayout),
+            typeof(UDK.WinUI.Grid.GridLayout),
             typeof(CandidatesTable),
             new PropertyMetadata(null)
         );
@@ -26,7 +22,7 @@ namespace PersonalEventsBuilder.Views {
                 [Localization.UiStrings.Get("Tr_WorkspaceCandidateOne"), Localization.UiStrings.Get("Tr_WorkspaceRankOne"), "123/26", "20.11.2026"],
                 [Localization.UiStrings.Get("Tr_WorkspaceCandidateTwo"), Localization.UiStrings.Get("Tr_WorkspaceRankTwo"), "124/26", "21.11.2026"],
             ];
-            this.Surface.Register(new CandidateGrid(2, 0, table));
+            this.Surface.Register(new CandidatesTableParts.CandidateGrid(2, 0, table));
             this.Surface.ViewportChanged += this.UpdateButtons;
             this.UpdateButtons();
         }

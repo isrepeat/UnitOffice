@@ -2,7 +2,7 @@ using System;
 
 using Microsoft.UI.Xaml;
 
-namespace PersonalEventsBuilder.Controls {
+namespace UDK.WinUI.Grid {
     public sealed class GridLayout : DependencyObject {
         public GridNavigation Navigation { get; set; } = new();
         public int NavigationOrder { get; set; }

@@ -146,4 +146,4 @@
 - **Две панели рядом с общей осью колонок.** Каждая показывает колонки общей сетки, целиком попавшие в её горизонтальный диапазон. Колонка, пересечённая сплиттером, может отсутствовать в обеих панелях.
 - **Зона уже одной колонки или ниже одной строки.** На этой поверхности не помещается целая ячейка, поэтому сетка не рисуется.
 
-Реализация расчёта доступна в [GridAxis.cs](../../Sources/Windows/PersonalEventsBuilder/Controls/GridAxis.cs), а отрисовка и обработка мыши — в [GridCanvas.xaml.cs](../../Sources/Windows/PersonalEventsBuilder/Controls/GridCanvas.xaml.cs).
+Реализация расчёта доступна в [GridAxis.cs](../../Sources/Windows/PersonalEventsBuilder/UDK/WinUI/Grid/GridAxis.cs), а отрисовка и обработка мыши — в [GridCanvas.xaml.cs](../../Sources/Windows/PersonalEventsBuilder/UDK/WinUI/Grid/GridCanvas.xaml.cs).

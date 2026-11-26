@@ -5,18 +5,14 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Automation;
 
-namespace PersonalEventsBuilder.Controls {
-    internal interface IGridViewportContent {
-        void ArrangeCells(GridArea visible, double width, double height);
-    }
-
-    internal sealed class CandidateGrid : UserControl, IGridNavigationTarget, IGridViewportContent {
+namespace PersonalEventsBuilder.Views.CandidatesTableParts {
+    internal sealed class CandidateGrid : UserControl, UDK.WinUI.Grid.IGridNavigationTarget, UDK.WinUI.Grid.IGridViewportContent {
         private readonly Canvas cells = new();
         private readonly string[][] values;
-        private readonly Dictionary<GridAddress, CandidateCell> visibleCells = [];
+        private readonly Dictionary<UDK.WinUI.Grid.GridAddress, CandidateCell> visibleCells = [];
         private readonly Stack<CandidateCell> recycledCells = new();
-        private GridAddress? active;
-        public GridArea Bounds { get; }
+        private UDK.WinUI.Grid.GridAddress? active;
+        public UDK.WinUI.Grid.GridArea Bounds { get; }
 
         internal CandidateGrid(int column, int row, string[][] values) {
             this.values = values;
@@ -25,10 +21,10 @@ namespace PersonalEventsBuilder.Controls {
             this.IsTabStop = false;
         }
 
-        public GridAddress FocusAddress(GridAddress address) => address;
-        public GridArea FocusArea(GridAddress address) => new(address.Column, address.Row, 1, 1);
+        public UDK.WinUI.Grid.GridAddress FocusAddress(UDK.WinUI.Grid.GridAddress address) => address;
+        public UDK.WinUI.Grid.GridArea FocusArea(UDK.WinUI.Grid.GridAddress address) => new(address.Column, address.Row, 1, 1);
 
-        public void SetActiveAddress(GridAddress? address) {
+        public void SetActiveAddress(UDK.WinUI.Grid.GridAddress? address) {
             if (this.active is { } previous && this.visibleCells.TryGetValue(previous, out var oldCell)) {
                 oldCell.SetSelected(false);
             }
@@ -43,7 +39,7 @@ namespace PersonalEventsBuilder.Controls {
             }
         }
 
-        public void ArrangeCells(GridArea visible, double width, double height) {
+        public void ArrangeCells(UDK.WinUI.Grid.GridArea visible, double width, double height) {
             foreach (var address in this.visibleCells.Keys.Where(address => !visible.Contains(address)).ToArray()) {
                 var released = this.visibleCells[address];
                 this.visibleCells.Remove(address);
@@ -53,7 +49,7 @@ namespace PersonalEventsBuilder.Controls {
             }
             for (int row = visible.Row; row < visible.Bottom; row++) {
                 for (int column = visible.Column; column < visible.Right; column++) {
-                    var address = new GridAddress(column, row);
+                    var address = new UDK.WinUI.Grid.GridAddress(column, row);
                     if (!this.visibleCells.TryGetValue(address, out var cell)) {
                         cell = this.recycledCells.TryPop(out var recycled) ? recycled : new CandidateCell();
                         cell.DataContext = this.values[row - this.Bounds.Row][column - this.Bounds.Column];

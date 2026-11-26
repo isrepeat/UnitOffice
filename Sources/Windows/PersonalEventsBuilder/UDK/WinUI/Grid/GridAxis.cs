@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 
-namespace PersonalEventsBuilder.Controls {
+namespace UDK.WinUI.Grid {
     public sealed class GridAxis : DependencyObject {
         public double Step {
             get => (double)this.GetValue(StepProperty);

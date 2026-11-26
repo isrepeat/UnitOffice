@@ -1,4 +1,4 @@
-<UserControl x:Class="PersonalEventsBuilder.Controls.FormInput"
+<UserControl x:Class="PersonalEventsBuilder.Views.EventFormParts.FormInput"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              IsTabStop="False">

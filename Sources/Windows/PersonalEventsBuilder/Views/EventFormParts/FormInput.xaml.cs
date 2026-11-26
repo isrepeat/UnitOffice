@@ -4,7 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 
-namespace PersonalEventsBuilder.Controls {
+namespace PersonalEventsBuilder.Views.EventFormParts {
     public sealed class FormInputViewModel : INotifyPropertyChanged {
         public bool IsActive {
             get => this.isActive;
@@ -20,9 +20,9 @@ namespace PersonalEventsBuilder.Controls {
         private bool isActive;
     }
 
-    public sealed partial class FormInput : UserControl, IGridNavigationTarget {
+    public sealed partial class FormInput : UserControl, UDK.WinUI.Grid.IGridNavigationTarget {
         public FormInputViewModel ViewModel { get; } = new();
-        public GridArea Bounds { get; }
+        public UDK.WinUI.Grid.GridArea Bounds { get; }
 
         public FormInput(int column, int row, int width, string label) {
             this.Bounds = new(column, row - 1, width, 2);
@@ -31,10 +31,10 @@ namespace PersonalEventsBuilder.Controls {
             this.IsHitTestVisible = false;
         }
 
-        public GridAddress FocusAddress(GridAddress address) => new(this.Bounds.Column, this.Bounds.Bottom - 1);
-        public GridArea FocusArea(GridAddress address) => this.Bounds;
+        public UDK.WinUI.Grid.GridAddress FocusAddress(UDK.WinUI.Grid.GridAddress address) => new(this.Bounds.Column, this.Bounds.Bottom - 1);
+        public UDK.WinUI.Grid.GridArea FocusArea(UDK.WinUI.Grid.GridAddress address) => this.Bounds;
 
-        public void SetActiveAddress(GridAddress? address) {
+        public void SetActiveAddress(UDK.WinUI.Grid.GridAddress? address) {
             this.ViewModel.IsActive = address.HasValue;
             this.IsHitTestVisible = address.HasValue;
             this.IsTabStop = address.HasValue;

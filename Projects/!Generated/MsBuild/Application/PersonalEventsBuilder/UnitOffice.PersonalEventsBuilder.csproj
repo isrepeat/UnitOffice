@@ -37,17 +37,20 @@
     <ApplicationDefinition Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\App.xaml" Link="App.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\App.xaml.cs" Link="App.xaml.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Layout\Zone.cs" Link="UDK\WinUI\Layout\Zone.cs" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\GridAxis.cs" Link="Controls\GridAxis.cs" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\GridLayout.cs" Link="Controls\GridLayout.cs" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\GridNavigation.cs" Link="Controls\GridNavigation.cs" />
-    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\GridCanvas.xaml" Link="Controls\GridCanvas.xaml" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\GridCanvas.xaml.cs" Link="Controls\GridCanvas.xaml.cs" />
-    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\FormInput.xaml" Link="Controls\FormInput.xaml" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\FormInput.xaml.cs" Link="Controls\FormInput.xaml.cs" />
-    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\CandidateCell.xaml" Link="Controls\CandidateCell.xaml" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\CandidateCell.xaml.cs" Link="Controls\CandidateCell.xaml.cs" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\CandidateGrid.cs" Link="Controls\CandidateGrid.cs" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\IGridNavigationTarget.cs" Link="Controls\IGridNavigationTarget.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\GridAxis.cs" Link="UDK\WinUI\Grid\GridAxis.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\GridLayout.cs" Link="UDK\WinUI\Grid\GridLayout.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\GridNavigation.cs" Link="UDK\WinUI\Grid\GridNavigation.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\GridCanvas.xaml" Link="UDK\WinUI\Grid\GridCanvas.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\GridCanvas.xaml.cs" Link="UDK\WinUI\Grid\GridCanvas.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventFormParts\FormInput.xaml" Link="Views\EventFormParts\FormInput.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventFormParts\FormInput.xaml.cs" Link="Views\EventFormParts\FormInput.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTableParts\CandidateCell.xaml" Link="Views\CandidatesTableParts\CandidateCell.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTableParts\CandidateCell.xaml.cs" Link="Views\CandidatesTableParts\CandidateCell.xaml.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTableParts\CandidateGrid.cs" Link="Views\CandidatesTableParts\CandidateGrid.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\GridAddress.cs" Link="UDK\WinUI\Grid\GridAddress.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\GridArea.cs" Link="UDK\WinUI\Grid\GridArea.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\IGridViewportContent.cs" Link="UDK\WinUI\Grid\IGridViewportContent.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\IGridNavigationTarget.cs" Link="UDK\WinUI\Grid\IGridNavigationTarget.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Layout\WorkspaceHost.cs" Link="UDK\WinUI\Layout\WorkspaceHost.cs" />
     <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\Strings\ru-RU\Resources.resw" Link="Localization\Strings\ru-RU\Resources.resw" />
     <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\Strings\uk-UA\Resources.resw" Link="Localization\Strings\uk-UA\Resources.resw" />

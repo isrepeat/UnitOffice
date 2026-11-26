@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Windows.System;
 
-namespace PersonalEventsBuilder.Controls {
+namespace UDK.WinUI.Grid {
     public sealed class GridNavigation : DependencyObject {
         private readonly List<GridCanvas> surfaces = [];
         private GridCanvas? activeSurface;

@@ -1,7 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-namespace PersonalEventsBuilder.Controls {
+namespace PersonalEventsBuilder.Views.CandidatesTableParts {
     public sealed partial class CandidateCell : UserControl {
         public CandidateCell() {
             this.InitializeComponent();
