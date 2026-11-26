@@ -1,4 +1,4 @@
-<UserControl x:Class="PersonalEventsBuilder.Views.CandidatesTableParts.CandidateCell"
+<UserControl x:Class="PersonalEventsBuilder.Views.CandidatesTableParts.Controls.CandidateCell"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 
              UseSystemFocusVisuals="False"
@@ -6,12 +6,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              IsHitTestVisible="False"
              IsTabStop="False">
-    <Border Background="{StaticResource PanelBrush}"
+    <Border x:Name="Surface"
+            Background="{StaticResource PanelBrush}"
             BorderBrush="{StaticResource GridLineBrush}"
             BorderThickness="0.5">
         <Grid>
             <controls:PlaceholderLines x:Name="Stroke"
-                                       Margin="8,0"
+                                       Margin="16,0"
                                        LineWidths="33"
                                        Visibility="Collapsed"
                                        AutomationProperties.Name="{Binding}" />

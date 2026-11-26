@@ -23,6 +23,10 @@ namespace UDK.WinUI.Grid {
         );
 
         public bool CanScrollLeft => this.columnWindow.Slots > 0 && this.LeftColumn > 0;
+        public Visibility GridLinesVisibility {
+            get => this.Lines.Visibility;
+            set => this.Lines.Visibility = value;
+        }
         public bool CanScrollRight => this.columns is { } axis && this.columnWindow.Slots > 0 && this.LeftColumn + this.visibleColumns < axis.Count;
 
         internal event Action? ViewportChanged;
@@ -222,6 +226,21 @@ namespace UDK.WinUI.Grid {
             this.regions.Add(region);
             this.Targets.Children.Add(region);
             this.UpdateTargets();
+        }
+
+        internal void ReplaceRegions<T>(IReadOnlyList<T> replacements) where T : FrameworkElement, IGridNavigationTarget {
+            var address = this.activeAddress;
+            this.SetActiveAddress(null);
+            this.Targets.Children.Clear();
+            this.regions.Clear();
+            foreach (var region in replacements) {
+                this.regions.Add(region);
+                this.Targets.Children.Add(region);
+            }
+            this.UpdateTargets();
+            if (address is { } previous) {
+                this.SetActiveAddress(this.ResolveAddress(previous));
+            }
         }
 
         private IGridNavigationTarget? Owner(GridAddress address) => this.regions.FirstOrDefault(region => region.Bounds.Contains(address));

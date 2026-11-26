@@ -6,7 +6,14 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Controls;
 
-namespace PersonalEventsBuilder.Views.EventFormParts {
+namespace PersonalEventsBuilder.Views.EventFormParts.Scheme {
+    [Flags]
+    public enum FormFeature {
+        None = 0,
+        Document = 1,
+        Treatment = 2
+    }
+
     public enum FormPlacement {
         Primary,
         Absolute,
@@ -15,9 +22,15 @@ namespace PersonalEventsBuilder.Views.EventFormParts {
         BelowField
     }
 
+    public sealed class FormModeDefinition {
+        public string Mode { get; set; } = "";
+        public FormFeature Features { get; set; }
+    }
+
     [ContentProperty(Name = nameof(Fields))]
     public sealed class FormGroup : DependencyObject {
         public FormPlacement Placement { get; set; }
+        public FormFeature Feature { get; set; }
         public string AnchorFieldId { get; set; } = "";
         public string LabelKey { get; set; } = "";
         public int Column { get; set; }
@@ -32,24 +45,13 @@ namespace PersonalEventsBuilder.Views.EventFormParts {
         public int Height { get; set; } = 2;
     }
 
-    internal readonly struct PlacedFormField {
-        public readonly FormGroup Group;
-        public readonly FormField Field;
-        public readonly UDK.WinUI.Grid.GridArea Bounds;
-
-        public PlacedFormField(FormGroup formGroup, FormField formField, UDK.WinUI.Grid.GridArea gridArea) {
-            this.Group = formGroup;
-            this.Field = formField;
-            this.Bounds = gridArea;
-        }
-    }
-
     [ContentProperty(Name = nameof(Groups))]
-    public sealed class FormDefinition : DependencyObject {
+    public class FormDefinition : DependencyObject {
         public IList<FormGroup> Groups { get; } = new List<FormGroup>();
+        public IList<FormModeDefinition> Modes { get; } = new List<FormModeDefinition>();
 
-        internal List<PlacedFormField> CreateLayout() {
-            var primary = this.Groups.Single(group => group.Placement == FormPlacement.Primary);
+        internal static EventLayout CreateLayout(IReadOnlyList<FormGroup> groups) {
+            var primary = groups.Single(group => group.Placement == FormPlacement.Primary);
             var layout = new List<PlacedFormField>();
             var ids = new HashSet<string>(StringComparer.Ordinal);
             var anchors = new Dictionary<string, UDK.WinUI.Grid.GridArea>(StringComparer.Ordinal);
@@ -57,7 +59,7 @@ namespace PersonalEventsBuilder.Views.EventFormParts {
             int left = primary.Column;
             int right = left;
             // Сначала резервируем заданные позиции, затем размещаем нижние расширения в порядке XAML.
-            foreach (var group in this.Groups.Where(group => group != primary).OrderBy(group => group.Placement == FormPlacement.BelowField).Prepend(primary)) {
+            foreach (var group in groups.Where(group => group != primary).OrderBy(group => group.Placement == FormPlacement.BelowField).Prepend(primary)) {
                 if (group.Fields.Count == 0 || group.Fields.Any(field => field.Width <= 0 || field.Height <= 0)) {
                     throw new InvalidOperationException("A group requires fields with positive dimensions.");
                 }
@@ -111,7 +113,7 @@ namespace PersonalEventsBuilder.Views.EventFormParts {
                     }
                 }
             }
-            return layout;
+            return new EventLayout(layout.AsReadOnly(), new ColumnRange(left, right - left));
         }
 
         private static int FindAvailableRow(List<PlacedFormField> layout, int column, int row, int width, int height) {

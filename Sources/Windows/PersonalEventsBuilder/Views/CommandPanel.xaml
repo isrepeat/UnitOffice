@@ -30,30 +30,48 @@
                                 RowSpacing="3"
                                 ColumnSpacing="4">
                 <controls:PlaceholderButton x:Uid="Tr_PlaceholderButton1"
+                                            Command="{Binding SelectModeCommand}"
+                                            CommandParameter="Arrival1"
                                             Grid.Row="0"
                                             Grid.Column="0" />
                 <controls:PlaceholderButton x:Uid="Tr_PlaceholderButton2"
+                                            Command="{Binding SelectModeCommand}"
+                                            CommandParameter="Arrival2"
                                             Grid.Row="1"
                                             Grid.Column="0" />
                 <controls:PlaceholderButton x:Uid="Tr_PlaceholderButton3"
+                                            Command="{Binding SelectModeCommand}"
+                                            CommandParameter="Arrival3"
                                             Grid.Row="2"
                                             Grid.Column="0" />
                 <controls:PlaceholderButton x:Uid="Tr_PlaceholderButton4"
+                                            Command="{Binding SelectModeCommand}"
+                                            CommandParameter="Arrival4"
                                             Grid.Row="3"
                                             Grid.Column="0" />
                 <controls:PlaceholderButton x:Uid="Tr_PlaceholderButton1"
+                                            Command="{Binding SelectModeCommand}"
+                                            CommandParameter="Departure1"
                                             Grid.Row="0"
                                             Grid.Column="1" />
                 <controls:PlaceholderButton x:Uid="Tr_PlaceholderButton2"
+                                            Command="{Binding SelectModeCommand}"
+                                            CommandParameter="Departure2"
                                             Grid.Row="1"
                                             Grid.Column="1" />
                 <controls:PlaceholderButton x:Uid="Tr_PlaceholderButton3"
+                                            Command="{Binding SelectModeCommand}"
+                                            CommandParameter="Departure3"
                                             Grid.Row="2"
                                             Grid.Column="1" />
                 <controls:PlaceholderButton x:Uid="Tr_PlaceholderButton4"
+                                            Command="{Binding SelectModeCommand}"
+                                            CommandParameter="Departure4"
                                             Grid.Row="3"
                                             Grid.Column="1" />
                 <controls:PlaceholderButton Grid.Row="0"
+                                            Command="{Binding SelectModeCommand}"
+                                            CommandParameter="ExtendMedicalLeave"
                                             Grid.Column="2"
                                             Grid.RowSpan="2"
                                             PlaceholderLines_LineWidths="33,57"
@@ -64,6 +82,8 @@
                                TextWrapping="Wrap" />
                 </controls:PlaceholderButton>
                 <controls:PlaceholderButton Grid.Row="0"
+                                            Command="{Binding SelectModeCommand}"
+                                            CommandParameter="TreatmentToMedicalLeave"
                                             Grid.Column="3"
                                             Grid.RowSpan="2"
                                             PlaceholderLines_LineWidths="33,57"
@@ -74,6 +94,8 @@
                                TextWrapping="Wrap" />
                 </controls:PlaceholderButton>
                 <controls:PlaceholderButton Grid.Row="2"
+                                            Command="{Binding SelectModeCommand}"
+                                            CommandParameter="MedicalLeaveToHospital"
                                             Grid.Column="2"
                                             Grid.RowSpan="2"
                                             PlaceholderLines_LineWidths="33,57"
@@ -84,6 +106,8 @@
                                TextWrapping="Wrap" />
                 </controls:PlaceholderButton>
                 <controls:PlaceholderButton Grid.Row="2"
+                                            Command="{Binding SelectModeCommand}"
+                                            CommandParameter="AbsenceToAssignment"
                                             Grid.Column="3"
                                             Grid.RowSpan="2"
                                             PlaceholderLines_LineWidths="33,57"

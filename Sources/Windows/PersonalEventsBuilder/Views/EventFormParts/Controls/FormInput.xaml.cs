@@ -2,7 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 
-namespace PersonalEventsBuilder.Views.EventFormParts {
+namespace PersonalEventsBuilder.Views.EventFormParts.Controls {
     public sealed partial class FormInput : UserControl, UDK.WinUI.Grid.IGridNavigationTarget {
         public UDK.WinUI.Grid.GridArea Bounds { get; }
 

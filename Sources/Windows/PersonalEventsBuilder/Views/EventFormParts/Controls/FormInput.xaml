@@ -1,4 +1,4 @@
-<UserControl x:Class="PersonalEventsBuilder.Views.EventFormParts.FormInput"
+<UserControl x:Class="PersonalEventsBuilder.Views.EventFormParts.Controls.FormInput"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 
              UseSystemFocusVisuals="False"

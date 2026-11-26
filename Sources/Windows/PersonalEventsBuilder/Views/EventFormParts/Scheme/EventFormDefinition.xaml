@@ -1,0 +1,55 @@
+<scheme:FormDefinition x:Class="PersonalEventsBuilder.Views.EventFormParts.Scheme.EventFormDefinition"
+                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                       xmlns:scheme="using:PersonalEventsBuilder.Views.EventFormParts.Scheme">
+    <scheme:FormDefinition.Modes>
+        <scheme:FormModeDefinition Mode="Arrival1"
+                                  Features="Document" />
+        <scheme:FormModeDefinition Mode="Arrival2"
+                                  Features="Treatment" />
+        <scheme:FormModeDefinition Mode="Arrival3"
+                                  Features="Document,Treatment" />
+    </scheme:FormDefinition.Modes>
+    <scheme:FormGroup Placement="Primary"
+                     Column="2"
+                     LabelKey="Tr_FormPrimary">
+        <scheme:FormField Id="A1"
+                         Width="3" />
+        <scheme:FormField Id="A2"
+                         Width="2" />
+        <scheme:FormField Id="A3"
+                         Width="2" />
+        <scheme:FormField Id="A4"
+                         Width="2" />
+    </scheme:FormGroup>
+    <scheme:FormGroup Placement="Left"
+                     Feature="Document"
+                     LabelKey="Tr_FormExtension">
+        <scheme:FormField Id="L1"
+                         Width="2" />
+    </scheme:FormGroup>
+    <scheme:FormGroup Placement="Right"
+                     Feature="Treatment"
+                     LabelKey="Tr_FormExtension">
+        <scheme:FormField Id="R1"
+                         Width="2" />
+    </scheme:FormGroup>
+    <scheme:FormGroup Placement="BelowField"
+                     AnchorFieldId="A1"
+                     LabelKey="Tr_FormExtension">
+        <scheme:FormField Id="B1"
+                         Width="6" />
+    </scheme:FormGroup>
+    <scheme:FormGroup Placement="BelowField"
+                     AnchorFieldId="A3"
+                     LabelKey="Tr_FormExtension">
+        <scheme:FormField Id="C1"
+                         Width="2" />
+    </scheme:FormGroup>
+    <scheme:FormGroup Placement="BelowField"
+                     AnchorFieldId="A1"
+                     LabelKey="Tr_FormExtension">
+        <scheme:FormField Id="D1"
+                         Width="6" />
+    </scheme:FormGroup>
+</scheme:FormDefinition>

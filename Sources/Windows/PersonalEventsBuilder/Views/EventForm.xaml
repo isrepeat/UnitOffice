@@ -1,7 +1,6 @@
 <UserControl x:Class="PersonalEventsBuilder.Views.EventForm"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:parts="using:PersonalEventsBuilder.Views.EventFormParts"
              xmlns:grid="using:UDK.WinUI.Grid">
     <UserControl.Resources>
         <Style x:Key="PrimaryFieldStyle"
@@ -25,48 +24,6 @@
             <Setter Property="Stroke"
                     Value="{StaticResource GridLineBrush}" />
         </Style>
-        <parts:FormDefinition x:Key="Definition">
-            <parts:FormGroup Placement="Primary"
-                             Column="2"
-                             LabelKey="Tr_FormPrimary">
-                <parts:FormField Id="A1"
-                                 Width="3" />
-                <parts:FormField Id="A2"
-                                 Width="2" />
-                <parts:FormField Id="A3"
-                                 Width="2" />
-                <parts:FormField Id="A4"
-                                 Width="2" />
-            </parts:FormGroup>
-            <parts:FormGroup Placement="Left"
-                             LabelKey="Tr_FormExtension">
-                <parts:FormField Id="L1"
-                                 Width="2" />
-            </parts:FormGroup>
-            <parts:FormGroup Placement="Right"
-                             LabelKey="Tr_FormExtension">
-                <parts:FormField Id="R1"
-                                 Width="2" />
-            </parts:FormGroup>
-            <parts:FormGroup Placement="BelowField"
-                             AnchorFieldId="A1"
-                             LabelKey="Tr_FormExtension">
-                <parts:FormField Id="B1"
-                                 Width="6" />
-            </parts:FormGroup>
-            <parts:FormGroup Placement="BelowField"
-                             AnchorFieldId="A3"
-                             LabelKey="Tr_FormExtension">
-                <parts:FormField Id="C1"
-                                 Width="2" />
-            </parts:FormGroup>
-            <parts:FormGroup Placement="BelowField"
-                             AnchorFieldId="A1"
-                             LabelKey="Tr_FormExtension">
-                <parts:FormField Id="D1"
-                                 Width="6" />
-            </parts:FormGroup>
-        </parts:FormDefinition>
     </UserControl.Resources>
     <Grid RowDefinitions="Auto,*">
         <TextBlock Foreground="{StaticResource WorkspaceTextBrush}"

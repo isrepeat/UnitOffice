@@ -14,17 +14,36 @@ namespace PersonalEventsBuilder.Views {
             new PropertyMetadata(null)
         );
 
+        private readonly string[][] table;
+
         public CandidatesTable() {
             this.InitializeComponent();
-            string[][] table = [
+            this.table = [
                 [Localization.UiStrings.Get("Tr_WorkspacePerson"), Localization.UiStrings.Get("Tr_WorkspaceRank"),
                     Localization.UiStrings.Get("Tr_WorkspaceDocumentNumber"), Localization.UiStrings.Get("Tr_WorkspaceDocumentDate")],
                 [Localization.UiStrings.Get("Tr_WorkspaceCandidateOne"), Localization.UiStrings.Get("Tr_WorkspaceRankOne"), "123/26", "20.11.2026"],
                 [Localization.UiStrings.Get("Tr_WorkspaceCandidateTwo"), Localization.UiStrings.Get("Tr_WorkspaceRankTwo"), "124/26", "21.11.2026"],
             ];
-            this.Surface.Register(new CandidatesTableParts.CandidateGrid(2, 0, table));
             this.Surface.ViewportChanged += this.UpdateButtons;
             this.UpdateButtons();
+        }
+
+        public EventFormParts.ColumnRange? ColumnRange {
+            get => (EventFormParts.ColumnRange?)this.GetValue(ColumnRangeProperty);
+            set => this.SetValue(ColumnRangeProperty, value);
+        }
+        public static readonly DependencyProperty ColumnRangeProperty = DependencyProperty.Register(
+            nameof(ColumnRange), typeof(EventFormParts.ColumnRange), typeof(CandidatesTable),
+            new PropertyMetadata(null, (sender, args) => {
+                if (!Equals(args.OldValue, args.NewValue)) {
+                    ((CandidatesTable)sender).UpdateRange();
+                }
+            }));
+
+        private void UpdateRange() {
+            CandidatesTableParts.Controls.CandidateGrid[] regions = this.ColumnRange is { Span: > 0 } range
+                ? [new CandidatesTableParts.Controls.CandidateGrid(range.Start, range.Span, this.table)] : [];
+            this.Surface.ReplaceRegions(regions);
         }
 
         private void UpdateButtons() {

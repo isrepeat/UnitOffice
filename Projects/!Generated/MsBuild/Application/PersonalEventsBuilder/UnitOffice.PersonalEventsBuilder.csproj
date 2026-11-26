@@ -45,12 +45,13 @@
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CommandPanelParts\CommandGrid.cs" Link="Views\CommandPanelParts\CommandGrid.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\GridCanvas.xaml" Link="UDK\WinUI\Grid\GridCanvas.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\GridCanvas.xaml.cs" Link="UDK\WinUI\Grid\GridCanvas.xaml.cs" />
-    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventFormParts\FormInput.xaml" Link="Views\EventFormParts\FormInput.xaml" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventFormParts\FormInput.xaml.cs" Link="Views\EventFormParts\FormInput.xaml.cs" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventFormParts\FormDefinition.cs" Link="Views\EventFormParts\FormDefinition.cs" />
-    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTableParts\CandidateCell.xaml" Link="Views\CandidatesTableParts\CandidateCell.xaml" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTableParts\CandidateCell.xaml.cs" Link="Views\CandidatesTableParts\CandidateCell.xaml.cs" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTableParts\CandidateGrid.cs" Link="Views\CandidatesTableParts\CandidateGrid.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventFormParts\Controls\FormInput.xaml" Link="Views\EventFormParts\Controls\FormInput.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventFormParts\Controls\FormInput.xaml.cs" Link="Views\EventFormParts\Controls\FormInput.xaml.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventFormParts\Scheme\FormDefinition.cs" Link="Views\EventFormParts\Scheme\FormDefinition.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTableParts\Controls\CandidateCell.xaml" Link="Views\CandidatesTableParts\Controls\CandidateCell.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTableParts\Controls\CandidateCell.xaml.cs" Link="Views\CandidatesTableParts\Controls\CandidateCell.xaml.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTableParts\Controls\CandidateGrid.xaml" Link="Views\CandidatesTableParts\Controls\CandidateGrid.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTableParts\Controls\CandidateGrid.xaml.cs" Link="Views\CandidatesTableParts\Controls\CandidateGrid.xaml.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\GridAddress.cs" Link="UDK\WinUI\Grid\GridAddress.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\GridArea.cs" Link="UDK\WinUI\Grid\GridArea.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\IGridViewportContent.cs" Link="UDK\WinUI\Grid\IGridViewportContent.cs" />
@@ -64,7 +65,8 @@
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\MainWindow.xaml" Link="MainWindow.xaml" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\PlaceholderButton.xaml" Link="Controls\PlaceholderButton.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\PlaceholderButton.xaml.cs" Link="Controls\PlaceholderButton.xaml.cs" />
-    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\PlaceholderLines.cs" Link="Controls\PlaceholderLines.cs" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\PlaceholderLines.xaml" Link="Controls\PlaceholderLines.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\PlaceholderLines.xaml.cs" Link="Controls\PlaceholderLines.xaml.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\States\NavigationFocus.cs" Link="States\NavigationFocus.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WindowTitleBar.xaml" Link="Controls\WindowTitleBar.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WindowTitleBar.xaml.cs" Link="Controls\WindowTitleBar.xaml.cs" />
@@ -82,6 +84,10 @@
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\PaletteEditor.xaml" Link="Views\PaletteEditor.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\PaletteEditor.xaml.cs" Link="Views\PaletteEditor.xaml.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventForm.xaml" Link="Views\EventForm.xaml" />
+    <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventFormParts\Scheme\EventFormDefinition.xaml" Link="Views\EventFormParts\Scheme\EventFormDefinition.xaml" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventFormParts\Scheme\EventFormDefinition.xaml.cs" Link="Views\EventFormParts\Scheme\EventFormDefinition.xaml.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Pages\ViewModels\WorkspacePageViewModel.cs" Link="Pages\ViewModels\WorkspacePageViewModel.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventFormParts\EventLayout.cs" Link="Views\EventFormParts\EventLayout.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventForm.xaml.cs" Link="Views\EventForm.xaml.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTable.xaml" Link="Views\CandidatesTable.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTable.xaml.cs" Link="Views\CandidatesTable.xaml.cs" />

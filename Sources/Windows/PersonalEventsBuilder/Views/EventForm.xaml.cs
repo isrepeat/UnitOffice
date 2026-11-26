@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -21,18 +22,32 @@ namespace PersonalEventsBuilder.Views {
 
         public EventForm() {
             this.InitializeComponent();
-            var definition = (EventFormParts.FormDefinition)this.Resources["Definition"];
-            foreach (var placedFormField in definition.CreateLayout()) {
+        }
+
+        public IReadOnlyList<EventFormParts.PlacedFormField> Fields {
+            get => (IReadOnlyList<EventFormParts.PlacedFormField>)this.GetValue(FieldsProperty);
+            set => this.SetValue(FieldsProperty, value);
+        }
+        public static readonly DependencyProperty FieldsProperty = DependencyProperty.Register(
+            nameof(Fields), typeof(IReadOnlyList<EventFormParts.PlacedFormField>), typeof(EventForm),
+            new PropertyMetadata(null, (sender, _) => ((EventForm)sender).UpdateFields()));
+
+        private void UpdateFields() {
+            var inputs = new List<EventFormParts.Controls.FormInput>();
+            this.requiredRows = 0;
+            this.requiredColumns = 0;
+            foreach (var placedFormField in this.Fields ?? []) {
                 this.requiredRows = Math.Max(this.requiredRows, placedFormField.Bounds.Bottom);
                 this.requiredColumns = Math.Max(this.requiredColumns, placedFormField.Bounds.Right);
                 var styleKey = placedFormField.Group.Placement switch {
-                    EventFormParts.FormPlacement.Primary => "PrimaryFieldStyle",
-                    EventFormParts.FormPlacement.Left or EventFormParts.FormPlacement.Right => "SideExtensionFieldStyle",
+                    EventFormParts.Scheme.FormPlacement.Primary => "PrimaryFieldStyle",
+                    EventFormParts.Scheme.FormPlacement.Left or EventFormParts.Scheme.FormPlacement.Right => "SideExtensionFieldStyle",
                     _ => "ExtensionFieldStyle"
                 };
                 var label = $"{Localization.UiStrings.Get(placedFormField.Group.LabelKey)} {placedFormField.Field.Id}";
-                this.Surface.Register(new EventFormParts.FormInput(placedFormField.Bounds, label, (Style)this.Resources[styleKey]));
+                inputs.Add(new EventFormParts.Controls.FormInput(placedFormField.Bounds, label, (Style)this.Resources[styleKey]));
             }
+            this.Surface.ReplaceRegions(inputs);
             this.UpdateGridSize();
         }
 

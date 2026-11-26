@@ -92,4 +92,5 @@
   <data name="Tr_PaletteGraphite.Content" xml:space="preserve"><value>Нейтральний графіт</value></data>
   <data name="Tr_PaletteSlate.Content" xml:space="preserve"><value>Холодний сланець</value></data>
   <data name="Tr_PaletteBrightness.Header" xml:space="preserve"><value>Яскравість тла</value></data>
+  <data name="Tr_CandidatesHeading.Text" xml:space="preserve"><value>Кандидати</value></data>
 </root>

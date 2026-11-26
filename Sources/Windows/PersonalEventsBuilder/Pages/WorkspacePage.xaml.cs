@@ -11,8 +11,12 @@ using Windows.UI.Core;
 
 namespace PersonalEventsBuilder.Pages {
     public sealed partial class WorkspacePage : Page {
+        public ViewModels.WorkspacePageViewModel WorkspacePageViewModel { get; } = new();
+
         public WorkspacePage() {
             this.InitializeComponent();
+            this.WorkspacePageViewModel.FormDefinition = new Views.EventFormParts.Scheme.EventFormDefinition();
+            this.DataContext = this.WorkspacePageViewModel;
             this.PreviewKeyDown += this.OnWorkspaceKeyDown;
         }
 
