@@ -35,11 +35,6 @@
                 OpacityTransition="{StaticResource HoverTransition}" />
         <controls:PlaceholderLines Margin="8,0"
                                    LineWidths="33" />
-        <TextBlock Margin="8,0"
-                   VerticalAlignment="Center"
-                   Foreground="{StaticResource WorkspaceTextBrush}"
-                   Text="{x:Bind Item.Field.Value, Mode=OneWay}"
-                   Visibility="{Binding DataVisibility, Source={StaticResource WorkspaceContentMode}}" />
         <Border x:Name="FocusFrame"
                 Style="{StaticResource ActiveEntityFrameStyle}"
                 Visibility="Collapsed" />

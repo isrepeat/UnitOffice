@@ -67,48 +67,28 @@
                                             Height="Auto"
                                             Command="{Binding SelectModeCommand}"
                                             CommandParameter="ExtendMedicalLeave"
-                                            PlaceholderLines_LineWidths="33,57">
-                    <TextBlock x:Uid="Tr_ExtendMedicalLeave"
-                               FontSize="12"
-                               TextWrapping="Wrap"
-                               TextAlignment="Center" />
-                </controls:PlaceholderButton>
+                                            PlaceholderLines_LineWidths="33,57" />
                 <controls:PlaceholderButton Grid.Row="0"
                                             Grid.Column="3"
                                             Grid.RowSpan="2"
                                             Height="Auto"
                                             Command="{Binding SelectModeCommand}"
                                             CommandParameter="TreatmentToMedicalLeave"
-                                            PlaceholderLines_LineWidths="33,57">
-                    <TextBlock x:Uid="Tr_TreatmentToMedicalLeave"
-                               FontSize="12"
-                               TextWrapping="Wrap"
-                               TextAlignment="Center" />
-                </controls:PlaceholderButton>
+                                            PlaceholderLines_LineWidths="33,57" />
                 <controls:PlaceholderButton Grid.Row="2"
                                             Grid.Column="2"
                                             Grid.RowSpan="2"
                                             Height="Auto"
                                             Command="{Binding SelectModeCommand}"
                                             CommandParameter="MedicalLeaveToHospital"
-                                            PlaceholderLines_LineWidths="33,57">
-                    <TextBlock x:Uid="Tr_MedicalLeaveToHospital"
-                               FontSize="12"
-                               TextWrapping="Wrap"
-                               TextAlignment="Center" />
-                </controls:PlaceholderButton>
+                                            PlaceholderLines_LineWidths="33,57" />
                 <controls:PlaceholderButton Grid.Row="2"
                                             Grid.Column="3"
                                             Grid.RowSpan="2"
                                             Height="Auto"
                                             Command="{Binding SelectModeCommand}"
                                             CommandParameter="AbsenceToAssignment"
-                                            PlaceholderLines_LineWidths="33,57">
-                    <TextBlock x:Uid="Tr_AbsenceToAssignment"
-                               FontSize="12"
-                               TextWrapping="Wrap"
-                               TextAlignment="Center" />
-                </controls:PlaceholderButton>
+                                            PlaceholderLines_LineWidths="33,57" />
             </parts:CommandGrid>
         </ScrollViewer>
     </Grid>
