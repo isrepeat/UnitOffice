@@ -3,16 +3,15 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace PersonalEventsBuilder.Controls {
     public sealed partial class PlaceholderButton : Button {
-        public static readonly DependencyProperty PlaceholderLines_LineWidthsProperty = DependencyProperty.Register(
-            nameof(PlaceholderLines_LineWidths), typeof(string), typeof(PlaceholderButton), new PropertyMetadata("33"));
-
         public string PlaceholderLines_LineWidths {
             get => (string)this.GetValue(PlaceholderLines_LineWidthsProperty);
             set => this.SetValue(PlaceholderLines_LineWidthsProperty, value);
         }
+        public static readonly DependencyProperty PlaceholderLines_LineWidthsProperty = DependencyProperty.Register(
+            nameof(PlaceholderLines_LineWidths), typeof(string), typeof(PlaceholderButton), new PropertyMetadata("33"));
 
-        private Border? focusFrame;
         private bool isActive;
+        private Border? focusFrame;
 
         public PlaceholderButton() {
             this.InitializeComponent();

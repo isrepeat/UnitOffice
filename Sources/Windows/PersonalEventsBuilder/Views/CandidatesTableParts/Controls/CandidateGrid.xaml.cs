@@ -8,11 +8,11 @@ namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
     internal sealed partial class CandidateGrid : UserControl, UDK.WinUI.Grid.IGridNavigationTarget, UDK.WinUI.Grid.IGridViewportContent {
         public UDK.WinUI.Grid.GridArea Bounds { get; }
 
-        private readonly string[][] values;
         private readonly int[] columnEdges;
-        private readonly Dictionary<UDK.WinUI.Grid.GridAddress, CandidateCell> visibleCells = [];
-        private readonly Stack<CandidateCell> recycledCells = new();
+        private readonly string[][] values;
         private UDK.WinUI.Grid.GridAddress? active;
+        private readonly Stack<CandidateCell> recycledCells = new();
+        private readonly Dictionary<UDK.WinUI.Grid.GridAddress, CandidateCell> visibleCells = [];
 
         internal CandidateGrid(int column, int span, string[][] values) {
             this.values = values;

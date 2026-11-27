@@ -10,8 +10,8 @@ namespace UDK.WinUI.Navigation {
     internal sealed class NavigationCoordinator {
         public Grid.GridAddress EntryCell { get; private set; }
 
-        private bool? lastMoveHorizontal;
         private int preferredIndex;
+        private bool? lastMoveHorizontal;
 
         public void Remember(Grid.GridAddress address) {
             this.EntryCell = address;

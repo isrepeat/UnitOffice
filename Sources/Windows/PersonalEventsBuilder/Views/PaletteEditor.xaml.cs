@@ -9,12 +9,12 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 
 namespace PersonalEventsBuilder.Views {
     public sealed partial class PaletteEditor : UserControl {
-        public event EventHandler? CloseRequested;
-        private const string DefaultPalette = "v2,warm,0,17,18";
+        private bool updating = true;
+        private const string ActiveKey = "ActivePaletteProfile";
         private const string SettingsKey = "WorkspacePalette";
         private const string ProfileFolder = "PaletteProfiles";
-        private const string ActiveKey = "ActivePaletteProfile";
-        private bool updating = true;
+        private const string DefaultPalette = "v2,warm,0,17,18";
+        public event EventHandler? CloseRequested;
 
         public PaletteEditor() {
             this.InitializeComponent();

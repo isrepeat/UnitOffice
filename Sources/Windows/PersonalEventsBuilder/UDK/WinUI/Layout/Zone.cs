@@ -12,12 +12,19 @@ namespace UDK.WinUI.Layout {
     [ContentProperty(Name = nameof(Items))]
     public sealed class Zone : DependencyObject {
         public Style? Style { get; set; }
-        public Brush? Background { get; set; }
-        public GridLength Size { get; set; } = new(1, GridUnitType.Star);
-        public double MinSize { get; set; }
+
         public double MaxSize { get; set; } = double.PositiveInfinity;
-        public ZoneDirection Direction { get; set; }
+
+        public double MinSize { get; set; }
+
         public double Spacing { get; set; } = 5;
+
+        public Brush? Background { get; set; }
+
+        public GridLength Size { get; set; } = new(1, GridUnitType.Star);
+
+        public ZoneDirection Direction { get; set; }
+
         public IList<DependencyObject> Items { get; } = new List<DependencyObject>();
     }
 }

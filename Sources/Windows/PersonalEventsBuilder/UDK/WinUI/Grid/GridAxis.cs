@@ -7,13 +7,6 @@ using Microsoft.UI.Xaml.Media;
 
 namespace UDK.WinUI.Grid {
     public sealed class GridAxis : DependencyObject {
-        public static readonly DependencyProperty StepProperty = DependencyProperty.Register(
-            nameof(Step),
-            typeof(double),
-            typeof(GridAxis),
-            new PropertyMetadata(48.0, (sender, _) => ((GridAxis)sender).UpdateViewport(stepChanged: true))
-        );
-
         public double Step {
             get => (double)this.GetValue(StepProperty);
             set {
@@ -23,6 +16,12 @@ namespace UDK.WinUI.Grid {
                 this.SetValue(StepProperty, value);
             }
         }
+        public static readonly DependencyProperty StepProperty = DependencyProperty.Register(
+            nameof(Step),
+            typeof(double),
+            typeof(GridAxis),
+            new PropertyMetadata(48.0, (sender, _) => ((GridAxis)sender).UpdateViewport(stepChanged: true))
+        );
 
         public int Count {
             get => this.count;
@@ -36,17 +35,19 @@ namespace UDK.WinUI.Grid {
         }
 
         public int FirstVisibleIndex { get; private set; }
-        internal double DisplayIndex { get; private set; }
+
         internal double Origin { get; private set; }
 
-        private readonly Stopwatch animation = new();
-        private double animationStart;
-        private readonly Dictionary<object, (double Start, double End)> viewports = new();
+        internal double DisplayIndex { get; private set; }
+
         private int count = 1;
         private int previousCapacity;
+        private double animationStart;
         private double scrollPosition;
-        internal event Action? Changed;
         internal const double MinimumStep = 8;
+        internal event Action? Changed;
+        private readonly Stopwatch animation = new();
+        private readonly Dictionary<object, (double Start, double End)> viewports = new();
 
         internal void SetViewport(object owner, double length, double start = 0) {
             if (length <= 0) {

@@ -12,8 +12,8 @@ namespace PersonalEventsBuilder.Pages.ViewModels {
             set => this.RebuildLayout(value, this.selectedMode);
         }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
         private string? selectedMode;
+        public event PropertyChangedEventHandler? PropertyChanged;
         private Views.EventFormParts.Scheme.FormDefinition formDefinition = new();
 
         public WorkspacePageViewModel() {

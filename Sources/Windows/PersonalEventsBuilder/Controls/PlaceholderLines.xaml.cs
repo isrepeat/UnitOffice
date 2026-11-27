@@ -4,14 +4,13 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace PersonalEventsBuilder.Controls {
     public sealed partial class PlaceholderLines : UserControl {
-        public static readonly DependencyProperty LineWidthsProperty = DependencyProperty.Register(
-            nameof(LineWidths), typeof(string), typeof(PlaceholderLines),
-            new PropertyMetadata("33", (sender, _) => ((PlaceholderLines)sender).Rebuild()));
-
         public string LineWidths {
             get => (string)this.GetValue(LineWidthsProperty);
             set => this.SetValue(LineWidthsProperty, value);
         }
+        public static readonly DependencyProperty LineWidthsProperty = DependencyProperty.Register(
+            nameof(LineWidths), typeof(string), typeof(PlaceholderLines),
+            new PropertyMetadata("33", (sender, _) => ((PlaceholderLines)sender).Rebuild()));
 
         public PlaceholderLines() {
             this.InitializeComponent();

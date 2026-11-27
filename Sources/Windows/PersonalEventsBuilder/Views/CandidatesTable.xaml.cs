@@ -3,6 +3,10 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace PersonalEventsBuilder.Views {
     public sealed partial class CandidatesTable : UserControl {
+        public UDK.WinUI.Grid.GridLayout? GridLayout {
+            get => (UDK.WinUI.Grid.GridLayout?)this.GetValue(GridLayoutProperty);
+            set => this.SetValue(GridLayoutProperty, value);
+        }
         public static readonly DependencyProperty GridLayoutProperty = DependencyProperty.Register(
             nameof(GridLayout),
             typeof(UDK.WinUI.Grid.GridLayout),
@@ -10,6 +14,10 @@ namespace PersonalEventsBuilder.Views {
             new PropertyMetadata(null)
         );
 
+        public EventFormParts.ColumnRange? ColumnRange {
+            get => (EventFormParts.ColumnRange?)this.GetValue(ColumnRangeProperty);
+            set => this.SetValue(ColumnRangeProperty, value);
+        }
         public static readonly DependencyProperty ColumnRangeProperty = DependencyProperty.Register(
             nameof(ColumnRange), typeof(EventFormParts.ColumnRange), typeof(CandidatesTable),
             new PropertyMetadata(null, (sender, args) => {
@@ -17,16 +25,6 @@ namespace PersonalEventsBuilder.Views {
                     ((CandidatesTable)sender).UpdateRange();
                 }
             }));
-
-        public UDK.WinUI.Grid.GridLayout? GridLayout {
-            get => (UDK.WinUI.Grid.GridLayout?)this.GetValue(GridLayoutProperty);
-            set => this.SetValue(GridLayoutProperty, value);
-        }
-
-        public EventFormParts.ColumnRange? ColumnRange {
-            get => (EventFormParts.ColumnRange?)this.GetValue(ColumnRangeProperty);
-            set => this.SetValue(ColumnRangeProperty, value);
-        }
 
         private readonly string[][] table;
 

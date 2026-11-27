@@ -28,20 +28,29 @@ namespace PersonalEventsBuilder.Views.EventFormParts.Scheme {
 
     [ContentProperty(Name = nameof(Fields))]
     public sealed class FormGroup : DependencyObject {
-        public FormPlacement Placement { get; set; }
-        public FormFeature Feature { get; set; }
-        public string AnchorFieldId { get; set; } = "";
-        public string LabelKey { get; set; } = "";
-        public int Column { get; set; }
         public int Row { get; set; }
+
+        public int Column { get; set; }
+
+        public string LabelKey { get; set; } = "";
+
+        public string AnchorFieldId { get; set; } = "";
+
+        public FormFeature Feature { get; set; }
+
         public Orientation Orientation { get; set; } = Orientation.Horizontal;
+
+        public FormPlacement Placement { get; set; }
+
         public IList<FormField> Fields { get; } = new List<FormField>();
     }
 
     public sealed class FormField : DependencyObject {
-        public string Id { get; set; } = "";
         public int Width { get; set; } = 1;
+
         public int Height { get; set; } = 2;
+
+        public string Id { get; set; } = "";
     }
 
     [ContentProperty(Name = nameof(Groups))]

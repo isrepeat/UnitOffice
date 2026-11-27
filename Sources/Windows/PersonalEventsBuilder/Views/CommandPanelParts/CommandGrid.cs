@@ -7,18 +7,18 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace PersonalEventsBuilder.Views.CommandPanelParts {
     public sealed class CommandGrid : Grid, UDK.WinUI.Navigation.IKeyboardNavigationArea, UDK.WinUI.Navigation.INavigationSurface {
-        private System.Collections.Generic.IEnumerable<Controls.PlaceholderButton> AvailableButtons =>
-            this.Children.OfType<Controls.PlaceholderButton>().Where(button => button.IsEnabled && button.Visibility == Visibility.Visible);
-
         UDK.WinUI.Grid.GridArea UDK.WinUI.Navigation.INavigationSurface.NavigationBounds =>
             new(0, 0, this.ColumnDefinitions.Count, this.RowDefinitions.Count);
+
+        private System.Collections.Generic.IEnumerable<Controls.PlaceholderButton> AvailableButtons =>
+            this.Children.OfType<Controls.PlaceholderButton>().Where(button => button.IsEnabled && button.Visibility == Visibility.Visible);
 
         System.Collections.Generic.IEnumerable<UDK.WinUI.Grid.GridArea> UDK.WinUI.Navigation.INavigationSurface.NavigationRegions =>
             this.AvailableButtons.Select(BoundsOf);
 
+        private bool moving;
         private Controls.PlaceholderButton? lastButton;
         private readonly UDK.WinUI.Navigation.NavigationCoordinator coordinator = new();
-        private bool moving;
 
         public CommandGrid() {
             this.AddHandler(PointerPressedEvent, new PointerEventHandler(this.OnButtonPressed), true);

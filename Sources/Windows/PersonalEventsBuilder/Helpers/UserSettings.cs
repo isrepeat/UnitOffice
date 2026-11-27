@@ -2,8 +2,8 @@ using Microsoft.Win32;
 
 namespace PersonalEventsBuilder.Helpers {
     internal static class UserSettings {
-        private const string SettingsPath = @"Software\UnitOffice\PersonalEventsBuilder";
         private const string SettingsKey = @"HKEY_CURRENT_USER\" + SettingsPath;
+        private const string SettingsPath = @"Software\UnitOffice\PersonalEventsBuilder";
 
         internal static string[] Names(string folder) {
             using var key = Registry.CurrentUser.OpenSubKey($@"{SettingsPath}\{folder}");

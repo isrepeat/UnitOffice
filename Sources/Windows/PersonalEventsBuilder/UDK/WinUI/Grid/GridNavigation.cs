@@ -5,9 +5,9 @@ using Microsoft.UI.Xaml;
 
 namespace UDK.WinUI.Grid {
     public sealed class GridNavigation : DependencyObject, UDK.WinUI.Navigation.IKeyboardNavigationArea {
-        private readonly List<Controls.GridCanvas> surfaces = [];
-        private Controls.GridCanvas? activeSurface;
         private Controls.GridCanvas? lastSurface;
+        private Controls.GridCanvas? activeSurface;
+        private readonly List<Controls.GridCanvas> surfaces = [];
         private readonly Navigation.NavigationCoordinator coordinator = new();
 
         public bool FocusArea() {
