@@ -68,8 +68,8 @@
                                     Direction="Rows">
                         <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
                                         Size="2*">
-                            <views:EventForm Fields="{x:Bind WorkspacePageViewModel.EventLayout.Fields, Mode=OneWay}"
-                                             GridLayout="{StaticResource FormGrid}" />
+                            <views:EventForm GridLayout="{StaticResource FormGrid}"
+                                             Fields="{x:Bind WorkspacePageViewModel.EventLayout.Fields, Mode=OneWay}" />
                         </udkLayout:Zone>
                         <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
                                         Size="*">
@@ -78,7 +78,7 @@
                         <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
                                         Size="3*">
                             <views:CandidatesTable GridLayout="{StaticResource CandidatesGrid}"
-                                                   ColumnRange="{x:Bind WorkspacePageViewModel.EventLayout.MainColumnRange, Mode=OneWay}" />
+                                                   Columns="{x:Bind WorkspacePageViewModel.EventLayout.MainColumns, Mode=OneWay}" />
                         </udkLayout:Zone>
                     </udkLayout:Zone>
                 </udkLayout:Zone>
@@ -86,13 +86,18 @@
                 <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
                                 Size="218"
                                 MinSize="100">
-                    <Grid RowDefinitions="Auto,*">
+                    <Grid RowDefinitions="Auto,Auto,*">
                         <Button x:Uid="Tr_PaletteOpen"
                                 x:Name="PaletteButton"
                                 Margin="6"
                                 HorizontalAlignment="Right"
                                 Click="OnOpenPalette" />
-                        <TextBlock Grid.Row="1"
+                        <ToggleButton Grid.Row="1"
+                                      x:Uid="Tr_ShowPlaceholders"
+                                      Margin="6,0,6,6"
+                                      HorizontalAlignment="Right"
+                                      IsChecked="{Binding ShowPlaceholders, Mode=TwoWay, Source={StaticResource WorkspaceContentMode}}" />
+                        <TextBlock Grid.Row="2"
                                    Text="Действия" />
                     </Grid>
                 </udkLayout:Zone>

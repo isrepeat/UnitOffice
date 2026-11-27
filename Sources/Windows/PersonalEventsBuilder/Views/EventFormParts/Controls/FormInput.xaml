@@ -1,17 +1,45 @@
 <UserControl x:Class="PersonalEventsBuilder.Views.EventFormParts.Controls.FormInput"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-
-             UseSystemFocusVisuals="False"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:PersonalEventsBuilder.Controls"
-             IsTabStop="False">
+             IsTabStop="False"
+             UseSystemFocusVisuals="False">
     <Grid Margin="3">
-        <Rectangle Style="{x:Bind FieldStyle}" />
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState x:Name="Primary">
+                    <VisualState.StateTriggers>
+                        <StateTrigger IsActive="{x:Bind IsPrimary}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Value="{StaticResource PrimaryFieldBrush}"
+                                Target="FieldBackground.Fill" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Side">
+                    <VisualState.StateTriggers>
+                        <StateTrigger IsActive="{x:Bind IsSide}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Value="{StaticResource SideFieldBrush}"
+                                Target="FieldBackground.Fill" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Rectangle x:Name="FieldBackground"
+                   Fill="{StaticResource LowerFieldBrush}"
+                   Stroke="{StaticResource GridLineBrush}" />
         <Border x:Name="HoverLayer"
-                OpacityTransition="{StaticResource HoverTransition}"
-                Style="{StaticResource HoverLayerStyle}" />
+                Style="{StaticResource HoverLayerStyle}"
+                OpacityTransition="{StaticResource HoverTransition}" />
         <controls:PlaceholderLines Margin="8,0"
                                    LineWidths="33" />
+        <TextBlock Margin="8,0"
+                   VerticalAlignment="Center"
+                   Foreground="{StaticResource WorkspaceTextBrush}"
+                   Text="{x:Bind Item.Field.Value, Mode=OneWay}"
+                   Visibility="{Binding DataVisibility, Source={StaticResource WorkspaceContentMode}}" />
         <Border x:Name="FocusFrame"
                 Style="{StaticResource ActiveEntityFrameStyle}"
                 Visibility="Collapsed" />

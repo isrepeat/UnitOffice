@@ -1,16 +1,16 @@
 using System.Collections.Generic;
 
 namespace PersonalEventsBuilder.Views.EventFormParts {
-    public sealed record ColumnRange(int Start, int Span);
+    public sealed record FormColumn(int Start, int Span, int? PrimaryIndex);
 
     public sealed class EventLayout {
-        public ColumnRange MainColumnRange { get; }
+        public IReadOnlyList<FormColumn> MainColumns { get; }
 
         public IReadOnlyList<PlacedFormField> Fields { get; }
 
-        internal EventLayout(IReadOnlyList<PlacedFormField> fields, ColumnRange mainColumnRange) {
+        internal EventLayout(IReadOnlyList<PlacedFormField> fields, IReadOnlyList<FormColumn> mainColumns) {
             this.Fields = fields;
-            this.MainColumnRange = mainColumnRange;
+            this.MainColumns = mainColumns;
         }
     }
     public readonly struct PlacedFormField {

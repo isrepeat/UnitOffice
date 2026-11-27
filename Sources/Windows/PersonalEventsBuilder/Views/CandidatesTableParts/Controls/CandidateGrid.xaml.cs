@@ -5,37 +5,32 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Automation;
 
 namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
-    internal sealed partial class CandidateGrid : UserControl, UDK.WinUI.Grid.IGridNavigationTarget, UDK.WinUI.Grid.IGridViewportContent {
-        public UDK.WinUI.Grid.GridArea Bounds { get; }
+    internal sealed record CandidateTableItem(IReadOnlyList<EventFormParts.FormColumn> Columns, IReadOnlyList<IReadOnlyList<string>> Values);
 
-        private readonly int[] columnEdges;
-        private readonly string[][] values;
+    internal sealed partial class CandidateGrid : UserControl, UDK.WinUI.Grid.IGridNavigationTarget, UDK.WinUI.Grid.IGridViewportContent {
+        //
+        // IGridNavigationTarget
+        //
+        public UDK.WinUI.Grid.GridArea Bounds { get; private set; }
+
+        private IReadOnlyList<EventFormParts.FormColumn> columns = [];
+        private IReadOnlyList<IReadOnlyList<string>> values = [];
         private UDK.WinUI.Grid.GridAddress? active;
         private readonly Stack<CandidateCell> recycledCells = new();
         private readonly Dictionary<UDK.WinUI.Grid.GridAddress, CandidateCell> visibleCells = [];
 
-        internal CandidateGrid(int column, int span, string[][] values) {
-            this.values = values;
-            int columns = values.Length == 0 ? 0 : values[0].Length;
-            this.Bounds = new(column, 0, span, System.Math.Max(8, values.Length));
-            this.columnEdges = new int[columns + 1];
-            this.columnEdges[0] = column;
-            for (int index = 0; index < columns; index++) {
-                int width = span / columns + (index < span % columns ? 1 : 0);
-                this.columnEdges[index + 1] = this.columnEdges[index] + width;
-            }
+        public CandidateGrid() {
             this.InitializeComponent();
+            this.DataContextChanged += (_, args) => {
+                if (args.NewValue is CandidateTableItem candidateTableItem) {
+                    this.Configure(candidateTableItem);
+                }
+            };
         }
 
-        public UDK.WinUI.Grid.GridArea FocusArea(UDK.WinUI.Grid.GridAddress address) {
-            int index = this.ColumnIndex(address.Column);
-            int start = this.columnEdges[index];
-            return new(start, address.Row, this.columnEdges[index + 1] - start, 1);
-        }
-
-        public UDK.WinUI.Grid.GridAddress FocusAddress(UDK.WinUI.Grid.GridAddress address) =>
-            new(this.FocusArea(address).Column, address.Row);
-
+        //
+        // IGridNavigationTarget
+        //
         public void SetActiveAddress(UDK.WinUI.Grid.GridAddress? address) {
             if (this.active is { } previous && this.visibleCells.TryGetValue(previous, out var oldCell)) {
                 oldCell.SetSelected(false);
@@ -51,6 +46,18 @@ namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
             }
         }
 
+        public UDK.WinUI.Grid.GridArea FocusArea(UDK.WinUI.Grid.GridAddress address) {
+            int index = this.ColumnIndex(address.Column);
+            var column = this.columns[index];
+            return new(column.Start, address.Row, column.Span, 1);
+        }
+
+        public UDK.WinUI.Grid.GridAddress FocusAddress(UDK.WinUI.Grid.GridAddress address) =>
+            new(this.FocusArea(address).Column, address.Row);
+
+        //
+        // IGridViewportContent
+        //
         public void ArrangeCells(UDK.WinUI.Grid.GridArea visible, double width, double height) {
             foreach (var address in this.visibleCells.Keys.Where(address => visible.Intersect(this.FocusArea(address)).IsEmpty).ToArray()) {
                 var released = this.visibleCells[address];
@@ -64,8 +71,9 @@ namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
                     var area = this.FocusArea(new(column, row));
                     var address = new UDK.WinUI.Grid.GridAddress(area.Column, row);
                     if (!this.visibleCells.TryGetValue(address, out var cell)) {
-                        cell = this.recycledCells.TryPop(out var recycled) ? recycled : new CandidateCell();
-                        cell.SetContent(this.ValueAt(address), row == this.Bounds.Row);
+                        cell = this.recycledCells.TryPop(out var recycled) ? recycled
+                            : (CandidateCell)((DataTemplate)this.Resources["CandidateCellTemplate"]).LoadContent();
+                        cell.SetContent(this.ValueAt(address), row == this.Bounds.Row, row - this.Bounds.Row < 3);
                         cell.SetSelected(address == this.active);
                         this.visibleCells.Add(address, cell);
                         this.Cells.Children.Add(cell);
@@ -79,11 +87,21 @@ namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
             }
         }
 
-        private int ColumnIndex(int column) => System.Array.FindIndex(this.columnEdges, edge => edge > column) - 1;
+        private void Configure(CandidateTableItem candidateTableItem) {
+            this.values = candidateTableItem.Values;
+            this.columns = candidateTableItem.Columns;
+            int start = this.columns[0].Start;
+            var last = this.columns[^1];
+            this.Bounds = new(start, 0, last.Start + last.Span - start, System.Math.Max(8, this.values.Count));
+        }
+
+        private int ColumnIndex(int column) => Enumerable.Range(0, this.columns.Count).First(index => column < this.columns[index].Start + this.columns[index].Span);
 
         private string ValueAt(UDK.WinUI.Grid.GridAddress address) {
             int row = address.Row - this.Bounds.Row;
-            return row < this.values.Length ? this.values[row][this.ColumnIndex(address.Column)] : string.Empty;
+            int? index = this.columns[this.ColumnIndex(address.Column)].PrimaryIndex;
+            return row < this.values.Count && index is int dataIndex && dataIndex < this.values[row].Count
+                ? this.values[row][dataIndex] : string.Empty;
         }
     }
 }

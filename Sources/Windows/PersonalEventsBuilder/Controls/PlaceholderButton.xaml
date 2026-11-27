@@ -54,7 +54,7 @@
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}">
                     <Grid Margin="12,0">
-                        <ContentPresenter Opacity="0"
+                        <ContentPresenter Visibility="{Binding DataVisibility, Source={StaticResource WorkspaceContentMode}}"
                                           Content="{TemplateBinding Content}"
                                           IsHitTestVisible="False" />
                         <controls:PlaceholderLines Opacity="0.65"

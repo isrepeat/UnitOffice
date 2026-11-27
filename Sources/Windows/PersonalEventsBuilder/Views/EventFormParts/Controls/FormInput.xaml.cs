@@ -4,24 +4,32 @@ using Microsoft.UI.Xaml.Automation;
 
 namespace PersonalEventsBuilder.Views.EventFormParts.Controls {
     public sealed partial class FormInput : UserControl, UDK.WinUI.Grid.IGridNavigationTarget {
-        public UDK.WinUI.Grid.GridArea Bounds { get; }
+        //
+        // IGridNavigationTarget
+        //
+        public UDK.WinUI.Grid.GridArea Bounds => this.Item.Bounds;
 
-        public string Label { get; }
-        public Style FieldStyle { get; }
+        public bool IsSide => this.Item.Group?.Placement is Scheme.FormPlacement.Left or Scheme.FormPlacement.Right;
 
-        public FormInput(UDK.WinUI.Grid.GridArea gridArea, string label, Style fieldStyle) {
-            this.Bounds = gridArea;
-            this.Label = label;
-            this.FieldStyle = fieldStyle;
+        public bool IsPrimary => this.Item.Group?.Placement == Scheme.FormPlacement.Primary;
+
+        private PlacedFormField Item => this.DataContext is PlacedFormField item ? item : default;
+
+        public FormInput() {
             this.InitializeComponent();
-            AutomationProperties.SetName(this, label);
+            this.DataContextChanged += (_, args) => {
+                this.Bindings.Update();
+                if (args.NewValue is PlacedFormField item) {
+                    AutomationProperties.SetName(this, $"{Localization.UiStrings.Get(item.Group.LabelKey)} {item.Field.Id}");
+                }
+            };
             this.PointerEntered += (_, _) => this.HoverLayer.Opacity = 1;
             this.PointerExited += (_, _) => this.HoverLayer.Opacity = 0;
         }
 
-        public UDK.WinUI.Grid.GridAddress FocusAddress(UDK.WinUI.Grid.GridAddress address) => new(this.Bounds.Column, this.Bounds.Bottom - 1);
-        public UDK.WinUI.Grid.GridArea FocusArea(UDK.WinUI.Grid.GridAddress address) => this.Bounds;
-
+        //
+        // IGridNavigationTarget
+        //
         public void SetActiveAddress(UDK.WinUI.Grid.GridAddress? address) {
             States.NavigationFocus.SetActive(this.FocusFrame, address.HasValue);
             this.IsTabStop = address.HasValue;
@@ -29,5 +37,9 @@ namespace PersonalEventsBuilder.Views.EventFormParts.Controls {
                 this.Focus(FocusState.Programmatic);
             }
         }
+
+        public UDK.WinUI.Grid.GridArea FocusArea(UDK.WinUI.Grid.GridAddress address) => this.Bounds;
+
+        public UDK.WinUI.Grid.GridAddress FocusAddress(UDK.WinUI.Grid.GridAddress address) => new(this.Bounds.Column, this.Bounds.Bottom - 1);
     }
 }

@@ -15,8 +15,14 @@
                 Background="{StaticResource WorkspaceDeepBrush}"
                 BorderBrush="{StaticResource GridLineBrush}"
                 BorderThickness="1">
-            <controls:PlaceholderLines VerticalAlignment="Top"
-                                       LineWidths="30,55" />
+            <Grid>
+                <controls:PlaceholderLines VerticalAlignment="Top"
+                                           LineWidths="30,55" />
+                <TextBlock Text="{x:Bind PreviewText, Mode=OneWay}"
+                           Foreground="{StaticResource WorkspaceTextBrush}"
+                           TextWrapping="Wrap"
+                           Visibility="{Binding DataVisibility, Source={StaticResource WorkspaceContentMode}}" />
+            </Grid>
         </Border>
     </Grid>
 </UserControl>

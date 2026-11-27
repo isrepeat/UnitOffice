@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using Windows.Foundation;
 using Microsoft.UI.Xaml;
@@ -9,6 +10,18 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace UDK.WinUI.Grid.Controls {
     public sealed partial class GridCanvas : UserControl, Navigation.INavigationSurface {
+        //
+        // INavigationSurface
+        //
+        GridArea Navigation.INavigationSurface.NavigationBounds => this.GridBounds;
+
+        IEnumerable<GridArea> Navigation.INavigationSurface.NavigationRegions => this.regions.Count == 0
+            ? new[] { this.GridBounds } : this.regions.Select(region => region.Bounds);
+
+        public GridLayout? GridLayout {
+            get => (GridLayout?)this.GetValue(GridLayoutProperty);
+            set => this.SetValue(GridLayoutProperty, value);
+        }
         public static readonly DependencyProperty GridLayoutProperty = DependencyProperty.Register(
             nameof(GridLayout),
             typeof(GridLayout),
@@ -16,24 +29,33 @@ namespace UDK.WinUI.Grid.Controls {
             new PropertyMetadata(null, OnLayoutChanged)
         );
 
-        public GridLayout? GridLayout {
-            get => (GridLayout?)this.GetValue(GridLayoutProperty);
-            set => this.SetValue(GridLayoutProperty, value);
+        public IEnumerable? ItemsSource {
+            get => (IEnumerable?)this.GetValue(ItemsSourceProperty);
+            set => this.SetValue(ItemsSourceProperty, value);
         }
+        public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(
+            nameof(ItemsSource), typeof(IEnumerable), typeof(GridCanvas),
+            new PropertyMetadata(null, (sender, _) => ((GridCanvas)sender).RebuildRegions()));
+
+        public DataTemplate? ItemTemplate {
+            get => (DataTemplate?)this.GetValue(ItemTemplateProperty);
+            set => this.SetValue(ItemTemplateProperty, value);
+        }
+        public static readonly DependencyProperty ItemTemplateProperty = DependencyProperty.Register(
+            nameof(ItemTemplate), typeof(DataTemplate), typeof(GridCanvas),
+            new PropertyMetadata(null, (sender, _) => ((GridCanvas)sender).RebuildRegions()));
+
+        private int LeftColumn => this.columnWindow.First;
 
         public bool CanScrollLeft => this.columnWindow.Slots > 0 && this.LeftColumn > 0;
-        public Visibility GridLinesVisibility {
-            get => this.Lines.Visibility;
-            set => this.Lines.Visibility = value;
-        }
 
         public bool CanScrollRight => this.columns is { } axis && this.columnWindow.Slots > 0 && this.LeftColumn + this.visibleColumns < axis.Count;
-        private double gridLeft => this.columnWindow.Left;
+
         private int visibleColumns => this.columnWindow.Count;
+
         internal int NavigationOrder => this.observedLayout?.NavigationOrder ?? 0;
-        private int LeftColumn => this.columnWindow.First;
-        internal GridArea GridBounds => this.visibleColumns > 0 && this.visibleRows > 0
-            ? new(0, 0, this.columns!.Count, this.rows!.Count) : default;
+
+        private double gridLeft => this.columnWindow.Left;
 
         private GridArea VisibleArea {
             get {
@@ -45,30 +67,34 @@ namespace UDK.WinUI.Grid.Controls {
             }
         }
 
-        GridArea Navigation.INavigationSurface.NavigationBounds => this.GridBounds;
-        IEnumerable<GridArea> Navigation.INavigationSurface.NavigationRegions => this.regions.Count == 0
-            ? new[] { this.GridBounds } : this.regions.Select(region => region.Bounds);
+        internal GridArea GridBounds => this.visibleColumns > 0 && this.visibleRows > 0
+            ? new(0, 0, this.columns!.Count, this.rows!.Count) : default;
 
-        internal event Action? ViewportChanged;
-        private readonly object columnViewport = new();
-        private readonly object rowViewport = new();
-        private GridLayout? observedLayout;
-        private GridAxis? columns;
-        private GridAxis? rows;
-        private double gridHeight;
-        private double surfaceX;
-        private GridAxis.ColumnWindow columnWindow;
+        public Visibility GridLinesVisibility {
+            get => this.Lines.Visibility;
+            set => this.Lines.Visibility = value;
+        }
+
         private int visibleRows;
-        private readonly List<IGridNavigationTarget> regions = [];
-        private GridAddress? activeAddress;
-        private IGridNavigationTarget? activeTarget;
-        private Rect drawingBounds;
-        private double displayColumn;
-        private double displayRow;
-        private uint? pointerId;
         private bool vertical;
+        private Rect drawingBounds;
+        private uint? pointerId;
+        private double surfaceX;
         private double lineIndex;
+        private double displayRow;
         private double grabOffset;
+        private double gridHeight;
+        private double displayColumn;
+        private GridAxis? rows;
+        private GridAxis? columns;
+        private GridLayout? observedLayout;
+        private GridAddress? activeAddress;
+        internal event Action? ViewportChanged;
+        private readonly object rowViewport = new();
+        private readonly object columnViewport = new();
+        private GridAxis.ColumnWindow columnWindow;
+        private IGridNavigationTarget? activeTarget;
+        private readonly List<IGridNavigationTarget> regions = [];
 
         public GridCanvas() {
             this.InitializeComponent();
@@ -140,13 +166,13 @@ namespace UDK.WinUI.Grid.Controls {
             this.UpdateTargets();
         }
 
-        internal void ReplaceRegions<T>(IReadOnlyList<T> replacements) where T : FrameworkElement, IGridNavigationTarget {
+        internal void ReplaceRegions<T>(IReadOnlyList<T> replacements) where T : FrameworkElement {
             var address = this.activeAddress;
             this.SetActiveAddress(null);
             this.Targets.Children.Clear();
             this.regions.Clear();
             foreach (var region in replacements) {
-                this.regions.Add(region);
+                this.regions.Add((IGridNavigationTarget)region);
                 this.Targets.Children.Add(region);
             }
             this.UpdateTargets();
@@ -178,6 +204,20 @@ namespace UDK.WinUI.Grid.Controls {
             int lastColumn = Math.Min(area.Right, area.Column + this.visibleColumns) - 1;
             this.ScrollColumns(area.Column < left ? area.Column - left : Math.Max(0, lastColumn - (left + this.visibleColumns - 1)));
             this.ScrollRows(firstRow < top ? firstRow - top : Math.Max(0, address.Row - (top + this.visibleRows - 1)));
+        }
+
+        private void RebuildRegions() {
+            var elements = new List<FrameworkElement>();
+            if (this.ItemTemplate is { } template && this.ItemsSource is { } source) {
+                foreach (var item in source) {
+                    if (template.LoadContent() is not FrameworkElement element || element is not IGridNavigationTarget) {
+                        throw new InvalidOperationException("ItemTemplate must create a FrameworkElement implementing IGridNavigationTarget.");
+                    }
+                    element.DataContext = item;
+                    elements.Add(element);
+                }
+            }
+            this.ReplaceRegions(elements);
         }
 
         private static void OnLayoutChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args) {

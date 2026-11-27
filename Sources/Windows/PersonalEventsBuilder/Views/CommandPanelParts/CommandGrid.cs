@@ -7,14 +7,17 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace PersonalEventsBuilder.Views.CommandPanelParts {
     public sealed class CommandGrid : Grid, UDK.WinUI.Navigation.IKeyboardNavigationArea, UDK.WinUI.Navigation.INavigationSurface {
+        //
+        // INavigationSurface
+        //
         UDK.WinUI.Grid.GridArea UDK.WinUI.Navigation.INavigationSurface.NavigationBounds =>
             new(0, 0, this.ColumnDefinitions.Count, this.RowDefinitions.Count);
 
-        private System.Collections.Generic.IEnumerable<Controls.PlaceholderButton> AvailableButtons =>
-            this.Children.OfType<Controls.PlaceholderButton>().Where(button => button.IsEnabled && button.Visibility == Visibility.Visible);
-
         System.Collections.Generic.IEnumerable<UDK.WinUI.Grid.GridArea> UDK.WinUI.Navigation.INavigationSurface.NavigationRegions =>
             this.AvailableButtons.Select(BoundsOf);
+
+        private System.Collections.Generic.IEnumerable<Controls.PlaceholderButton> AvailableButtons =>
+            this.Children.OfType<Controls.PlaceholderButton>().Where(button => button.IsEnabled && button.Visibility == Visibility.Visible);
 
         private bool moving;
         private Controls.PlaceholderButton? lastButton;
@@ -34,6 +37,9 @@ namespace PersonalEventsBuilder.Views.CommandPanelParts {
             };
         }
 
+        //
+        // IKeyboardNavigationArea
+        //
         public bool FocusArea() {
             var button = this.AvailableButtons.FirstOrDefault(item => item == this.lastButton) ?? this.AvailableButtons.FirstOrDefault();
             return button?.Focus(FocusState.Keyboard) == true;

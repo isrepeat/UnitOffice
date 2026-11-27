@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -14,37 +15,29 @@ namespace PersonalEventsBuilder.Views {
             new PropertyMetadata(null)
         );
 
-        public EventFormParts.ColumnRange? ColumnRange {
-            get => (EventFormParts.ColumnRange?)this.GetValue(ColumnRangeProperty);
-            set => this.SetValue(ColumnRangeProperty, value);
+        public IReadOnlyList<EventFormParts.FormColumn>? Columns {
+            get => (IReadOnlyList<EventFormParts.FormColumn>?)this.GetValue(ColumnsProperty);
+            set => this.SetValue(ColumnsProperty, value);
         }
-        public static readonly DependencyProperty ColumnRangeProperty = DependencyProperty.Register(
-            nameof(ColumnRange), typeof(EventFormParts.ColumnRange), typeof(CandidatesTable),
-            new PropertyMetadata(null, (sender, args) => {
-                if (!Equals(args.OldValue, args.NewValue)) {
-                    ((CandidatesTable)sender).UpdateRange();
-                }
-            }));
+        public static readonly DependencyProperty ColumnsProperty = DependencyProperty.Register(
+            nameof(Columns), typeof(IReadOnlyList<EventFormParts.FormColumn>), typeof(CandidatesTable),
+            new PropertyMetadata(null));
 
-        private readonly string[][] table;
+        public IReadOnlyList<IReadOnlyList<string>>? Rows {
+            get => (IReadOnlyList<IReadOnlyList<string>>?)this.GetValue(RowsProperty);
+            set => this.SetValue(RowsProperty, value);
+        }
+        public static readonly DependencyProperty RowsProperty = DependencyProperty.Register(
+            nameof(Rows), typeof(IReadOnlyList<IReadOnlyList<string>>), typeof(CandidatesTable), new PropertyMetadata(null));
 
         public CandidatesTable() {
             this.InitializeComponent();
-            this.table = [
-                [Localization.UiStrings.Get("Tr_WorkspacePerson"), Localization.UiStrings.Get("Tr_WorkspaceRank"),
-                    Localization.UiStrings.Get("Tr_WorkspaceDocumentNumber"), Localization.UiStrings.Get("Tr_WorkspaceDocumentDate")],
-                [Localization.UiStrings.Get("Tr_WorkspaceCandidateOne"), Localization.UiStrings.Get("Tr_WorkspaceRankOne"), "123/26", "20.11.2026"],
-                [Localization.UiStrings.Get("Tr_WorkspaceCandidateTwo"), Localization.UiStrings.Get("Tr_WorkspaceRankTwo"), "124/26", "21.11.2026"],
-            ];
             this.Surface.ViewportChanged += this.UpdateButtons;
             this.UpdateButtons();
         }
 
-        private void UpdateRange() {
-            CandidatesTableParts.Controls.CandidateGrid[] regions = this.ColumnRange is { Span: > 0 } range
-                ? [new CandidatesTableParts.Controls.CandidateGrid(range.Start, range.Span, this.table)] : [];
-            this.Surface.ReplaceRegions(regions);
-        }
+        private CandidatesTableParts.Controls.CandidateTableItem[] GetTableItems(IReadOnlyList<EventFormParts.FormColumn>? columns, IReadOnlyList<IReadOnlyList<string>>? rows) =>
+            columns is { Count: > 0 } ? [new(columns, rows ?? [])] : [];
 
         private void UpdateButtons() {
             this.Previous.IsEnabled = this.Surface.CanScrollLeft;

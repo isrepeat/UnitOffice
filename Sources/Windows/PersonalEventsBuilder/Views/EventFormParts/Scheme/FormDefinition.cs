@@ -46,6 +46,13 @@ namespace PersonalEventsBuilder.Views.EventFormParts.Scheme {
     }
 
     public sealed class FormField : DependencyObject {
+        public string? Value {
+            get => (string?)this.GetValue(ValueProperty);
+            set => this.SetValue(ValueProperty, value);
+        }
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(
+            nameof(Value), typeof(string), typeof(FormField), new PropertyMetadata(null));
+
         public int Width { get; set; } = 1;
 
         public int Height { get; set; } = 2;
@@ -59,6 +66,10 @@ namespace PersonalEventsBuilder.Views.EventFormParts.Scheme {
         public IList<FormModeDefinition> Modes { get; } = new List<FormModeDefinition>();
 
         internal static EventLayout CreateLayout(IReadOnlyList<FormGroup> groups) {
+            if (groups.Count == 0) {
+                return new EventLayout(Array.Empty<PlacedFormField>(), Array.Empty<FormColumn>());
+            }
+
             var primary = groups.Single(group => group.Placement == FormPlacement.Primary);
             var layout = new List<PlacedFormField>();
             var ids = new HashSet<string>(StringComparer.Ordinal);
@@ -121,7 +132,15 @@ namespace PersonalEventsBuilder.Views.EventFormParts.Scheme {
                     }
                 }
             }
-            return new EventLayout(layout.AsReadOnly(), new ColumnRange(left, right - left));
+            // Use the widest field at each horizontal position and exclude lower extensions.
+            var mainColumns = layout.Where(item => item.Group.Placement != FormPlacement.BelowField)
+                .GroupBy(item => item.Bounds.Column)
+                .OrderBy(group => group.Key)
+                .Select(group => group.OrderByDescending(item => item.Bounds.Width).First())
+                .Select(item => new FormColumn(item.Bounds.Column, item.Bounds.Width,
+                    item.Group == primary ? primary.Fields.IndexOf(item.Field) : null))
+                .ToArray();
+            return new EventLayout(layout.AsReadOnly(), Array.AsReadOnly(mainColumns));
         }
 
         private static int FindAvailableRow(List<PlacedFormField> layout, int column, int row, int width, int height) {

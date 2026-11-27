@@ -61,6 +61,7 @@
     <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\Strings\ru-RU\Resources.resw" Link="Localization\Strings\ru-RU\Resources.resw" />
     <PRIResource Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\Strings\uk-UA\Resources.resw" Link="Localization\Strings\uk-UA\Resources.resw" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Helpers\UserSettings.cs" Link="Helpers\UserSettings.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Helpers\PropertyChange.cs" Link="Helpers\PropertyChange.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\UiLanguage.cs" Link="Localization\UiLanguage.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Localization\UiStrings.cs" Link="Localization\UiStrings.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\MainWindow.xaml" Link="MainWindow.xaml" />
@@ -69,6 +70,7 @@
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\PlaceholderLines.xaml" Link="Controls\PlaceholderLines.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\PlaceholderLines.xaml.cs" Link="Controls\PlaceholderLines.xaml.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\States\NavigationFocus.cs" Link="States\NavigationFocus.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\States\WorkspaceContentMode.cs" Link="States\WorkspaceContentMode.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WindowTitleBar.xaml" Link="Controls\WindowTitleBar.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Controls\WindowTitleBar.xaml.cs" Link="Controls\WindowTitleBar.xaml.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Navigation\PageManager.cs" Link="Navigation\PageManager.cs" />

@@ -7,6 +7,9 @@ namespace PersonalEventsBuilder.Views {
             this.InitializeComponent();
         }
 
+        //
+        // IKeyboardNavigationArea
+        //
         public bool FocusArea() => this.Buttons.FocusArea();
 
         public void MoveFocus(VirtualKey direction) => this.Buttons.MoveFocus(direction);

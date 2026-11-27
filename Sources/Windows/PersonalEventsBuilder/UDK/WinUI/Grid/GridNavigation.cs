@@ -10,6 +10,9 @@ namespace UDK.WinUI.Grid {
         private readonly List<Controls.GridCanvas> surfaces = [];
         private readonly Navigation.NavigationCoordinator coordinator = new();
 
+        //
+        // IKeyboardNavigationArea
+        //
         public bool FocusArea() {
             if (this.lastSurface is { } previous && previous.GridBounds.Contains(this.coordinator.EntryCell)) {
                 this.Select(previous, this.coordinator.EntryCell, restore: true);

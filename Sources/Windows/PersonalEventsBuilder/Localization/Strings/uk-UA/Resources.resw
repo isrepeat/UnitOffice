@@ -17,9 +17,6 @@
   <data name="Tr_ModeStatusTreatmentLocation" xml:space="preserve"><value>Зміна місця лікування</value></data>
   <data name="Tr_ModeStatusExtendLeave" xml:space="preserve"><value>Продовження відпустки</value></data>
   <data name="Tr_ModeStatusOther" xml:space="preserve"><value>Інша зміна</value></data>
-  <data name="Tr_DemoAnnualLeavePreview" xml:space="preserve"><value>З 20 листопада 2026 року:
-Коваля Олексія — після щорічної відпустки.
-Підстава: рапорт № 42 від 20.11.2026.</value></data>
   <data name="Tr_PreviewPending" xml:space="preserve"><value>Попередній перегляд з’явиться після підключення шаблонів.</value></data>
   <data name="Tr_LoadDatabase" xml:space="preserve"><value>Завантажити базу</value></data>
   <data name="Tr_ReloadConfiguration" xml:space="preserve"><value>Оновити конфіг</value></data>
@@ -59,19 +56,11 @@
   <data name="Tr_WorkspaceDocumentDate" xml:space="preserve"><value>Дата документа</value></data>
   <data name="Tr_WorkspaceSummaryHeading.Text" xml:space="preserve"><value>Зведення</value></data>
   <data name="Tr_WorkspaceSummaryPreview" xml:space="preserve"><value>Підтвердьте кандидата клавішею Enter.</value></data>
-  <data name="Tr_WorkspaceCandidateOne" xml:space="preserve"><value>Коваль Олексій</value></data>
-  <data name="Tr_WorkspaceCandidateTwo" xml:space="preserve"><value>Мельник Андрій</value></data>
-  <data name="Tr_WorkspaceRankOne" xml:space="preserve"><value>солдат</value></data>
-  <data name="Tr_WorkspaceRankTwo" xml:space="preserve"><value>сержант</value></data>
   <data name="Tr_WorkspaceDestination" xml:space="preserve"><value>Місце</value></data>
   <data name="Tr_WorkspaceDepartureDate" xml:space="preserve"><value>Дата виїзду</value></data>
   <data name="Tr_WorkspaceNotes" xml:space="preserve"><value>Примітка</value></data>
   <data name="Tr_FormPrimary" xml:space="preserve"><value>Основна</value></data>
   <data name="Tr_FormExtension" xml:space="preserve"><value>Розширення</value></data>
-  <data name="Tr_PlaceholderButton1.Content" xml:space="preserve"><value>Кнопка 1</value></data>
-  <data name="Tr_PlaceholderButton2.Content" xml:space="preserve"><value>Кнопка 2</value></data>
-  <data name="Tr_PlaceholderButton3.Content" xml:space="preserve"><value>Кнопка 3</value></data>
-  <data name="Tr_PlaceholderButton4.Content" xml:space="preserve"><value>Кнопка 4</value></data>
   <data name="Tr_ExtendMedicalLeave.Text" xml:space="preserve"><value>Відпустка для лікування → відпустка для лікування</value></data>
   <data name="Tr_TreatmentToMedicalLeave.Text" xml:space="preserve"><value>Лікування → відпустка для лікування</value></data>
   <data name="Tr_MedicalLeaveToHospital.Text" xml:space="preserve"><value>Відпустка для лікування → лікування в лікарні</value></data>
@@ -93,4 +82,5 @@
   <data name="Tr_PaletteSlate.Content" xml:space="preserve"><value>Холодний сланець</value></data>
   <data name="Tr_PaletteBrightness.Header" xml:space="preserve"><value>Яскравість тла</value></data>
   <data name="Tr_CandidatesHeading.Text" xml:space="preserve"><value>Кандидати</value></data>
+  <data name="Tr_ShowPlaceholders.Content" xml:space="preserve"><value>Заглушки</value></data>
 </root>

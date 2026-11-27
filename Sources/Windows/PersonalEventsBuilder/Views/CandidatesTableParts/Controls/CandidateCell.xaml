@@ -15,6 +15,12 @@
                                        LineWidths="33"
                                        Visibility="Collapsed"
                                        AutomationProperties.Name="{Binding}" />
+            <TextBlock Margin="16,0"
+                       VerticalAlignment="Center"
+                       Foreground="{StaticResource WorkspaceTextBrush}"
+                       Text="{Binding}"
+                       TextTrimming="CharacterEllipsis"
+                       Visibility="{Binding DataVisibility, Source={StaticResource WorkspaceContentMode}}" />
             <Border x:Name="FocusFrame"
                     Style="{StaticResource ActiveEntityFrameStyle}"
                     Visibility="Collapsed" />

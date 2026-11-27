@@ -6,14 +6,13 @@ namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
     public sealed partial class CandidateCell : UserControl {
         public CandidateCell() {
             this.InitializeComponent();
-            this.DataContextChanged += (_, args) => this.Stroke.Visibility =
-                args.NewValue is string text && !string.IsNullOrWhiteSpace(text) ? Visibility.Visible : Visibility.Collapsed;
         }
 
         internal void SetSelected(bool isActive) => States.NavigationFocus.SetActive(this.FocusFrame, isActive);
 
-        internal void SetContent(string value, bool header) {
+        internal void SetContent(string value, bool header, bool showPlaceholder) {
             this.DataContext = value;
+            this.Stroke.Visibility = showPlaceholder ? Visibility.Visible : Visibility.Collapsed;
             this.Surface.Background = (Brush)Application.Current.Resources[header ? "CommandBrush" : "PanelBrush"];
         }
     }

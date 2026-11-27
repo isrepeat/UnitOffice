@@ -1,35 +1,20 @@
 <UserControl x:Class="PersonalEventsBuilder.Views.EventForm"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:udkGridControls="using:UDK.WinUI.Grid.Controls">
-    <UserControl.Resources>
-        <Style x:Key="PrimaryFieldStyle"
-               TargetType="Rectangle">
-            <Setter Property="Fill"
-                    Value="{StaticResource PrimaryFieldBrush}" />
-            <Setter Property="Stroke"
-                    Value="{StaticResource GridLineBrush}" />
-        </Style>
-        <Style x:Key="ExtensionFieldStyle"
-               TargetType="Rectangle">
-            <Setter Property="Fill"
-                    Value="{StaticResource LowerFieldBrush}" />
-            <Setter Property="Stroke"
-                    Value="{StaticResource GridLineBrush}" />
-        </Style>
-        <Style x:Key="SideExtensionFieldStyle"
-               TargetType="Rectangle">
-            <Setter Property="Fill"
-                    Value="{StaticResource SideFieldBrush}" />
-            <Setter Property="Stroke"
-                    Value="{StaticResource GridLineBrush}" />
-        </Style>
-    </UserControl.Resources>
+             xmlns:udkGridControls="using:UDK.WinUI.Grid.Controls"
+             xmlns:eventFormControls="using:PersonalEventsBuilder.Views.EventFormParts.Controls">
     <Grid RowDefinitions="Auto,*">
         <TextBlock Foreground="{StaticResource WorkspaceTextBrush}"
                    Text="Форма события" />
-        <udkGridControls:GridCanvas x:Name="Surface"
-                                    Grid.Row="1"
-                                    GridLayout="{x:Bind GridLayout, Mode=OneWay}" />
+        <udkGridControls:GridCanvas Grid.Row="1"
+                                    GridLayout="{x:Bind GridLayout, Mode=OneWay}"
+                                    GridLinesVisibility="Visible"
+                                    ItemsSource="{x:Bind Fields, Mode=OneWay}">
+            <udkGridControls:GridCanvas.ItemTemplate>
+                <DataTemplate>
+                    <eventFormControls:FormInput />
+                </DataTemplate>
+            </udkGridControls:GridCanvas.ItemTemplate>
+        </udkGridControls:GridCanvas>
     </Grid>
 </UserControl>
