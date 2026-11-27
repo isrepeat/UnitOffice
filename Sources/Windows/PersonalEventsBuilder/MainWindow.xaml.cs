@@ -1,12 +1,10 @@
 using System;
 using System.IO;
 using System.Security;
-
+using Windows.Graphics;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Windowing;
-
-using Windows.Graphics;
 
 namespace PersonalEventsBuilder {
     public sealed partial class MainWindow : Window {

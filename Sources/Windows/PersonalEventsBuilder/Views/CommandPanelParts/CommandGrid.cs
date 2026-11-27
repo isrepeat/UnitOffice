@@ -1,11 +1,9 @@
 using System.Linq;
-
+using Windows.System;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-
-using Windows.System;
+using Microsoft.UI.Xaml.Controls;
 
 namespace PersonalEventsBuilder.Views.CommandPanelParts {
     public sealed class CommandGrid : Grid, UDK.WinUI.Navigation.IKeyboardNavigationArea, UDK.WinUI.Navigation.INavigationSurface {

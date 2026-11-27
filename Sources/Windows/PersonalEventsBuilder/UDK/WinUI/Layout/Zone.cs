@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Markup;

@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.ComponentModel;
-
 using Microsoft.UI.Xaml.Input;
 
 namespace PersonalEventsBuilder.Pages.ViewModels {

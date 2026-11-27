@@ -1,5 +1,4 @@
 using System;
-
 using Microsoft.UI.Xaml;
 
 namespace UDK.WinUI.Grid {

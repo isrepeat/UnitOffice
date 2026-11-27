@@ -1,6 +1,5 @@
-using Microsoft.UI.Xaml.Controls;
-
 using Windows.System;
+using Microsoft.UI.Xaml.Controls;
 
 namespace PersonalEventsBuilder.Views {
     public sealed partial class CommandPanel : UserControl, UDK.WinUI.Navigation.IKeyboardNavigationArea {

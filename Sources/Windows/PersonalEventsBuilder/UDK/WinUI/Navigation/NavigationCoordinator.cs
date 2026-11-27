@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-
 using Windows.System;
 
 namespace UDK.WinUI.Navigation {

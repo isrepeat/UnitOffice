@@ -1,9 +1,7 @@
 using System.Linq;
 using System.Collections.Generic;
-
-using Microsoft.UI.Xaml;
-
 using Windows.System;
+using Microsoft.UI.Xaml;
 
 namespace UDK.WinUI.Grid {
     public sealed class GridNavigation : DependencyObject, UDK.WinUI.Navigation.IKeyboardNavigationArea {

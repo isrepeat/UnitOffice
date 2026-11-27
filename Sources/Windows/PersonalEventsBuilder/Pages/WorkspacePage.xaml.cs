@@ -1,13 +1,11 @@
 using System;
-
-using Microsoft.UI.Input;
+using Windows.UI.Core;
+using Windows.System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Controls;
-
-using Windows.System;
-using Windows.UI.Core;
+using Microsoft.UI.Input;
 
 namespace PersonalEventsBuilder.Pages {
     public sealed partial class WorkspacePage : Page {

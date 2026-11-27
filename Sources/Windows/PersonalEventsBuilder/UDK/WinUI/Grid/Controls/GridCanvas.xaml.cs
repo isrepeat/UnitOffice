@@ -1,13 +1,11 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-
+using Windows.Foundation;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Controls;
-
-using Windows.Foundation;
 
 namespace UDK.WinUI.Grid.Controls {
     public sealed partial class GridCanvas : UserControl, Navigation.INavigationSurface {

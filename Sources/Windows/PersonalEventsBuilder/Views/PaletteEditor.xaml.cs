@@ -1,13 +1,11 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-
+using Windows.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
-
-using Windows.UI;
 
 namespace PersonalEventsBuilder.Views {
     public sealed partial class PaletteEditor : UserControl {

@@ -1,11 +1,10 @@
 using System;
 using System.IO;
 using System.Security;
-
 using Microsoft.UI;
-using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Windowing;
 using Microsoft.Windows.AppLifecycle;
 
 using Color = Windows.UI.Color;
