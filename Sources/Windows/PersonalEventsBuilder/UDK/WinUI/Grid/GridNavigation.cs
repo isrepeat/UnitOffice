@@ -12,6 +12,28 @@ namespace UDK.WinUI.Grid {
         private GridCanvas? lastSurface;
         private readonly Navigation.NavigationCoordinator coordinator = new();
 
+        public bool FocusArea() {
+            if (this.lastSurface is { } previous && previous.GridBounds.Contains(this.coordinator.EntryCell)) {
+                this.Select(previous, this.coordinator.EntryCell, restore: true);
+                return this.activeSurface == previous;
+            }
+            foreach (var surface in this.surfaces.OrderBy(item => item.NavigationOrder)) {
+                if (this.coordinator.FindEntry(surface, forward: true) is { } first) {
+                    this.Select(surface, first);
+                    return this.activeSurface == surface;
+                }
+            }
+            return false;
+        }
+
+        public void MoveFocus(VirtualKey direction) {
+            if (this.activeSurface is { } surface) {
+                this.Move(surface, direction);
+            } else {
+                this.FocusArea();
+            }
+        }
+
         internal void Register(GridCanvas surface) => this.surfaces.Add(surface);
 
         internal void Remove(GridCanvas surface) {
@@ -45,28 +67,6 @@ namespace UDK.WinUI.Grid {
             }
             surface.Reveal(address);
             surface.SetActiveAddress(surface.ResolveAddress(address));
-        }
-
-        public bool FocusArea() {
-            if (this.lastSurface is { } previous && previous.GridBounds.Contains(this.coordinator.EntryCell)) {
-                this.Select(previous, this.coordinator.EntryCell, restore: true);
-                return this.activeSurface == previous;
-            }
-            foreach (var surface in this.surfaces.OrderBy(item => item.NavigationOrder)) {
-                if (this.coordinator.FindEntry(surface, forward: true) is { } first) {
-                    this.Select(surface, first);
-                    return this.activeSurface == surface;
-                }
-            }
-            return false;
-        }
-
-        public void MoveFocus(VirtualKey direction) {
-            if (this.activeSurface is { } surface) {
-                this.Move(surface, direction);
-            } else {
-                this.FocusArea();
-            }
         }
 
         internal bool Move(GridCanvas surface, VirtualKey key) {

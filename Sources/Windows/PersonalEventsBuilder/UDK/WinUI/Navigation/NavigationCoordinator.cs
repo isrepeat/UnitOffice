@@ -10,6 +10,7 @@ namespace UDK.WinUI.Navigation {
 
     internal sealed class NavigationCoordinator {
         public Grid.GridAddress EntryCell { get; private set; }
+
         private bool? lastMoveHorizontal;
         private int preferredIndex;
 
@@ -17,9 +18,6 @@ namespace UDK.WinUI.Navigation {
             this.EntryCell = address;
             this.lastMoveHorizontal = null;
         }
-
-        private int DesiredIndex(bool horizontal) => this.lastMoveHorizontal == horizontal
-            ? this.preferredIndex : horizontal ? this.EntryCell.Row : this.EntryCell.Column;
 
         public void CommitMove(Grid.GridAddress hit, VirtualKey key) {
             bool horizontal = key is VirtualKey.Left or VirtualKey.Right;
@@ -46,6 +44,9 @@ namespace UDK.WinUI.Navigation {
 
         public Grid.GridAddress? FindEntry(INavigationSurface surface, bool forward) =>
             this.Find(surface, surface.NavigationBounds, forward, alongColumns: false);
+
+        private int DesiredIndex(bool horizontal) => this.lastMoveHorizontal == horizontal
+            ? this.preferredIndex : horizontal ? this.EntryCell.Row : this.EntryCell.Column;
 
         private Grid.GridAddress? Find(INavigationSurface surface, Grid.GridArea search, bool forward, bool alongColumns) {
             if (search.IsEmpty) {

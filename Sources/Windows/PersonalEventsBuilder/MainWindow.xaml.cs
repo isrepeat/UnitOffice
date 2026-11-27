@@ -10,13 +10,13 @@ using Windows.Graphics;
 
 namespace PersonalEventsBuilder {
     public sealed partial class MainWindow : Window {
+        private static Navigation.PageManager PageManager => States.AppData.AppSessionState.PageManager;
+
         private const string WindowWidthValue = "WindowWidth";
         private const string WindowHeightValue = "WindowHeight";
         private const string WindowMaximizedValue = "WindowMaximized";
         private SizeInt32 restoredSize;
         private bool wasMaximized;
-
-        private static Navigation.PageManager PageManager => States.AppData.AppSessionState.PageManager;
 
         public MainWindow() {
             this.InitializeComponent();

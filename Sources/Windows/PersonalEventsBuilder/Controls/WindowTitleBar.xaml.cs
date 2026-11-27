@@ -46,6 +46,15 @@ namespace PersonalEventsBuilder.Controls {
             titleBar.ButtonPressedForegroundColor = Colors.White;
         }
 
+        internal void UpdateNavigationState(bool isWorkspace, bool canGoBack) {
+            this.LoadDatabaseItem.IsEnabled = false;
+            this.SaveEventItem.IsEnabled = false;
+            this.ReloadConfigurationItem.IsEnabled = false;
+            this.SettingsItem.IsEnabled = isWorkspace;
+            this.Caption.IsBackButtonVisible = canGoBack;
+            this.Caption.IsBackButtonEnabled = canGoBack;
+        }
+
         private void UpdateLanguageSelection() {
             var language = Localization.UiLanguage.Current;
             this.UkrainianLanguageItem.IsChecked = language == Localization.UiLanguage.Ukrainian;
@@ -93,15 +102,6 @@ namespace PersonalEventsBuilder.Controls {
 
         private void OnBackRequested(TitleBar sender, object args) {
             WindowTitleBar.PageManager.GoBack();
-        }
-
-        internal void UpdateNavigationState(bool isWorkspace, bool canGoBack) {
-            this.LoadDatabaseItem.IsEnabled = false;
-            this.SaveEventItem.IsEnabled = false;
-            this.ReloadConfigurationItem.IsEnabled = false;
-            this.SettingsItem.IsEnabled = isWorkspace;
-            this.Caption.IsBackButtonVisible = canGoBack;
-            this.Caption.IsBackButtonEnabled = canGoBack;
         }
 
         private void OnCloseWindowClick(object sender, RoutedEventArgs args) {

@@ -36,6 +36,8 @@ namespace PersonalEventsBuilder.Views {
             this.Profiles.SelectedItem = this.Profiles.Items.Contains(selected) ? selected : names[0];
         }
 
+        internal void FocusCloseButton() => this.CloseButton.Focus(FocusState.Keyboard);
+
         private bool LoadPalette(string value) {
             var parts = value.Split(',');
             bool legacy = parts.Length is 7 or 16;
@@ -59,8 +61,6 @@ namespace PersonalEventsBuilder.Views {
             this.Apply();
             return true;
         }
-
-        internal void FocusCloseButton() => this.CloseButton.Focus(FocusState.Keyboard);
 
         private string SerializePalette() {
             return $"v2,{((ComboBoxItem)this.Scheme.SelectedItem).Tag},{(int)this.Brightness.Value},{(int)this.Difference.Value},{(int)this.Lines.Value}";

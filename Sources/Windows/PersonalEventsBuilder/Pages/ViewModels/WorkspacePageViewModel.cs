@@ -6,19 +6,19 @@ using Microsoft.UI.Xaml.Input;
 
 namespace PersonalEventsBuilder.Pages.ViewModels {
     public sealed class WorkspacePageViewModel : INotifyPropertyChanged {
-        public event PropertyChangedEventHandler? PropertyChanged;
         public XamlUICommand SelectModeCommand { get; } = new();
-        private string? selectedMode;
-
-        public WorkspacePageViewModel() {
-            this.SelectModeCommand.ExecuteRequested += (_, args) => this.SelectMode(args.Parameter as string);
-        }
         public Views.EventFormParts.EventLayout EventLayout { get; private set; } = new(Array.Empty<Views.EventFormParts.PlacedFormField>(), new Views.EventFormParts.ColumnRange(0, 0));
-
-        private Views.EventFormParts.Scheme.FormDefinition formDefinition = new();
         public Views.EventFormParts.Scheme.FormDefinition FormDefinition {
             get => this.formDefinition;
             set => this.RebuildLayout(value, this.selectedMode);
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private string? selectedMode;
+        private Views.EventFormParts.Scheme.FormDefinition formDefinition = new();
+
+        public WorkspacePageViewModel() {
+            this.SelectModeCommand.ExecuteRequested += (_, args) => this.SelectMode(args.Parameter as string);
         }
 
         public void SelectMode(string? mode) {

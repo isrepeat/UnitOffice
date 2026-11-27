@@ -11,10 +11,6 @@ using Windows.Foundation;
 
 namespace UDK.WinUI.Grid {
     public sealed partial class GridCanvas : UserControl, Navigation.INavigationSurface {
-        public GridLayout? GridLayout {
-            get => (GridLayout?)this.GetValue(GridLayoutProperty);
-            set => this.SetValue(GridLayoutProperty, value);
-        }
         public static readonly DependencyProperty GridLayoutProperty = DependencyProperty.Register(
             nameof(GridLayout),
             typeof(GridLayout),
@@ -22,33 +18,25 @@ namespace UDK.WinUI.Grid {
             new PropertyMetadata(null, OnLayoutChanged)
         );
 
+        public GridLayout? GridLayout {
+            get => (GridLayout?)this.GetValue(GridLayoutProperty);
+            set => this.SetValue(GridLayoutProperty, value);
+        }
+
         public bool CanScrollLeft => this.columnWindow.Slots > 0 && this.LeftColumn > 0;
         public Visibility GridLinesVisibility {
             get => this.Lines.Visibility;
             set => this.Lines.Visibility = value;
         }
+
         public bool CanScrollRight => this.columns is { } axis && this.columnWindow.Slots > 0 && this.LeftColumn + this.visibleColumns < axis.Count;
-
-        internal event Action? ViewportChanged;
-        private readonly object columnViewport = new();
-        private readonly object rowViewport = new();
-        private GridLayout? observedLayout;
-        private GridAxis? columns;
-        private GridAxis? rows;
-        private double gridHeight;
-
-        private double surfaceX;
-        private GridAxis.ColumnWindow columnWindow;
         private double gridLeft => this.columnWindow.Left;
         private int visibleColumns => this.columnWindow.Count;
-        private int visibleRows;
         internal int NavigationOrder => this.observedLayout?.NavigationOrder ?? 0;
         private int LeftColumn => this.columnWindow.First;
-        private readonly List<IGridNavigationTarget> regions = [];
-        private GridAddress? activeAddress;
-        private IGridNavigationTarget? activeTarget;
         internal GridArea GridBounds => this.visibleColumns > 0 && this.visibleRows > 0
             ? new(0, 0, this.columns!.Count, this.rows!.Count) : default;
+
         private GridArea VisibleArea {
             get {
                 int left = (int)Math.Floor(this.displayColumn);
@@ -58,6 +46,24 @@ namespace UDK.WinUI.Grid {
                 return this.GridBounds.Intersect(new(left, top, right - left, bottom - top));
             }
         }
+
+        GridArea Navigation.INavigationSurface.NavigationBounds => this.GridBounds;
+        IEnumerable<GridArea> Navigation.INavigationSurface.NavigationRegions => this.regions.Count == 0
+            ? new[] { this.GridBounds } : this.regions.Select(region => region.Bounds);
+
+        internal event Action? ViewportChanged;
+        private readonly object columnViewport = new();
+        private readonly object rowViewport = new();
+        private GridLayout? observedLayout;
+        private GridAxis? columns;
+        private GridAxis? rows;
+        private double gridHeight;
+        private double surfaceX;
+        private GridAxis.ColumnWindow columnWindow;
+        private int visibleRows;
+        private readonly List<IGridNavigationTarget> regions = [];
+        private GridAddress? activeAddress;
+        private IGridNavigationTarget? activeTarget;
         private Rect drawingBounds;
         private double displayColumn;
         private double displayRow;
@@ -123,16 +129,65 @@ namespace UDK.WinUI.Grid {
             };
         }
 
+        public void ScrollColumns(int delta) => this.columns?.ScrollColumns(delta, this.columnWindow);
+
+        public void ScrollRows(int delta) => this.rows?.Scroll(delta, this.rows.Capacity(this.Surface.ActualHeight, 0));
+
+        internal void Register<T>(T region) where T : FrameworkElement, IGridNavigationTarget {
+            if (this.regions.Any(other => !region.Bounds.Intersect(other.Bounds).IsEmpty)) {
+                throw new ArgumentException("Grid regions must not overlap.", nameof(region));
+            }
+            this.regions.Add(region);
+            this.Targets.Children.Add(region);
+            this.UpdateTargets();
+        }
+
+        internal void ReplaceRegions<T>(IReadOnlyList<T> replacements) where T : FrameworkElement, IGridNavigationTarget {
+            var address = this.activeAddress;
+            this.SetActiveAddress(null);
+            this.Targets.Children.Clear();
+            this.regions.Clear();
+            foreach (var region in replacements) {
+                this.regions.Add(region);
+                this.Targets.Children.Add(region);
+            }
+            this.UpdateTargets();
+            if (address is { } previous) {
+                this.SetActiveAddress(this.ResolveAddress(previous));
+            }
+        }
+
+        internal GridAddress ResolveAddress(GridAddress hit) => this.Owner(hit)?.FocusAddress(hit) ?? hit;
+
+        internal GridArea FocusArea(GridAddress address) => this.Owner(address)?.FocusArea(address) ?? new(address.Column, address.Row, 1, 1);
+
+        internal void SetActiveAddress(GridAddress? address) {
+            var target = address is { } cell ? this.Owner(cell) : null;
+            if (this.activeTarget != target) {
+                this.activeTarget?.SetActiveAddress(null);
+            }
+            this.activeAddress = address;
+            this.activeTarget = target;
+            target?.SetActiveAddress(address);
+            this.UpdateCursor();
+        }
+
+        internal void Reveal(GridAddress address) {
+            var area = this.FocusArea(address);
+            int left = this.LeftColumn;
+            int top = this.rows!.FirstVisibleIndex;
+            int firstRow = Math.Max(area.Row, address.Row - this.visibleRows + 1);
+            int lastColumn = Math.Min(area.Right, area.Column + this.visibleColumns) - 1;
+            this.ScrollColumns(area.Column < left ? area.Column - left : Math.Max(0, lastColumn - (left + this.visibleColumns - 1)));
+            this.ScrollRows(firstRow < top ? firstRow - top : Math.Max(0, address.Row - (top + this.visibleRows - 1)));
+        }
+
         private static void OnLayoutChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args) {
             var gridCanvas = (GridCanvas)sender;
             if (gridCanvas.IsLoaded) {
                 gridCanvas.Observe(gridCanvas.GridLayout);
             }
         }
-
-        public void ScrollColumns(int delta) => this.columns?.ScrollColumns(delta, this.columnWindow);
-
-        public void ScrollRows(int delta) => this.rows?.Scroll(delta, this.rows.Capacity(this.Surface.ActualHeight, 0));
 
         private void Observe(GridLayout? layout) {
             if (this.observedLayout is { } previous) {
@@ -219,39 +274,7 @@ namespace UDK.WinUI.Grid {
             this.Lines.Data = geometry;
         }
 
-        internal void Register<T>(T region) where T : FrameworkElement, IGridNavigationTarget {
-            if (this.regions.Any(other => !region.Bounds.Intersect(other.Bounds).IsEmpty)) {
-                throw new ArgumentException("Grid regions must not overlap.", nameof(region));
-            }
-            this.regions.Add(region);
-            this.Targets.Children.Add(region);
-            this.UpdateTargets();
-        }
-
-        internal void ReplaceRegions<T>(IReadOnlyList<T> replacements) where T : FrameworkElement, IGridNavigationTarget {
-            var address = this.activeAddress;
-            this.SetActiveAddress(null);
-            this.Targets.Children.Clear();
-            this.regions.Clear();
-            foreach (var region in replacements) {
-                this.regions.Add(region);
-                this.Targets.Children.Add(region);
-            }
-            this.UpdateTargets();
-            if (address is { } previous) {
-                this.SetActiveAddress(this.ResolveAddress(previous));
-            }
-        }
-
         private IGridNavigationTarget? Owner(GridAddress address) => this.regions.FirstOrDefault(region => region.Bounds.Contains(address));
-
-        GridArea Navigation.INavigationSurface.NavigationBounds => this.GridBounds;
-        IEnumerable<GridArea> Navigation.INavigationSurface.NavigationRegions => this.regions.Count == 0
-            ? new[] { this.GridBounds } : this.regions.Select(region => region.Bounds);
-
-        internal GridAddress ResolveAddress(GridAddress hit) => this.Owner(hit)?.FocusAddress(hit) ?? hit;
-
-        internal GridArea FocusArea(GridAddress address) => this.Owner(address)?.FocusArea(address) ?? new(address.Column, address.Row, 1, 1);
 
         private GridAddress? FindNearestCell(GridArea search, GridAddress desired) {
             search = search.Intersect(this.GridBounds);
@@ -283,17 +306,6 @@ namespace UDK.WinUI.Grid {
                 }
             }
             return best;
-        }
-
-        internal void SetActiveAddress(GridAddress? address) {
-            var target = address is { } cell ? this.Owner(cell) : null;
-            if (this.activeTarget != target) {
-                this.activeTarget?.SetActiveAddress(null);
-            }
-            this.activeAddress = address;
-            this.activeTarget = target;
-            target?.SetActiveAddress(address);
-            this.UpdateCursor();
         }
 
         private void UpdateCursor() {
@@ -338,16 +350,6 @@ namespace UDK.WinUI.Grid {
                 args.Handled = true;
                 this.observedLayout!.Navigation.Select(this, address);
             }
-        }
-
-        internal void Reveal(GridAddress address) {
-            var area = this.FocusArea(address);
-            int left = this.LeftColumn;
-            int top = this.rows!.FirstVisibleIndex;
-            int firstRow = Math.Max(area.Row, address.Row - this.visibleRows + 1);
-            int lastColumn = Math.Min(area.Right, area.Column + this.visibleColumns) - 1;
-            this.ScrollColumns(area.Column < left ? area.Column - left : Math.Max(0, lastColumn - (left + this.visibleColumns - 1)));
-            this.ScrollRows(firstRow < top ? firstRow - top : Math.Max(0, address.Row - (top + this.visibleRows - 1)));
         }
 
         private void StartDrag(object sender, PointerRoutedEventArgs args) {

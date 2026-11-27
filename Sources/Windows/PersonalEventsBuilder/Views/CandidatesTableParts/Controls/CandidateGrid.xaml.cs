@@ -7,12 +7,13 @@ using Microsoft.UI.Xaml.Automation;
 
 namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
     internal sealed partial class CandidateGrid : UserControl, UDK.WinUI.Grid.IGridNavigationTarget, UDK.WinUI.Grid.IGridViewportContent {
+        public UDK.WinUI.Grid.GridArea Bounds { get; }
+
         private readonly string[][] values;
         private readonly int[] columnEdges;
         private readonly Dictionary<UDK.WinUI.Grid.GridAddress, CandidateCell> visibleCells = [];
         private readonly Stack<CandidateCell> recycledCells = new();
         private UDK.WinUI.Grid.GridAddress? active;
-        public UDK.WinUI.Grid.GridArea Bounds { get; }
 
         internal CandidateGrid(int column, int span, string[][] values) {
             this.values = values;
@@ -27,8 +28,6 @@ namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
             this.InitializeComponent();
         }
 
-        private int ColumnIndex(int column) => System.Array.FindIndex(this.columnEdges, edge => edge > column) - 1;
-
         public UDK.WinUI.Grid.GridArea FocusArea(UDK.WinUI.Grid.GridAddress address) {
             int index = this.ColumnIndex(address.Column);
             int start = this.columnEdges[index];
@@ -37,11 +36,6 @@ namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
 
         public UDK.WinUI.Grid.GridAddress FocusAddress(UDK.WinUI.Grid.GridAddress address) =>
             new(this.FocusArea(address).Column, address.Row);
-
-        private string ValueAt(UDK.WinUI.Grid.GridAddress address) {
-            int row = address.Row - this.Bounds.Row;
-            return row < this.values.Length ? this.values[row][this.ColumnIndex(address.Column)] : string.Empty;
-        }
 
         public void SetActiveAddress(UDK.WinUI.Grid.GridAddress? address) {
             if (this.active is { } previous && this.visibleCells.TryGetValue(previous, out var oldCell)) {
@@ -84,6 +78,13 @@ namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
                     column = area.Right;
                 }
             }
+        }
+
+        private int ColumnIndex(int column) => System.Array.FindIndex(this.columnEdges, edge => edge > column) - 1;
+
+        private string ValueAt(UDK.WinUI.Grid.GridAddress address) {
+            int row = address.Row - this.Bounds.Row;
+            return row < this.values.Length ? this.values[row][this.ColumnIndex(address.Column)] : string.Empty;
         }
     }
 }

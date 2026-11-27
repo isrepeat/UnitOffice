@@ -8,6 +8,13 @@ using Microsoft.UI.Xaml.Media;
 
 namespace UDK.WinUI.Grid {
     public sealed class GridAxis : DependencyObject {
+        public static readonly DependencyProperty StepProperty = DependencyProperty.Register(
+            nameof(Step),
+            typeof(double),
+            typeof(GridAxis),
+            new PropertyMetadata(48.0, (sender, _) => ((GridAxis)sender).UpdateViewport(stepChanged: true))
+        );
+
         public double Step {
             get => (double)this.GetValue(StepProperty);
             set {
@@ -17,12 +24,6 @@ namespace UDK.WinUI.Grid {
                 this.SetValue(StepProperty, value);
             }
         }
-        public static readonly DependencyProperty StepProperty = DependencyProperty.Register(
-            nameof(Step),
-            typeof(double),
-            typeof(GridAxis),
-            new PropertyMetadata(48.0, (sender, _) => ((GridAxis)sender).UpdateViewport(stepChanged: true))
-        );
 
         public int Count {
             get => this.count;
@@ -34,21 +35,19 @@ namespace UDK.WinUI.Grid {
                 }
             }
         }
+
         public int FirstVisibleIndex { get; private set; }
-
-        internal readonly record struct ColumnWindow(int First, int Count, double Left, int Slot, int Slots);
-
         internal double DisplayIndex { get; private set; }
-        private readonly Stopwatch animation = new();
-        private double animationStart;
-
         internal double Origin { get; private set; }
 
+        private readonly Stopwatch animation = new();
+        private double animationStart;
         private readonly Dictionary<object, (double Start, double End)> viewports = new();
         private int count = 1;
         private int previousCapacity;
         private double scrollPosition;
         internal event Action? Changed;
+        internal const double MinimumStep = 8;
 
         internal void SetViewport(object owner, double length, double start = 0) {
             if (length <= 0) {
@@ -62,24 +61,6 @@ namespace UDK.WinUI.Grid {
                 this.viewports[owner] = (start, start + length);
             }
             this.UpdateViewport();
-        }
-
-        private void UpdateViewport(bool stepChanged = false) {
-            // Центрируем сетку один раз в общем диапазоне участвующих поверхностей.
-            double start = this.viewports.Values.Select(viewport => viewport.Start).DefaultIfEmpty().Min();
-            double end = this.viewports.Values.Select(viewport => viewport.End).DefaultIfEmpty().Max();
-            double width = end - start;
-            int capacity = this.Capacity(width, 0);
-            this.Origin = start + (width - capacity * this.Step) / 2;
-            // Сохраняем половину ячейки между соседними шагами перетаскивания.
-            if (stepChanged && this.previousCapacity > 0 && capacity > 0) {
-                this.scrollPosition += (this.previousCapacity - capacity) / 2.0;
-            }
-            this.scrollPosition = Math.Clamp(this.scrollPosition, 0, Math.Max(0, this.Count - Math.Max(1, capacity)));
-            this.FirstVisibleIndex = (int)Math.Floor(this.scrollPosition);
-            this.StopAnimation();
-            this.previousCapacity = capacity;
-            this.Changed?.Invoke();
         }
 
         internal int Capacity(double length, double offset) =>
@@ -119,6 +100,24 @@ namespace UDK.WinUI.Grid {
             this.SetScrollIndex(index);
         }
 
+        private void UpdateViewport(bool stepChanged = false) {
+            // Центрируем сетку один раз в общем диапазоне участвующих поверхностей.
+            double start = this.viewports.Values.Select(viewport => viewport.Start).DefaultIfEmpty().Min();
+            double end = this.viewports.Values.Select(viewport => viewport.End).DefaultIfEmpty().Max();
+            double width = end - start;
+            int capacity = this.Capacity(width, 0);
+            this.Origin = start + (width - capacity * this.Step) / 2;
+            // Сохраняем половину ячейки между соседними шагами перетаскивания.
+            if (stepChanged && this.previousCapacity > 0 && capacity > 0) {
+                this.scrollPosition += (this.previousCapacity - capacity) / 2.0;
+            }
+            this.scrollPosition = Math.Clamp(this.scrollPosition, 0, Math.Max(0, this.Count - Math.Max(1, capacity)));
+            this.FirstVisibleIndex = (int)Math.Floor(this.scrollPosition);
+            this.StopAnimation();
+            this.previousCapacity = capacity;
+            this.Changed?.Invoke();
+        }
+
         private void SetScrollIndex(int index) {
             if (index != this.FirstVisibleIndex) {
                 this.scrollPosition = index;
@@ -149,6 +148,6 @@ namespace UDK.WinUI.Grid {
             this.DisplayIndex = this.FirstVisibleIndex;
         }
 
-        internal const double MinimumStep = 8;
+        internal readonly record struct ColumnWindow(int First, int Count, double Left, int Slot, int Slots);
     }
 }

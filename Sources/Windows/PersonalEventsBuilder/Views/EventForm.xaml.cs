@@ -6,10 +6,6 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace PersonalEventsBuilder.Views {
     public sealed partial class EventForm : UserControl {
-        public UDK.WinUI.Grid.GridLayout? GridLayout {
-            get => (UDK.WinUI.Grid.GridLayout?)this.GetValue(GridLayoutProperty);
-            set => this.SetValue(GridLayoutProperty, value);
-        }
         public static readonly DependencyProperty GridLayoutProperty = DependencyProperty.Register(
             nameof(GridLayout),
             typeof(UDK.WinUI.Grid.GridLayout),
@@ -17,20 +13,26 @@ namespace PersonalEventsBuilder.Views {
             new PropertyMetadata(null, (sender, _) => ((EventForm)sender).UpdateGridSize())
         );
 
-        private int requiredRows;
-        private int requiredColumns;
+        public static readonly DependencyProperty FieldsProperty = DependencyProperty.Register(
+            nameof(Fields), typeof(IReadOnlyList<EventFormParts.PlacedFormField>), typeof(EventForm),
+            new PropertyMetadata(null, (sender, _) => ((EventForm)sender).UpdateFields()));
 
-        public EventForm() {
-            this.InitializeComponent();
+        public UDK.WinUI.Grid.GridLayout? GridLayout {
+            get => (UDK.WinUI.Grid.GridLayout?)this.GetValue(GridLayoutProperty);
+            set => this.SetValue(GridLayoutProperty, value);
         }
 
         public IReadOnlyList<EventFormParts.PlacedFormField> Fields {
             get => (IReadOnlyList<EventFormParts.PlacedFormField>)this.GetValue(FieldsProperty);
             set => this.SetValue(FieldsProperty, value);
         }
-        public static readonly DependencyProperty FieldsProperty = DependencyProperty.Register(
-            nameof(Fields), typeof(IReadOnlyList<EventFormParts.PlacedFormField>), typeof(EventForm),
-            new PropertyMetadata(null, (sender, _) => ((EventForm)sender).UpdateFields()));
+
+        private int requiredRows;
+        private int requiredColumns;
+
+        public EventForm() {
+            this.InitializeComponent();
+        }
 
         private void UpdateFields() {
             var inputs = new List<EventFormParts.Controls.FormInput>();

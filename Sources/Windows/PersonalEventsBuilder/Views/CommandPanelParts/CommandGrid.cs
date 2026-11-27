@@ -9,6 +9,15 @@ using Windows.System;
 
 namespace PersonalEventsBuilder.Views.CommandPanelParts {
     public sealed class CommandGrid : Grid, UDK.WinUI.Navigation.IKeyboardNavigationArea, UDK.WinUI.Navigation.INavigationSurface {
+        private System.Collections.Generic.IEnumerable<Controls.PlaceholderButton> AvailableButtons =>
+            this.Children.OfType<Controls.PlaceholderButton>().Where(button => button.IsEnabled && button.Visibility == Visibility.Visible);
+
+        UDK.WinUI.Grid.GridArea UDK.WinUI.Navigation.INavigationSurface.NavigationBounds =>
+            new(0, 0, this.ColumnDefinitions.Count, this.RowDefinitions.Count);
+
+        System.Collections.Generic.IEnumerable<UDK.WinUI.Grid.GridArea> UDK.WinUI.Navigation.INavigationSurface.NavigationRegions =>
+            this.AvailableButtons.Select(BoundsOf);
+
         private Controls.PlaceholderButton? lastButton;
         private readonly UDK.WinUI.Navigation.NavigationCoordinator coordinator = new();
         private bool moving;
@@ -27,14 +36,32 @@ namespace PersonalEventsBuilder.Views.CommandPanelParts {
             };
         }
 
-        private System.Collections.Generic.IEnumerable<Controls.PlaceholderButton> AvailableButtons =>
-            this.Children.OfType<Controls.PlaceholderButton>().Where(button => button.IsEnabled && button.Visibility == Visibility.Visible);
+        public bool FocusArea() {
+            var button = this.AvailableButtons.FirstOrDefault(item => item == this.lastButton) ?? this.AvailableButtons.FirstOrDefault();
+            return button?.Focus(FocusState.Keyboard) == true;
+        }
 
-        UDK.WinUI.Grid.GridArea UDK.WinUI.Navigation.INavigationSurface.NavigationBounds =>
-            new(0, 0, this.ColumnDefinitions.Count, this.RowDefinitions.Count);
-
-        System.Collections.Generic.IEnumerable<UDK.WinUI.Grid.GridArea> UDK.WinUI.Navigation.INavigationSurface.NavigationRegions =>
-            this.AvailableButtons.Select(BoundsOf);
+        public void MoveFocus(VirtualKey direction) {
+            if (FocusManager.GetFocusedElement(this.XamlRoot) is not Button current || !this.Children.Contains(current)) {
+                this.FocusArea();
+                return;
+            }
+            var area = BoundsOf(current);
+            if (this.coordinator.FindNext(this, area, direction) is not { } hit) {
+                return;
+            }
+            var next = this.AvailableButtons.First(button => BoundsOf(button).Contains(hit));
+            this.moving = true;
+            try {
+                if (next.Focus(FocusState.Keyboard)) {
+                    this.Select(next);
+                    this.coordinator.CommitMove(hit, direction);
+                    next.StartBringIntoView();
+                }
+            } finally {
+                this.moving = false;
+            }
+        }
 
         private static UDK.WinUI.Grid.GridArea BoundsOf(FrameworkElement button) =>
             new(GetColumn(button), GetRow(button), GetColumnSpan(button), GetRowSpan(button));
@@ -76,33 +103,6 @@ namespace PersonalEventsBuilder.Views.CommandPanelParts {
             }
             this.Select(button);
             this.coordinator.Remember(BoundsOf(button).Closest(new(column, row)));
-        }
-
-        public bool FocusArea() {
-            var button = this.AvailableButtons.FirstOrDefault(item => item == this.lastButton) ?? this.AvailableButtons.FirstOrDefault();
-            return button?.Focus(FocusState.Keyboard) == true;
-        }
-
-        public void MoveFocus(VirtualKey direction) {
-            if (FocusManager.GetFocusedElement(this.XamlRoot) is not Button current || !this.Children.Contains(current)) {
-                this.FocusArea();
-                return;
-            }
-            var area = BoundsOf(current);
-            if (this.coordinator.FindNext(this, area, direction) is not { } hit) {
-                return;
-            }
-            var next = this.AvailableButtons.First(button => BoundsOf(button).Contains(hit));
-            this.moving = true;
-            try {
-                if (next.Focus(FocusState.Keyboard)) {
-                    this.Select(next);
-                    this.coordinator.CommitMove(hit, direction);
-                    next.StartBringIntoView();
-                }
-            } finally {
-                this.moving = false;
-            }
         }
     }
 }

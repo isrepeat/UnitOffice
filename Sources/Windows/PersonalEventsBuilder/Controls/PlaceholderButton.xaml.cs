@@ -11,13 +11,13 @@ namespace PersonalEventsBuilder.Controls {
             set => this.SetValue(PlaceholderLines_LineWidthsProperty, value);
         }
 
+        private Border? focusFrame;
+        private bool isActive;
+
         public PlaceholderButton() {
             this.InitializeComponent();
             this.Click += (_, _) => this.Focus(FocusState.Programmatic);
         }
-
-        private Border? focusFrame;
-        private bool isActive;
 
         protected override void OnApplyTemplate() {
             base.OnApplyTemplate();
