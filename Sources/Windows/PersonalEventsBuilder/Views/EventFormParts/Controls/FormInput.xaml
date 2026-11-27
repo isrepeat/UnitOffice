@@ -2,8 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 
              UseSystemFocusVisuals="False"
-             xmlns:controls="using:PersonalEventsBuilder.Controls"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:PersonalEventsBuilder.Controls"
              IsTabStop="False">
     <Grid Margin="3">
         <Rectangle Style="{x:Bind FieldStyle}" />

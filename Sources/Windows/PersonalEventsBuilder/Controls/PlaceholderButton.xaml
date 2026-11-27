@@ -1,19 +1,19 @@
 <Button x:Class="PersonalEventsBuilder.Controls.PlaceholderButton"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:controls="using:PersonalEventsBuilder.Controls"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        UseSystemFocusVisuals="False"
+        xmlns:controls="using:PersonalEventsBuilder.Controls"
         MinWidth="0"
         Height="36"
         Padding="2,0"
-        HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch"
-        HorizontalContentAlignment="Center"
+        HorizontalAlignment="Stretch"
         VerticalContentAlignment="Center"
+        HorizontalContentAlignment="Center"
         Background="{StaticResource CommandBrush}"
-        BorderBrush="{StaticResource ZoneSplitterBrush}"
         Foreground="{StaticResource CommandTextBrush}"
-        CornerRadius="0">
+        BorderBrush="{StaticResource ZoneSplitterBrush}"
+        CornerRadius="0"
+        UseSystemFocusVisuals="False">
     <Button.Template>
         <ControlTemplate TargetType="controls:PlaceholderButton">
             <Grid>
@@ -21,30 +21,30 @@
                     <VisualStateGroup x:Name="CommonStates">
                         <VisualState x:Name="Normal">
                             <VisualState.Setters>
-                                <Setter Target="HoverLayer.Opacity"
-                                        Value="0" />
+                                <Setter Value="0"
+                                        Target="HoverLayer.Opacity" />
                             </VisualState.Setters>
                         </VisualState>
                         <VisualState x:Name="PointerOver">
                             <VisualState.Setters>
-                                <Setter Target="HoverLayer.Opacity"
-                                        Value="1" />
+                                <Setter Value="1"
+                                        Target="HoverLayer.Opacity" />
                             </VisualState.Setters>
                         </VisualState>
                         <VisualState x:Name="Pressed">
                             <VisualState.Setters>
-                                <Setter Target="HoverLayer.Opacity"
-                                        Value="0" />
-                                <Setter Target="Presenter.Background"
-                                        Value="{StaticResource LowerFieldBrush}" />
+                                <Setter Value="0"
+                                        Target="HoverLayer.Opacity" />
+                                <Setter Value="{StaticResource LowerFieldBrush}"
+                                        Target="Presenter.Background" />
                             </VisualState.Setters>
                         </VisualState>
                         <VisualState x:Name="Disabled">
                             <VisualState.Setters>
-                                <Setter Target="HoverLayer.Opacity"
-                                        Value="0" />
-                                <Setter Target="Presenter.Background"
-                                        Value="{ThemeResource ButtonBackgroundDisabled}" />
+                                <Setter Value="0"
+                                        Target="HoverLayer.Opacity" />
+                                <Setter Value="{ThemeResource ButtonBackgroundDisabled}"
+                                        Target="Presenter.Background" />
                             </VisualState.Setters>
                         </VisualState>
                     </VisualStateGroup>
@@ -54,17 +54,17 @@
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}">
                     <Grid Margin="12,0">
-                        <ContentPresenter Content="{TemplateBinding Content}"
-                                          Opacity="0"
+                        <ContentPresenter Opacity="0"
+                                          Content="{TemplateBinding Content}"
                                           IsHitTestVisible="False" />
-                        <controls:PlaceholderLines LineWidths="{TemplateBinding PlaceholderLines_LineWidths}"
+                        <controls:PlaceholderLines Opacity="0.65"
                                                    Foreground="{TemplateBinding Foreground}"
-                                                   Opacity="0.65" />
+                                                   LineWidths="{TemplateBinding PlaceholderLines_LineWidths}" />
                     </Grid>
                 </Border>
                 <Border x:Name="HoverLayer"
-                        OpacityTransition="{StaticResource HoverTransition}"
-                        Style="{StaticResource HoverLayerStyle}" />
+                        Style="{StaticResource HoverLayerStyle}"
+                        OpacityTransition="{StaticResource HoverTransition}" />
                 <Border x:Name="FocusFrame"
                         Style="{StaticResource ActiveEntityFrameStyle}"
                         Visibility="Collapsed" />

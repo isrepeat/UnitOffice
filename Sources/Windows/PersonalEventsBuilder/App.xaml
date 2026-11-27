@@ -32,38 +32,38 @@
                               Duration="0:0:0.14" />
             <Style x:Key="HoverLayerStyle"
                    TargetType="Border">
-                <Setter Property="Background"
-                        Value="{StaticResource HoverOverlayBrush}" />
-                <Setter Property="IsHitTestVisible"
-                        Value="False" />
-                <Setter Property="Opacity"
-                        Value="0" />
+                <Setter Value="{StaticResource HoverOverlayBrush}"
+                        Property="Background" />
+                <Setter Value="False"
+                        Property="IsHitTestVisible" />
+                <Setter Value="0"
+                        Property="Opacity" />
             </Style>
 
             <Style x:Key="ActiveEntityFrameStyle"
                    TargetType="Border">
-                <Setter Property="BorderBrush"
-                        Value="{StaticResource WorkspaceAccentBrush}" />
-                <Setter Property="BorderThickness"
-                        Value="2" />
-                <Setter Property="IsHitTestVisible"
-                        Value="False" />
+                <Setter Value="{StaticResource WorkspaceAccentBrush}"
+                        Property="BorderBrush" />
+                <Setter Value="2"
+                        Property="BorderThickness" />
+                <Setter Value="False"
+                        Property="IsHitTestVisible" />
             </Style>
             <Style x:Key="WorkspacePageStyle"
                    TargetType="Page">
-                <Setter Property="Background"
-                        Value="{StaticResource WorkspaceBackgroundBrush}" />
-                <Setter Property="Foreground"
-                        Value="{StaticResource WorkspaceTextBrush}" />
-                <Setter Property="RequestedTheme"
-                        Value="Dark" />
+                <Setter Value="{StaticResource WorkspaceBackgroundBrush}"
+                        Property="Background" />
+                <Setter Value="{StaticResource WorkspaceTextBrush}"
+                        Property="Foreground" />
+                <Setter Value="Dark"
+                        Property="RequestedTheme" />
             </Style>
             <Style x:Key="ZoneLabelStyle"
                    TargetType="TextBlock">
-                <Setter Property="HorizontalAlignment"
-                        Value="Center" />
-                <Setter Property="VerticalAlignment"
-                        Value="Center" />
+                <Setter Value="Center"
+                        Property="HorizontalAlignment" />
+                <Setter Value="Center"
+                        Property="VerticalAlignment" />
             </Style>
             <SolidColorBrush x:Key="GridLineBrush"
                              Color="#3F3B36" />
@@ -73,8 +73,8 @@
                              Color="#4A4641" />
             <Style x:Key="ZoneSplitterStyle"
                    TargetType="Thumb">
-                <Setter Property="Background"
-                        Value="{StaticResource ZoneSplitterBrush}" />
+                <Setter Value="{StaticResource ZoneSplitterBrush}"
+                        Property="Background" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Thumb">
@@ -84,23 +84,23 @@
                                         <VisualState x:Name="Normal" />
                                         <VisualState x:Name="PointerOver">
                                             <VisualState.Setters>
-                                                <Setter Target="Highlight.Opacity"
-                                                        Value="1" />
+                                                <Setter Value="1"
+                                                        Target="Highlight.Opacity" />
                                             </VisualState.Setters>
                                         </VisualState>
                                         <VisualState x:Name="Pressed">
                                             <VisualState.Setters>
-                                                <Setter Target="Highlight.Opacity"
-                                                        Value="1" />
+                                                <Setter Value="1"
+                                                        Target="Highlight.Opacity" />
                                             </VisualState.Setters>
                                         </VisualState>
                                         <VisualState x:Name="Disabled" />
                                     </VisualStateGroup>
                                 </VisualStateManager.VisualStateGroups>
                                 <Border x:Name="Highlight"
+                                        Opacity="0"
                                         Background="{StaticResource ZoneSplitterHoverBrush}"
-                                        IsHitTestVisible="False"
-                                        Opacity="0" />
+                                        IsHitTestVisible="False" />
                             </Grid>
                         </ControlTemplate>
                     </Setter.Value>
@@ -108,10 +108,10 @@
             </Style>
             <Style x:Key="ZonePanelStyle"
                    TargetType="Border">
-                <Setter Property="Margin"
-                        Value="5" />
-                <Setter Property="Background"
-                        Value="{StaticResource PanelBrush}" />
+                <Setter Value="5"
+                        Property="Margin" />
+                <Setter Value="{StaticResource PanelBrush}"
+                        Property="Background" />
             </Style>
         </ResourceDictionary>
     </Application.Resources>

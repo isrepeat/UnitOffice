@@ -1,10 +1,15 @@
-<UserControl x:Class="UDK.WinUI.Grid.GridCanvas"
+<UserControl x:Class="UDK.WinUI.Grid.Controls.GridCanvas"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             UseSystemFocusVisuals="False"
-             IsTabStop="True">
+             IsTabStop="True"
+             UseSystemFocusVisuals="False">
     <Grid x:Name="Surface"
           Background="Transparent">
+        <Grid.Resources>
+            <DataTemplate x:Key="ColumnLabelTemplate">
+                <TextBlock Text="{Binding}" />
+            </DataTemplate>
+        </Grid.Resources>
         <Canvas>
             <Canvas.Clip>
                 <RectangleGeometry x:Name="ViewportClip" />
@@ -17,8 +22,8 @@
             <Border x:Name="Cursor"
                     BorderBrush="{StaticResource WorkspaceAccentBrush}"
                     BorderThickness="2"
-                    IsHitTestVisible="False"
-                    Visibility="Collapsed" />
+                    Visibility="Collapsed"
+                    IsHitTestVisible="False" />
             <Canvas x:Name="Labels"
                     IsHitTestVisible="False" />
         </Canvas>

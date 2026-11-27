@@ -1,11 +1,11 @@
 <UserControl x:Class="PersonalEventsBuilder.Controls.PlaceholderLines"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             IsTabStop="False"
-             IsHitTestVisible="False"
              VerticalAlignment="Center"
+             Opacity="0.32"
              Foreground="{StaticResource WorkspaceTextBrush}"
-             Opacity="0.32">
+             IsTabStop="False"
+             IsHitTestVisible="False">
     <UserControl.Resources>
         <DataTemplate x:Key="LineTemplate">
             <Grid ColumnDefinitions="*,*">

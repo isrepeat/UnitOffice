@@ -1,11 +1,11 @@
 <UserControl x:Class="PersonalEventsBuilder.Views.WordPreview"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:controls="using:PersonalEventsBuilder.Controls"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:PersonalEventsBuilder.Controls"
              IsTabStop="False">
     <Grid Margin="7"
-          RowDefinitions="Auto,*"
-          RowSpacing="4">
+          RowSpacing="4"
+          RowDefinitions="Auto,*">
         <TextBlock x:Uid="Tr_WordPreviewHeading"
                    HorizontalAlignment="Left"
                    FontWeight="SemiBold"
@@ -15,8 +15,8 @@
                 Background="{StaticResource WorkspaceDeepBrush}"
                 BorderBrush="{StaticResource GridLineBrush}"
                 BorderThickness="1">
-            <controls:PlaceholderLines LineWidths="30,55"
-                                       VerticalAlignment="Top" />
+            <controls:PlaceholderLines VerticalAlignment="Top"
+                                       LineWidths="30,55" />
         </Border>
     </Grid>
 </UserControl>

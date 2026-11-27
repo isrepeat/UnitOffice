@@ -2,44 +2,47 @@ using System;
 using System.Linq;
 
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 
 using XamlGrid = Microsoft.UI.Xaml.Controls.Grid;
 
-namespace UDK.WinUI.Layout {
+namespace UDK.WinUI.Layout.Controls {
     [ContentProperty(Name = nameof(Root))]
-    public sealed class WorkspaceHost : UserControl {
+    public sealed partial class WorkspaceHost : UserControl {
         public Zone? Root { get; set; }
 
         public WorkspaceHost() {
+            this.InitializeComponent();
             this.Loaded += (_, _) => {
-                if (this.Content is null && this.Root is { } root) {
-                    this.Content = Build(root);
+                if (this.ZonePresenter.Child is null && this.Root is { } root) {
+                    this.ZonePresenter.Child = this.Build(root);
                 }
             };
         }
 
-        private static FrameworkElement Build(Zone zone) {
+        private FrameworkElement Build(Zone zone) {
             if (zone.Style is { } || zone.Background is { } || zone.Items.Count == 1 && zone.Items[0] is FrameworkElement) {
-                var border = new Border { Style = zone.Style };
+                var border = this.CreateElement<Border>("ZoneFrame");
+                if (zone.Style is { } style) {
+                    border.Style = style;
+                }
                 if (zone.Background is { } background) {
                     border.Background = background;
                 }
-                border.Child = BuildContent(zone);
+                border.Child = this.BuildContent(zone);
                 return border;
             }
-            return BuildContent(zone);
+            return this.BuildContent(zone);
         }
 
-        private static FrameworkElement BuildContent(Zone zone) {
+        private FrameworkElement BuildContent(Zone zone) {
             if (zone.Items.Count == 1 && zone.Items[0] is FrameworkElement content) {
                 return content;
             }
 
-            var grid = new XamlGrid();
+            var grid = this.CreateElement<XamlGrid>("ZoneGrid");
             var columns = zone.Direction == ZoneDirection.Columns;
             Splitter? pending = null;
             foreach (var item in zone.Items) {
@@ -59,12 +62,9 @@ namespace UDK.WinUI.Layout {
                     AddTrack(grid, columns, new GridLength(zone.Spacing), 0, double.PositiveInfinity);
                     FrameworkElement separator;
                     if (pending is null) {
-                        separator = new Border {
-                            Background = (Brush)Application.Current.Resources["ZoneSplitterBrush"],
-                            IsHitTestVisible = false,
-                        };
+                        separator = this.CreateElement<Border>("Gap");
                     } else {
-                        var thumb = CreateSplitter(grid, columns, index);
+                        var thumb = this.CreateSplitter(grid, columns, index);
                         if (pending.Style is { } style) {
                             thumb.Style = style;
                         }
@@ -75,7 +75,7 @@ namespace UDK.WinUI.Layout {
                 }
 
                 AddTrack(grid, columns, child.Size, child.MinSize, child.MaxSize);
-                Place(grid, Build(child), columns, index);
+                Place(grid, this.Build(child), columns, index);
             }
             if (pending is not null) {
                 throw new InvalidOperationException("A splitter must be followed by a zone.");
@@ -100,13 +100,11 @@ namespace UDK.WinUI.Layout {
             grid.Children.Add(element);
         }
 
-        private static Thumb CreateSplitter(XamlGrid grid, bool columns, int index) {
-            var thumb = new Thumb {
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch,
-                MinWidth = 0,
-                MinHeight = 0,
-            };
+        private T CreateElement<T>(string key) where T : FrameworkElement =>
+            (T)((DataTemplate)this.ZonePresenter.Resources[key]).LoadContent();
+
+        private Thumb CreateSplitter(XamlGrid grid, bool columns, int index) {
+            var thumb = this.CreateElement<Thumb>("DragHandle");
             double[] initial = [];
             GridLength[] sizes = [];
             double offset = 0;

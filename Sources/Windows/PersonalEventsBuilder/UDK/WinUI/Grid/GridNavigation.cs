@@ -7,9 +7,9 @@ using Windows.System;
 
 namespace UDK.WinUI.Grid {
     public sealed class GridNavigation : DependencyObject, UDK.WinUI.Navigation.IKeyboardNavigationArea {
-        private readonly List<GridCanvas> surfaces = [];
-        private GridCanvas? activeSurface;
-        private GridCanvas? lastSurface;
+        private readonly List<Controls.GridCanvas> surfaces = [];
+        private Controls.GridCanvas? activeSurface;
+        private Controls.GridCanvas? lastSurface;
         private readonly Navigation.NavigationCoordinator coordinator = new();
 
         public bool FocusArea() {
@@ -34,9 +34,9 @@ namespace UDK.WinUI.Grid {
             }
         }
 
-        internal void Register(GridCanvas surface) => this.surfaces.Add(surface);
+        internal void Register(Controls.GridCanvas surface) => this.surfaces.Add(surface);
 
-        internal void Remove(GridCanvas surface) {
+        internal void Remove(Controls.GridCanvas surface) {
             this.surfaces.Remove(surface);
             this.Release(surface);
             if (this.lastSurface == surface) {
@@ -44,14 +44,14 @@ namespace UDK.WinUI.Grid {
             }
         }
 
-        internal void Release(GridCanvas surface) {
+        internal void Release(Controls.GridCanvas surface) {
             if (this.activeSurface == surface) {
                 this.activeSurface = null;
                 surface.SetActiveAddress(null);
             }
         }
 
-        internal void Select(GridCanvas surface, GridAddress address, VirtualKey? move = null, bool restore = false) {
+        internal void Select(Controls.GridCanvas surface, GridAddress address, VirtualKey? move = null, bool restore = false) {
             if (!surface.Focus(FocusState.Programmatic)) {
                 return;
             }
@@ -69,7 +69,7 @@ namespace UDK.WinUI.Grid {
             surface.SetActiveAddress(surface.ResolveAddress(address));
         }
 
-        internal bool Move(GridCanvas surface, VirtualKey key) {
+        internal bool Move(Controls.GridCanvas surface, VirtualKey key) {
             if (this.activeSurface != surface || key is not (VirtualKey.Left or VirtualKey.Right or VirtualKey.Up or VirtualKey.Down)) {
                 return false;
             }

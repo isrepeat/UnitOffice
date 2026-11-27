@@ -1,11 +1,10 @@
 <UserControl x:Class="PersonalEventsBuilder.Views.CandidatesTableParts.Controls.CandidateCell"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-
-             UseSystemFocusVisuals="False"
-             xmlns:controls="using:PersonalEventsBuilder.Controls"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:PersonalEventsBuilder.Controls"
+             IsTabStop="False"
              IsHitTestVisible="False"
-             IsTabStop="False">
+             UseSystemFocusVisuals="False">
     <Border x:Name="Surface"
             Background="{StaticResource PanelBrush}"
             BorderBrush="{StaticResource GridLineBrush}"

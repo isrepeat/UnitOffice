@@ -9,8 +9,8 @@
                             Glyph="&#xE8A5;" />
         </TitleBar.IconSource>
         <TitleBar.Content>
-            <MenuBar Background="Transparent"
-                     HorizontalAlignment="Left">
+            <MenuBar HorizontalAlignment="Left"
+                     Background="Transparent">
                 <MenuBarItem x:Uid="Tr_FileMenu">
                     <MenuFlyoutItem x:Uid="Tr_LoadDatabaseMenu"
                                     x:Name="LoadDatabaseItem" />
@@ -30,14 +30,14 @@
                 <MenuBarItem x:Uid="Tr_LanguageMenu">
                     <RadioMenuFlyoutItem x:Uid="Tr_UkrainianLanguage"
                                          x:Name="UkrainianLanguageItem"
-                                         GroupName="UiLanguage"
                                          Tag="uk-UA"
-                                         Click="OnLanguageClick" />
+                                         Click="OnLanguageClick"
+                                         GroupName="UiLanguage" />
                     <RadioMenuFlyoutItem x:Uid="Tr_RussianLanguage"
                                          x:Name="RussianLanguageItem"
-                                         GroupName="UiLanguage"
                                          Tag="ru-RU"
-                                         Click="OnLanguageClick" />
+                                         Click="OnLanguageClick"
+                                         GroupName="UiLanguage" />
                 </MenuBarItem>
             </MenuBar>
         </TitleBar.Content>

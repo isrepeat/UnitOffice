@@ -1,102 +1,102 @@
 <Page x:Class="PersonalEventsBuilder.Pages.WorkspacePage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:layout="using:UDK.WinUI.Layout"
       xmlns:views="using:PersonalEventsBuilder.Views"
-      xmlns:grid="using:UDK.WinUI.Grid"
-      Style="{StaticResource WorkspacePageStyle}"
-      NavigationCacheMode="Required">
+      xmlns:udkGrid="using:UDK.WinUI.Grid"
+      xmlns:udkLayout="using:UDK.WinUI.Layout"
+      xmlns:udkLayoutControls="using:UDK.WinUI.Layout.Controls"
+      Style="{StaticResource WorkspacePageStyle}">
     <SplitView x:Name="PaletteDrawer"
+               PaneClosed="OnPaletteClosed"
                DisplayMode="Overlay"
                PanePlacement="Right"
-               OpenPaneLength="336"
-               PaneClosed="OnPaletteClosed">
+               OpenPaneLength="336">
         <SplitView.Pane>
             <views:PaletteEditor x:Name="Palette"
                                  CloseRequested="OnClosePalette" />
         </SplitView.Pane>
-        <layout:WorkspaceHost x:Name="Workspace">
-            <layout:WorkspaceHost.Resources>
-                <grid:GridNavigation x:Key="EventNavigation" />
-                <grid:GridAxis x:Key="EventColumns"
-                               Step="116"
-                               Count="24" />
-                <grid:GridLayout x:Key="FormGrid"
-                                 Columns="{StaticResource EventColumns}"
-                                 Navigation="{StaticResource EventNavigation}">
-                    <grid:GridLayout.Rows>
-                        <grid:GridAxis Step="40"
-                                       Count="6" />
-                    </grid:GridLayout.Rows>
-                </grid:GridLayout>
-                <grid:GridLayout x:Key="CandidatesGrid"
-                                 NavigationOrder="1"
-                                 Columns="{StaticResource EventColumns}"
-                                 Navigation="{StaticResource EventNavigation}">
-                    <grid:GridLayout.Rows>
-                        <grid:GridAxis Step="28"
-                                       Count="30" />
-                    </grid:GridLayout.Rows>
-                </grid:GridLayout>
-                <Style TargetType="Thumb"
-                       BasedOn="{StaticResource ZoneSplitterStyle}" />
-                <Style TargetType="TextBlock"
-                       BasedOn="{StaticResource ZoneLabelStyle}" />
-            </layout:WorkspaceHost.Resources>
-            <layout:Zone Direction="Columns">
-                <layout:Zone Direction="Rows">
-                    <layout:Zone Size="194"
-                                 MinSize="48"
-                                 Direction="Columns">
-                        <layout:Zone Size="1.44*"
-                                     Style="{StaticResource ZonePanelStyle}">
+        <udkLayoutControls:WorkspaceHost x:Name="Workspace">
+            <udkLayoutControls:WorkspaceHost.Resources>
+                <udkGrid:GridNavigation x:Key="EventNavigation" />
+                <udkGrid:GridAxis x:Key="EventColumns"
+                                  Step="116"
+                                  Count="24" />
+                <udkGrid:GridLayout x:Key="FormGrid"
+                                    Columns="{StaticResource EventColumns}"
+                                    Navigation="{StaticResource EventNavigation}">
+                    <udkGrid:GridLayout.Rows>
+                        <udkGrid:GridAxis Step="40"
+                                          Count="6" />
+                    </udkGrid:GridLayout.Rows>
+                </udkGrid:GridLayout>
+                <udkGrid:GridLayout x:Key="CandidatesGrid"
+                                    Columns="{StaticResource EventColumns}"
+                                    Navigation="{StaticResource EventNavigation}"
+                                    NavigationOrder="1">
+                    <udkGrid:GridLayout.Rows>
+                        <udkGrid:GridAxis Step="28"
+                                          Count="30" />
+                    </udkGrid:GridLayout.Rows>
+                </udkGrid:GridLayout>
+                <Style BasedOn="{StaticResource ZoneSplitterStyle}"
+                       TargetType="Thumb" />
+                <Style BasedOn="{StaticResource ZoneLabelStyle}"
+                       TargetType="TextBlock" />
+            </udkLayoutControls:WorkspaceHost.Resources>
+            <udkLayout:Zone Direction="Columns">
+                <udkLayout:Zone Direction="Rows">
+                    <udkLayout:Zone Size="194"
+                                    MinSize="48"
+                                    Direction="Columns">
+                        <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
+                                        Size="1.44*">
                             <views:CommandPanel x:Name="Commands" />
-                        </layout:Zone>
-                        <layout:Splitter />
-                        <layout:Zone Size="149"
-                                     Style="{StaticResource ZonePanelStyle}">
+                        </udkLayout:Zone>
+                        <udkLayout:Splitter />
+                        <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
+                                        Size="149">
                             <TextBlock Text="Новое событие" />
-                        </layout:Zone>
-                        <layout:Splitter />
-                        <layout:Zone Size="*"
-                                     Style="{StaticResource ZonePanelStyle}">
+                        </udkLayout:Zone>
+                        <udkLayout:Splitter />
+                        <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
+                                        Size="*">
                             <views:WordPreview />
-                        </layout:Zone>
-                    </layout:Zone>
-                    <layout:Splitter />
-                    <layout:Zone MinSize="96"
-                                 Direction="Rows">
-                        <layout:Zone Size="2*"
-                                     Style="{StaticResource ZonePanelStyle}">
+                        </udkLayout:Zone>
+                    </udkLayout:Zone>
+                    <udkLayout:Splitter />
+                    <udkLayout:Zone MinSize="96"
+                                    Direction="Rows">
+                        <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
+                                        Size="2*">
                             <views:EventForm Fields="{x:Bind WorkspacePageViewModel.EventLayout.Fields, Mode=OneWay}"
                                              GridLayout="{StaticResource FormGrid}" />
-                        </layout:Zone>
-                        <layout:Zone Size="*"
-                                     Style="{StaticResource ZonePanelStyle}">
+                        </udkLayout:Zone>
+                        <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
+                                        Size="*">
                             <TextBlock Text="Сводка" />
-                        </layout:Zone>
-                        <layout:Zone Size="3*"
-                                     Style="{StaticResource ZonePanelStyle}">
-                            <views:CandidatesTable ColumnRange="{x:Bind WorkspacePageViewModel.EventLayout.MainColumnRange, Mode=OneWay}"
-                                                   GridLayout="{StaticResource CandidatesGrid}" />
-                        </layout:Zone>
-                    </layout:Zone>
-                </layout:Zone>
-                <layout:Splitter />
-                <layout:Zone Size="218"
-                             MinSize="100"
-                             Style="{StaticResource ZonePanelStyle}">
+                        </udkLayout:Zone>
+                        <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
+                                        Size="3*">
+                            <views:CandidatesTable GridLayout="{StaticResource CandidatesGrid}"
+                                                   ColumnRange="{x:Bind WorkspacePageViewModel.EventLayout.MainColumnRange, Mode=OneWay}" />
+                        </udkLayout:Zone>
+                    </udkLayout:Zone>
+                </udkLayout:Zone>
+                <udkLayout:Splitter />
+                <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
+                                Size="218"
+                                MinSize="100">
                     <Grid RowDefinitions="Auto,*">
-                        <Button x:Name="PaletteButton"
-                                x:Uid="Tr_PaletteOpen"
+                        <Button x:Uid="Tr_PaletteOpen"
+                                x:Name="PaletteButton"
                                 Margin="6"
                                 HorizontalAlignment="Right"
                                 Click="OnOpenPalette" />
                         <TextBlock Grid.Row="1"
                                    Text="Действия" />
                     </Grid>
-                </layout:Zone>
-            </layout:Zone>
-        </layout:WorkspaceHost>
+                </udkLayout:Zone>
+            </udkLayout:Zone>
+        </udkLayoutControls:WorkspaceHost>
     </SplitView>
 </Page>

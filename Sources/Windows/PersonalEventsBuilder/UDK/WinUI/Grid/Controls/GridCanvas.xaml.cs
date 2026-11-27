@@ -9,7 +9,7 @@ using Microsoft.UI.Xaml.Controls;
 
 using Windows.Foundation;
 
-namespace UDK.WinUI.Grid {
+namespace UDK.WinUI.Grid.Controls {
     public sealed partial class GridCanvas : UserControl, Navigation.INavigationSurface {
         public static readonly DependencyProperty GridLayoutProperty = DependencyProperty.Register(
             nameof(GridLayout),
@@ -261,7 +261,8 @@ namespace UDK.WinUI.Grid {
             for (int column = first; column <= end; column++) {
                 double x = left + (column - first) * step;
                 if (column < end && this.regions.Count == 0) {
-                    var label = new TextBlock { Text = (column + 1).ToString() };
+                    var label = (TextBlock)((DataTemplate)this.Surface.Resources["ColumnLabelTemplate"]).LoadContent();
+                    label.DataContext = (column + 1).ToString();
                     Canvas.SetLeft(label, x + 3);
                     this.Labels.Children.Add(label);
                 }
