@@ -27,7 +27,7 @@ namespace UDK.WinUI.Layout {
 
         public bool SequentialScroll { get; set; }
 
-        public UDK.WinUI.Grid.GridAxis? HorizontalAxis { get; set; }
+        public IScrollAxisBehavior? HorizontalScrollBehavior { get; set; }
 
         public string Title { get; set; } = string.Empty;
 

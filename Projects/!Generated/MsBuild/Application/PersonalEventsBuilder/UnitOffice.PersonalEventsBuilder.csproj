@@ -38,6 +38,8 @@
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\App.xaml.cs" Link="App.xaml.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Layout\Zone.cs" Link="UDK\WinUI\Layout\Zone.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\GridAxis.cs" Link="UDK\WinUI\Grid\GridAxis.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\GridAxisScroll.cs" Link="UDK\WinUI\Grid\GridAxisScroll.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Layout\IScrollAxisBehavior.cs" Link="UDK\WinUI\Layout\IScrollAxisBehavior.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\GridLayout.cs" Link="UDK\WinUI\Grid\GridLayout.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\GridNavigation.cs" Link="UDK\WinUI\Grid\GridNavigation.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Navigation\IKeyboardNavigationArea.cs" Link="UDK\WinUI\Navigation\IKeyboardNavigationArea.cs" />

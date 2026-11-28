@@ -7,7 +7,8 @@
                 <DataTemplate x:Key="ScrollingRows">
                     <Grid RowDefinitions="*,Auto">
                         <ScrollViewer HorizontalContentAlignment="Stretch"
-                                      HorizontalScrollMode="Disabled"
+                                      HorizontalScrollMode="Enabled"
+                                      HorizontalScrollBarVisibility="Auto"
                                       VerticalScrollBarVisibility="Auto"
                                       ZoomMode="Disabled" />
                         <StackPanel VerticalAlignment="Top"

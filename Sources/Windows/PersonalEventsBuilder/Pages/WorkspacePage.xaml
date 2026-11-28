@@ -74,8 +74,10 @@
                     <udkLayout:Splitter />
                     <udkLayout:Zone Direction="Rows"
                                     MinSize="96"
-                                    SequentialScroll="True"
-                                    HorizontalAxis="{StaticResource EventColumns}">
+                                    SequentialScroll="True">
+                        <udkLayout:Zone.HorizontalScrollBehavior>
+                            <udkGrid:GridAxisScroll Axis="{StaticResource EventColumns}" />
+                        </udkLayout:Zone.HorizontalScrollBehavior>
                         <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
                                         Title="Форма события"
                                         Size="Auto">

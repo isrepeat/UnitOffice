@@ -1,9 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using Windows.System;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -86,55 +84,24 @@ namespace UDK.WinUI.Layout.Controls {
             if (pending is not null) {
                 throw new InvalidOperationException("A splitter must be followed by a zone.");
             }
-            return sections.Count > 1 ? CreateScrollingRows(grid, sections, zone.HorizontalAxis) : grid;
+            return sections.Count > 1 ? CreateScrollingRows(grid, sections, zone.HorizontalScrollBehavior) : grid;
         }
 
-        private FrameworkElement CreateScrollingRows(XamlGrid grid, List<(Zone Zone, int Track)> sections, UDK.WinUI.Grid.GridAxis? horizontalAxis) {
+        private FrameworkElement CreateScrollingRows(XamlGrid grid, List<(Zone Zone, int Track)> sections, IScrollAxisBehavior? horizontalBehavior) {
             var container = this.CreateElement<XamlGrid>("ScrollingRows");
             var viewer = (ScrollViewer)container.Children[0];
             var headers = (StackPanel)container.Children[1];
             viewer.Content = grid;
-            if (horizontalAxis is { } axis) {
-                var bar = (ScrollBar)container.Children[2];
-                void UpdateBar() {
-                    bar.Maximum = axis.MaximumOffset;
-                    bar.ViewportSize = axis.ViewportCapacity;
-                    bar.LargeChange = Math.Max(1, axis.ViewportCapacity);
-                    bar.Value = axis.FirstVisibleIndex;
-                    bar.Visibility = axis.ViewportCapacity > 0 && axis.MaximumOffset > 0 ? Visibility.Visible : Visibility.Collapsed;
-                }
-                bar.Scroll += (_, args) => axis.SetGlobalOffset((int)Math.Round(args.NewValue));
-                int wheelRemainder = 0;
-                void OnWheel(object sender, PointerRoutedEventArgs args) {
-                    var modifiers = args.KeyModifiers;
-                    if (modifiers != VirtualKeyModifiers.Shift && modifiers != (VirtualKeyModifiers.Control | VirtualKeyModifiers.Shift)) {
-                        wheelRemainder = 0;
-                        return;
-                    }
-                    args.Handled = true;
-                    if (bar.Visibility != Visibility.Visible) {
-                        wheelRemainder = 0;
-                        return;
-                    }
-                    var pointer = args.GetCurrentPoint(container).Properties;
-                    int delta = pointer.IsHorizontalMouseWheel ? pointer.MouseWheelDelta : -pointer.MouseWheelDelta;
-                    if ((axis.FirstVisibleIndex == 0 && delta < 0) || (axis.FirstVisibleIndex == axis.MaximumOffset && delta > 0)) {
-                        wheelRemainder = 0;
-                        return;
-                    }
-                    // У колеса высокого разрешения один шаг может прийти несколькими событиями.
-                    wheelRemainder += delta;
-                    const int wheelDeltaPerColumn = 120;
-                    axis.SetGlobalOffset(axis.FirstVisibleIndex + wheelRemainder / wheelDeltaPerColumn);
-                    wheelRemainder %= wheelDeltaPerColumn;
-                }
-                grid.PointerWheelChanged += OnWheel;
-                container.PointerWheelChanged += OnWheel;
-                container.Loaded += (_, _) => {
-                    axis.Changed += UpdateBar;
-                    UpdateBar();
+            if (horizontalBehavior is not null) {
+                viewer.HorizontalScrollMode = ScrollMode.Disabled;
+                viewer.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                var context = new ScrollAxisContext((ScrollBar)container.Children[2], grid, container);
+                IDisposable? connection = null;
+                container.Loaded += (_, _) => connection ??= horizontalBehavior.Attach(context);
+                container.Unloaded += (_, _) => {
+                    connection?.Dispose();
+                    connection = null;
                 };
-                container.Unloaded += (_, _) => axis.Changed -= UpdateBar;
             }
             double TopOf(int track) => grid.RowDefinitions.Take(track).Sum(row => row.ActualHeight);
 
@@ -170,7 +137,7 @@ namespace UDK.WinUI.Layout.Controls {
 
             viewer.ViewChanged += (_, _) => UpdateHeaders();
             grid.BringIntoViewRequested += (_, args) => {
-                if (!args.AnimationDesired) {
+                if (!args.AnimationDesired || horizontalBehavior is null && viewer.ScrollableWidth > 0) {
                     return;
                 }
                 var bounds = args.TargetElement.TransformToVisual(grid).TransformBounds(args.TargetRect);
