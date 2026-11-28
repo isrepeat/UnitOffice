@@ -35,21 +35,10 @@ namespace PersonalEventsBuilder.Views {
 
         public CandidatesTable() {
             this.InitializeComponent();
-            this.Surface.ViewportChanged += this.UpdateButtons;
-            this.UpdateButtons();
         }
 
         private void UpdateTable() {
             this.TableItems[0].Update(this.Columns ?? [], this.Rows ?? []);
         }
-
-        private void UpdateButtons() {
-            this.Previous.IsEnabled = this.Surface.CanScrollLeft;
-            this.Next.IsEnabled = this.Surface.CanScrollRight;
-        }
-
-        private void OnPrevious(object sender, RoutedEventArgs args) => this.Surface.ScrollColumns(-1);
-
-        private void OnNext(object sender, RoutedEventArgs args) => this.Surface.ScrollColumns(1);
     }
 }

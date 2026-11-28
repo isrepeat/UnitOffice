@@ -27,6 +27,8 @@ namespace UDK.WinUI.Layout {
 
         public bool SequentialScroll { get; set; }
 
+        public UDK.WinUI.Grid.GridAxis? HorizontalAxis { get; set; }
+
         public string Title { get; set; } = string.Empty;
 
         public IList<DependencyObject> Items { get; } = new List<DependencyObject>();

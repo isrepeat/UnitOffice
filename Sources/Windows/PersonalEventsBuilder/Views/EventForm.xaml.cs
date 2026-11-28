@@ -33,7 +33,6 @@ namespace PersonalEventsBuilder.Views {
                 int rowCount = 1;
                 foreach (var field in this.Fields ?? []) {
                     rowCount = Math.Max(rowCount, field.Bounds.Bottom);
-                    layout.Columns.Count = Math.Max(layout.Columns.Count, field.Bounds.Right);
                 }
                 layout.Rows.Count = rowCount;
             }

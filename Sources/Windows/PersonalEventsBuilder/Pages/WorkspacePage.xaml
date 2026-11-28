@@ -20,7 +20,7 @@
                 <udkGrid:GridNavigation x:Key="EventNavigation" />
                 <udkGrid:GridAxis x:Key="EventColumns"
                                   Step="116"
-                                  Count="24" />
+                                  Count="{x:Bind WorkspacePageViewModel.EventLayout.ColumnCount, Mode=OneWay}" />
                 <udkGrid:GridLayout x:Key="FormGrid"
                                     Columns="{StaticResource EventColumns}"
                                     Navigation="{StaticResource EventNavigation}">
@@ -34,7 +34,7 @@
                                     NavigationOrder="1">
                     <udkGrid:GridLayout.Rows>
                         <udkGrid:GridAxis Step="28"
-                                          Count="30" />
+                                          Count="15" />
                     </udkGrid:GridLayout.Rows>
                 </udkGrid:GridLayout>
                 <udkGrid:GridLayout x:Key="TestCandidatesGrid"
@@ -43,7 +43,7 @@
                                     NavigationOrder="2">
                     <udkGrid:GridLayout.Rows>
                         <udkGrid:GridAxis Step="28"
-                                          Count="30" />
+                                          Count="15" />
                     </udkGrid:GridLayout.Rows>
                 </udkGrid:GridLayout>
                 <Style BasedOn="{StaticResource ZoneSplitterStyle}"
@@ -74,7 +74,8 @@
                     <udkLayout:Splitter />
                     <udkLayout:Zone Direction="Rows"
                                     MinSize="96"
-                                    SequentialScroll="True">
+                                    SequentialScroll="True"
+                                    HorizontalAxis="{StaticResource EventColumns}">
                         <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
                                         Title="Форма события"
                                         Size="Auto">
@@ -82,11 +83,20 @@
                                              Fields="{x:Bind WorkspacePageViewModel.EventLayout.Fields, Mode=OneWay}" />
                         </udkLayout:Zone>
                         <!--<udkLayout:Splitter />-->
-                        <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
+                        <udkLayout:Zone Direction="Columns"
                                         Title="Кандидати"
                                         Size="Auto">
-                            <views:CandidatesTable GridLayout="{StaticResource CandidatesGrid}"
-                                                   Columns="{x:Bind WorkspacePageViewModel.EventLayout.MainColumns, Mode=OneWay}" />
+                            <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
+                                            Size="96" />
+                            <udkLayout:Splitter />
+                            <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
+                                            MinSize="116">
+                                <views:CandidatesTable GridLayout="{StaticResource CandidatesGrid}"
+                                                       Columns="{x:Bind WorkspacePageViewModel.EventLayout.MainColumns, Mode=OneWay}" />
+                            </udkLayout:Zone>
+                            <udkLayout:Splitter />
+                            <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
+                                            Size="96" />
                         </udkLayout:Zone>
                         <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
                                         Title="Тестовая таблица"

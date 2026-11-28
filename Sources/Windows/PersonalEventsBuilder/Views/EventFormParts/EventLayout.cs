@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections.Generic;
 
 namespace PersonalEventsBuilder.Views.EventFormParts {
@@ -14,6 +15,8 @@ namespace PersonalEventsBuilder.Views.EventFormParts {
     }
 
     public sealed class EventLayout {
+        public int ColumnCount { get; }
+
         public IReadOnlyList<FormColumn> MainColumns { get; }
 
         public IReadOnlyList<PlacedFormField> Fields { get; }
@@ -21,6 +24,8 @@ namespace PersonalEventsBuilder.Views.EventFormParts {
         internal EventLayout(IReadOnlyList<PlacedFormField> fields, IReadOnlyList<FormColumn> mainColumns) {
             this.Fields = fields;
             this.MainColumns = mainColumns;
+            this.ColumnCount = fields.Select(field => field.Bounds.Right)
+                .Concat(mainColumns.Select(column => column.Start + column.Span)).DefaultIfEmpty().Max();
         }
     }
     public readonly struct PlacedFormField {

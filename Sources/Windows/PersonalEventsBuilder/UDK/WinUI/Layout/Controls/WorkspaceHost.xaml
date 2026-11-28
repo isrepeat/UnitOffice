@@ -5,13 +5,19 @@
         <Border x:Name="ZonePresenter">
             <Border.Resources>
                 <DataTemplate x:Key="ScrollingRows">
-                    <Grid>
+                    <Grid RowDefinitions="*,Auto">
                         <ScrollViewer HorizontalContentAlignment="Stretch"
                                       HorizontalScrollMode="Disabled"
                                       VerticalScrollBarVisibility="Auto"
                                       ZoomMode="Disabled" />
                         <StackPanel VerticalAlignment="Top"
                                     Margin="0,0,16,0" />
+                        <ScrollBar Grid.Row="1"
+                                   Orientation="Horizontal"
+                                   IndicatorMode="MouseIndicator"
+                                   AutomationProperties.AutomationId="SharedColumnScrollBar"
+                                   IsTabStop="False"
+                                   Visibility="Collapsed" />
                     </Grid>
                 </DataTemplate>
                 <DataTemplate x:Key="SectionHeader">

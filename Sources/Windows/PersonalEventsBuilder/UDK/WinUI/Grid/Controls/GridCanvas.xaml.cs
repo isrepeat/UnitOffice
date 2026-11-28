@@ -13,7 +13,11 @@ namespace UDK.WinUI.Grid.Controls {
         //
         // INavigationSurface
         //
-        GridArea Navigation.INavigationSurface.NavigationBounds => this.GridBounds;
+        GridArea Navigation.INavigationSurface.NavigationBounds => this.ReachableBounds;
+
+        internal GridArea ReachableBounds => this.columnWindow.Slots > 0 && this.columns is { } axis
+            ? this.GridBounds.Intersect(new(this.columnWindow.Slot, 0, this.columnWindow.Slots + axis.MaximumOffset, this.GridBounds.Height))
+            : default;
 
         IEnumerable<GridArea> Navigation.INavigationSurface.NavigationRegions => this.regions.Count == 0
             ? new[] { this.GridBounds } : this.regions.Select(region => region.Bounds);
@@ -46,10 +50,6 @@ namespace UDK.WinUI.Grid.Controls {
             new PropertyMetadata(null, (sender, _) => ((GridCanvas)sender).RebuildRegions(reuse: false)));
 
         private int LeftColumn => this.columnWindow.First;
-
-        public bool CanScrollLeft => this.columnWindow.Slots > 0 && this.LeftColumn > 0;
-
-        public bool CanScrollRight => this.columns is { } axis && this.columnWindow.Slots > 0 && this.LeftColumn + this.visibleColumns < axis.Count;
 
         private int visibleColumns => this.columnWindow.Count;
 
@@ -90,7 +90,6 @@ namespace UDK.WinUI.Grid.Controls {
         private GridAxis? columns;
         private GridLayout? observedLayout;
         private GridAddress? activeAddress;
-        internal event Action? ViewportChanged;
         private readonly object rowViewport = new();
         private readonly object columnViewport = new();
         private GridAxis.ColumnWindow columnWindow;
@@ -145,8 +144,6 @@ namespace UDK.WinUI.Grid.Controls {
                 }
             };
         }
-
-        public void ScrollColumns(int delta) => this.columns?.ScrollColumns(delta, this.columnWindow);
 
         public bool ScrollRows(int delta) {
             if (this.rows is not { } rows) {
@@ -237,7 +234,8 @@ namespace UDK.WinUI.Grid.Controls {
             int top = this.rows!.FirstVisibleIndex;
             int firstRow = Math.Max(area.Row, address.Row - this.visibleRows + 1);
             int lastColumn = Math.Min(area.Right, area.Column + this.visibleColumns) - 1;
-            this.ScrollColumns(area.Column < left ? area.Column - left : Math.Max(0, lastColumn - (left + this.visibleColumns - 1)));
+            int delta = area.Column < left ? area.Column - left : Math.Max(0, lastColumn - (left + this.visibleColumns - 1));
+            this.columns!.SetGlobalOffset(this.columns.FirstVisibleIndex + delta);
             int lastRow = Math.Min(area.Bottom, firstRow + this.visibleRows) - 1;
             this.ScrollRows(firstRow < top ? firstRow - top : Math.Max(0, lastRow - (top + this.visibleRows - 1)));
             if (revealInContainer && this.visibleRows > 0) {
@@ -342,7 +340,6 @@ namespace UDK.WinUI.Grid.Controls {
             var geometry = new GeometryGroup();
             if (this.columns is not { } columns || this.rows is not { } rows) {
                 this.UpdateTargets();
-                this.ViewportChanged?.Invoke();
                 return;
             }
             this.columnWindow = columns.GetColumns(this.surfaceX, this.Surface.ActualWidth);
@@ -362,7 +359,6 @@ namespace UDK.WinUI.Grid.Controls {
                 this.columnWindow.Slots * step, rows.Capacity(this.Surface.ActualHeight, 0) * rows.Step);
             this.ViewportClip.Rect = this.drawingBounds;
             this.UpdateTargets();
-            this.ViewportChanged?.Invoke();
             if (this.visibleColumns == 0 || this.gridHeight <= 0) {
                 return;
             }

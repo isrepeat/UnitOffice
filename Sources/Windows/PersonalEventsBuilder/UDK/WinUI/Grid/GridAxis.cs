@@ -51,6 +51,10 @@ namespace UDK.WinUI.Grid {
 
         public int FirstVisibleIndex { get; private set; }
 
+        internal int ViewportCapacity => this.previousCapacity;
+
+        internal int MaximumOffset => Math.Max(0, this.Count - Math.Max(1, this.ViewportCapacity));
+
         internal double Origin { get; private set; }
 
         internal double DisplayIndex { get; private set; }
@@ -89,21 +93,10 @@ namespace UDK.WinUI.Grid {
             double left = origin + slot * this.Step;
             int slots = Math.Min(this.previousCapacity - slot, this.Capacity(width, left));
             int first = this.FirstVisibleIndex + slot;
-            int skip = Math.Clamp(-first, 0, slots);
-            int count = Math.Clamp(this.Count - Math.Max(0, first), 0, slots - skip);
-            return new ColumnWindow(Math.Clamp(first, 0, this.Count), count, left + skip * this.Step, slot, slots);
+            return new ColumnWindow(first, slots, left, slot, slots);
         }
 
-        internal void ScrollColumns(int delta, ColumnWindow window) {
-            if (delta == 0 || window.Slots == 0) {
-                return;
-            }
-            int min = -window.Slot;
-            int max = this.Count - window.Slot - window.Slots;
-            long requested = (long)this.FirstVisibleIndex + delta;
-            int index = (int)Math.Clamp(requested, Math.Min(min, this.FirstVisibleIndex), Math.Max(max, this.FirstVisibleIndex));
-            this.SetScrollIndex(index);
-        }
+        internal void SetGlobalOffset(int index) => this.SetScrollIndex(Math.Clamp(index, 0, this.MaximumOffset));
 
         internal int VisibleCount(double length, double offset) =>
             Math.Min(this.Count - this.FirstVisibleIndex, this.Capacity(length, offset));

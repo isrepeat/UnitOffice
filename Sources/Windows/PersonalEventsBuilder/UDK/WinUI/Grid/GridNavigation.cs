@@ -14,7 +14,7 @@ namespace UDK.WinUI.Grid {
         // IKeyboardNavigationArea
         //
         public bool FocusArea() {
-            if (this.lastSurface is { } previous && previous.GridBounds.Contains(this.coordinator.EntryCell)) {
+            if (this.lastSurface is { } previous && previous.ReachableBounds.Contains(this.coordinator.EntryCell)) {
                 this.Select(previous, this.coordinator.EntryCell, restore: true);
                 return this.activeSurface == previous;
             }
