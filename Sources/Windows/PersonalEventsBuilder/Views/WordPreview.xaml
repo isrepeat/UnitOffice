@@ -17,7 +17,8 @@
                 BorderThickness="1">
             <Grid>
                 <controls:PlaceholderLines VerticalAlignment="Top"
-                                           LineWidths="30,55" />
+                                           LineWidths="30,55"
+                                           Visibility="{Binding PlaceholderVisibility, Source={StaticResource WorkspaceContentMode}}" />
                 <TextBlock Text="{x:Bind PreviewText, Mode=OneWay}"
                            Foreground="{StaticResource WorkspaceTextBrush}"
                            TextWrapping="Wrap"

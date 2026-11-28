@@ -7,6 +7,21 @@ using Microsoft.UI.Xaml.Media;
 
 namespace UDK.WinUI.Grid {
     public sealed class GridAxis : DependencyObject {
+        internal readonly struct ColumnWindow {
+            public int First { get; }
+            public int Count { get; }
+            public double Left { get; }
+            public int Slot { get; }
+            public int Slots { get; }
+
+            public ColumnWindow(int first, int count, double left, int slot, int slots) {
+                this.First = first;
+                this.Count = count;
+                this.Left = left;
+                this.Slot = slot;
+                this.Slots = slots;
+            }
+        }
         public double Step {
             get => (double)this.GetValue(StepProperty);
             set {
@@ -147,7 +162,5 @@ namespace UDK.WinUI.Grid {
             }
             this.DisplayIndex = this.FirstVisibleIndex;
         }
-
-        internal readonly record struct ColumnWindow(int First, int Count, double Left, int Slot, int Slots);
     }
 }

@@ -15,6 +15,5 @@
         </DataTemplate>
     </UserControl.Resources>
     <StackPanel x:Name="Lines"
-                Visibility="{Binding PlaceholderVisibility, Source={StaticResource WorkspaceContentMode}}"
                 Spacing="6" />
 </UserControl>

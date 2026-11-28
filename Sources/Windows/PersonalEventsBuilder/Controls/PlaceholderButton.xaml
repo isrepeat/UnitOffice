@@ -59,7 +59,8 @@
                                           IsHitTestVisible="False" />
                         <controls:PlaceholderLines Opacity="0.65"
                                                    Foreground="{TemplateBinding Foreground}"
-                                                   LineWidths="{TemplateBinding PlaceholderLines_LineWidths}" />
+                                                   LineWidths="{TemplateBinding PlaceholderLines_LineWidths}"
+                                                   Visibility="{Binding PlaceholderVisibility, Source={StaticResource WorkspaceContentMode}}" />
                     </Grid>
                 </Border>
                 <Border x:Name="HoverLayer"

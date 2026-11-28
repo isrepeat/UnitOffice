@@ -3,6 +3,16 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Controls;
 
 namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
+    public sealed class CandidateCellContent {
+        public string Value { get; }
+        public bool ShowPlaceholder { get; }
+
+        public CandidateCellContent(string value, bool showPlaceholder) {
+            this.Value = value;
+            this.ShowPlaceholder = showPlaceholder;
+        }
+    }
+
     public sealed partial class CandidateCell : UserControl {
         public CandidateCell() {
             this.InitializeComponent();
@@ -11,8 +21,7 @@ namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
         internal void SetSelected(bool isActive) => States.NavigationFocus.SetActive(this.FocusFrame, isActive);
 
         internal void SetContent(string value, bool header, bool showPlaceholder) {
-            this.DataContext = value;
-            this.Stroke.Visibility = showPlaceholder ? Visibility.Visible : Visibility.Collapsed;
+            this.DataContext = new CandidateCellContent(value, showPlaceholder);
             this.Surface.Background = (Brush)Application.Current.Resources[header ? "CommandBrush" : "PanelBrush"];
         }
     }

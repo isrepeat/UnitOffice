@@ -34,7 +34,8 @@
                 Style="{StaticResource HoverLayerStyle}"
                 OpacityTransition="{StaticResource HoverTransition}" />
         <controls:PlaceholderLines Margin="8,0"
-                                   LineWidths="33" />
+                                   LineWidths="33"
+                                   Visibility="{Binding PlaceholderVisibility, Source={StaticResource WorkspaceContentMode}}" />
         <Border x:Name="FocusFrame"
                 Style="{StaticResource ActiveEntityFrameStyle}"
                 Visibility="Collapsed" />

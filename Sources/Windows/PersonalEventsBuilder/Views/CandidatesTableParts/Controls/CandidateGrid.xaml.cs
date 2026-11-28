@@ -5,7 +5,15 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Automation;
 
 namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
-    internal sealed record CandidateTableItem(IReadOnlyList<EventFormParts.FormColumn> Columns, IReadOnlyList<IReadOnlyList<string>> Values);
+    internal sealed class CandidateTableItem {
+        public IReadOnlyList<EventFormParts.FormColumn> Columns { get; }
+        public IReadOnlyList<IReadOnlyList<string>> Values { get; }
+
+        public CandidateTableItem(IReadOnlyList<EventFormParts.FormColumn> columns, IReadOnlyList<IReadOnlyList<string>> values) {
+            this.Columns = columns;
+            this.Values = values;
+        }
+    }
 
     internal sealed partial class CandidateGrid : UserControl, UDK.WinUI.Grid.IGridNavigationTarget, UDK.WinUI.Grid.IGridViewportContent {
         //

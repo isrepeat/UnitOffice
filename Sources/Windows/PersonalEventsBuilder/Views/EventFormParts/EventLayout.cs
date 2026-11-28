@@ -1,7 +1,17 @@
 using System.Collections.Generic;
 
 namespace PersonalEventsBuilder.Views.EventFormParts {
-    public sealed record FormColumn(int Start, int Span, int? PrimaryIndex);
+    public sealed class FormColumn {
+        public int Start { get; }
+        public int Span { get; }
+        public int? PrimaryIndex { get; }
+
+        public FormColumn(int start, int span, int? primaryIndex) {
+            this.Start = start;
+            this.Span = span;
+            this.PrimaryIndex = primaryIndex;
+        }
+    }
 
     public sealed class EventLayout {
         public IReadOnlyList<FormColumn> MainColumns { get; }

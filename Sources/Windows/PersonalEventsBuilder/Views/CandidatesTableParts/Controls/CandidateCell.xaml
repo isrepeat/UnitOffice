@@ -10,17 +10,18 @@
             BorderBrush="{StaticResource GridLineBrush}"
             BorderThickness="0.5">
         <Grid>
-            <controls:PlaceholderLines x:Name="Stroke"
-                                       Margin="16,0"
-                                       LineWidths="33"
-                                       Visibility="Collapsed"
-                                       AutomationProperties.Name="{Binding}" />
+            <Grid Visibility="{Binding PlaceholderVisibility, Source={StaticResource WorkspaceContentMode}}">
+                <controls:PlaceholderLines Margin="16,0"
+                                           LineWidths="33"
+                                           Visibility="{Binding ShowPlaceholder, Converter={StaticResource BoolToVisibility}, FallbackValue=Collapsed}"
+                                           AutomationProperties.Name="{Binding Value}" />
+            </Grid>
             <TextBlock Margin="16,0"
                        VerticalAlignment="Center"
                        Foreground="{StaticResource WorkspaceTextBrush}"
-                       Text="{Binding}"
-                       TextTrimming="CharacterEllipsis"
-                       Visibility="{Binding DataVisibility, Source={StaticResource WorkspaceContentMode}}" />
+                       Text="{Binding Value}"
+                       Visibility="{Binding DataVisibility, Source={StaticResource WorkspaceContentMode}}"
+                       TextTrimming="CharacterEllipsis" />
             <Border x:Name="FocusFrame"
                     Style="{StaticResource ActiveEntityFrameStyle}"
                     Visibility="Collapsed" />

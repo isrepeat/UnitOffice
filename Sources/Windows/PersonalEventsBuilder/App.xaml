@@ -1,12 +1,14 @@
 <Application x:Class="PersonalEventsBuilder.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:states="using:PersonalEventsBuilder.States"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:convertors="using:PersonalEventsBuilder.Convertors">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
+            <convertors:BoolToVisibilityConverter x:Key="BoolToVisibility" />
             <states:WorkspaceContentMode x:Key="WorkspaceContentMode" />
             <SolidColorBrush x:Key="WorkspaceBackgroundBrush"
                              Color="#28241F" />

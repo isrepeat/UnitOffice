@@ -50,6 +50,7 @@
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\EventFormParts\Scheme\FormDefinition.cs" Link="Views\EventFormParts\Scheme\FormDefinition.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTableParts\Controls\CandidateCell.xaml" Link="Views\CandidatesTableParts\Controls\CandidateCell.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTableParts\Controls\CandidateCell.xaml.cs" Link="Views\CandidatesTableParts\Controls\CandidateCell.xaml.cs" />
+    <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Convertors\BoolToVisibilityConverter.cs" Link="Convertors\BoolToVisibilityConverter.cs" />
     <Page Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTableParts\Controls\CandidateGrid.xaml" Link="Views\CandidatesTableParts\Controls\CandidateGrid.xaml" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\Views\CandidatesTableParts\Controls\CandidateGrid.xaml.cs" Link="Views\CandidatesTableParts\Controls\CandidateGrid.xaml.cs" />
     <Compile Include="..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\UDK\WinUI\Grid\GridAddress.cs" Link="UDK\WinUI\Grid\GridAddress.cs" />
