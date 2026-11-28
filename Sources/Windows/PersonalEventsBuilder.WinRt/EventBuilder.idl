@@ -1,6 +1,9 @@
 namespace PersonalEventsBuilder.WinRt {
     runtimeclass EventBuilder {
         EventBuilder();
+        static Boolean InitializeLogging(String filePath);
+        static void LogInfo(String message);
+        static void LogError(String message);
         String GetMessage();
     }
 }

@@ -32,6 +32,13 @@
                     visibility="private"
                     linkage="static" />
       </Dependencies>
+      <Extension buildSystem="MSBuild">
+        <Files.Input role="msbuild-props">Sources/Windows/PersonalEventsBuilder.WinRt/PersonalEventsBuilder.WinRt.Packages.props</Files.Input>
+        <Properties>
+          <EnableNativePackageReferenceSupport>true</EnableNativePackageReferenceSupport>
+          <UniversalDevKitComponents>Helpers;Diagnostic</UniversalDevKitComponents>
+        </Properties>
+      </Extension>
     </Project>
   </Projects>
 </Component>

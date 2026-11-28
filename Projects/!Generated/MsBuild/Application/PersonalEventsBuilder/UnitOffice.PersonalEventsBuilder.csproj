@@ -105,6 +105,7 @@
     <Error Condition="'$(PlatformTarget)' != '$(Platform)' and !('$(Platform)' == 'Win32' and '$(PlatformTarget)' == 'x86')" Text="WinUI PlatformTarget must match the native solution platform." />
   </Target>
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+  <Import Project="$(MSBuildThisFileDirectory)..\..\..\..\..\Sources\Windows\PersonalEventsBuilder\PersonalEventsBuilder.Runtime.props" />
   <ItemGroup>
     <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\Library\PersonalEventsBuilder.WinRt\UnitOffice.PersonalEventsBuilder.WinRt.Projection.csproj" />
     <UniversalDevKitWinRTManifest Include="$(MSBuildThisFileDirectory)..\..\..\..\..\!artifacts\projects\Windows\msbuild\PersonalEventsBuilder.WinRt\$(Platform)\$(Configuration)\activation.g.manifest" />

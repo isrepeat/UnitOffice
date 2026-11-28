@@ -67,7 +67,7 @@ namespace PersonalEventsBuilder {
                 Helpers.UserSettings.Write(WindowHeightValue, this.restoredSize.Height);
                 Helpers.UserSettings.Write(WindowMaximizedValue, this.wasMaximized ? 1 : 0);
             } catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or SecurityException) {
-                System.Diagnostics.Debug.WriteLine(exception);
+                App.LogError(exception);
             }
         }
 

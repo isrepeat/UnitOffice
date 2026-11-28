@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="IncludeDiagnosticRuntime"
+          AfterTargets="__UniversalDevKitResolveNativeRuntime">
+    <ItemGroup>
+      <_DiagnosticRuntime Include="%(__UniversalDevKitNativeRuntime.RootDir)%(__UniversalDevKitNativeRuntime.Directory)universaldevkit_diagnostic_dynamic*.dll" />
+      <ContentWithTargetPath Include="@(_DiagnosticRuntime)"
+                             TargetPath="%(Filename)%(Extension)"
+                             CopyToOutputDirectory="PreserveNewest"
+                             CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+</Project>
