@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Controls;
@@ -44,6 +45,7 @@ namespace UDK.WinUI.Layout.Controls {
             var grid = this.CreateElement<XamlGrid>("ZoneGrid");
             var columns = zone.Direction == ZoneDirection.Columns;
             Splitter? pending = null;
+            var sections = new List<(Zone Zone, int Track)>();
             foreach (var item in zone.Items) {
                 if (item is Splitter splitter) {
                     if (grid.Children.Count == 0 || pending is not null) {
@@ -74,12 +76,57 @@ namespace UDK.WinUI.Layout.Controls {
                 }
 
                 AddTrack(grid, columns, child.Size, child.MinSize, child.MaxSize);
+                if (zone.SequentialScroll && !columns) {
+                    sections.Add((child, index));
+                }
                 Place(grid, this.Build(child), columns, index);
             }
             if (pending is not null) {
                 throw new InvalidOperationException("A splitter must be followed by a zone.");
             }
-            return grid;
+            return sections.Count > 1 ? CreateScrollingRows(grid, sections) : grid;
+        }
+
+        private FrameworkElement CreateScrollingRows(XamlGrid grid, List<(Zone Zone, int Track)> sections) {
+            var container = this.CreateElement<XamlGrid>("ScrollingRows");
+            var viewer = (ScrollViewer)container.Children[0];
+            var headers = (StackPanel)container.Children[1];
+            viewer.Content = grid;
+            double TopOf(int track) => grid.RowDefinitions.Take(track).Sum(row => row.ActualHeight);
+
+            // Последнюю зону тоже можно довести до верхнего края области просмотра.
+            var last = sections[^1];
+            container.SizeChanged += (_, args) => grid.RowDefinitions[last.Track].MinHeight =
+                Math.Clamp(args.NewSize.Height, last.Zone.MinSize, last.Zone.MaxSize);
+            foreach (var (zone, track) in sections) {
+                var button = this.CreateElement<Button>("SectionHeader");
+                button.Content = zone.Title;
+                int previousHeaders = headers.Children.Count;
+                button.Click += (_, _) => {
+                    double covered = headers.Children.Take(previousHeaders).Cast<Button>().Sum(header => header.ActualHeight);
+                    viewer.ChangeView(null, Math.Max(0, TopOf(track) - covered), null, true);
+                };
+                headers.Children.Add(button);
+            }
+
+            void UpdateHeaders() {
+                double covered = 0;
+                for (int i = 0; i < sections.Count; i++) {
+                    var row = grid.RowDefinitions[sections[i].Track];
+                    var visibility = row.ActualHeight > 0 && TopOf(sections[i].Track) + row.ActualHeight <= viewer.VerticalOffset + covered
+                        ? Visibility.Visible : Visibility.Collapsed;
+                    if (headers.Children[i].Visibility != visibility) {
+                        headers.Children[i].Visibility = visibility;
+                    }
+                    if (visibility == Visibility.Visible) {
+                        covered += ((Button)headers.Children[i]).ActualHeight;
+                    }
+                }
+            }
+
+            viewer.ViewChanged += (_, _) => UpdateHeaders();
+            grid.LayoutUpdated += (_, _) => UpdateHeaders();
+            return container;
         }
 
         private static void AddTrack(XamlGrid grid, bool columns, GridLength size, double min, double max) {

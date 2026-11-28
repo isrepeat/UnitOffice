@@ -132,14 +132,6 @@ namespace UDK.WinUI.Grid.Controls {
                 }
                 this.observedLayout?.Navigation.Release(this);
             };
-            this.Surface.PointerWheelChanged += (_, args) => {
-                int delta = args.GetCurrentPoint(this.Surface).Properties.MouseWheelDelta;
-                if (delta != 0 && this.rows is { } axis) {
-                    int previous = axis.FirstVisibleIndex;
-                    this.ScrollRows(-Math.Sign(delta));
-                    args.Handled = previous != axis.FirstVisibleIndex;
-                }
-            };
             this.Surface.PointerMoved += this.MoveDrag;
             this.Surface.PointerReleased += (_, args) => {
                 if (this.pointerId == args.Pointer.PointerId) {
@@ -155,7 +147,20 @@ namespace UDK.WinUI.Grid.Controls {
 
         public void ScrollColumns(int delta) => this.columns?.ScrollColumns(delta, this.columnWindow);
 
-        public void ScrollRows(int delta) => this.rows?.Scroll(delta, this.rows.Capacity(this.Surface.ActualHeight, 0));
+        public bool ScrollRows(int delta) {
+            if (this.rows is not { } rows) {
+                return false;
+            }
+            int previous = rows.FirstVisibleIndex;
+            rows.Scroll(delta, rows.Capacity(this.Surface.ActualHeight, 0));
+            return previous != rows.FirstVisibleIndex;
+        }
+
+        private void OnRowScroll(object sender, Microsoft.UI.Xaml.Controls.Primitives.ScrollEventArgs args) {
+            if (this.rows is { } rows) {
+                this.ScrollRows((int)Math.Round(args.NewValue) - rows.FirstVisibleIndex);
+            }
+        }
 
         internal void Register<T>(T region) where T : FrameworkElement, IGridNavigationTarget {
             if (this.regions.Any(other => !region.Bounds.Intersect(other.Bounds).IsEmpty)) {
@@ -315,6 +320,12 @@ namespace UDK.WinUI.Grid.Controls {
             this.columnWindow = columns.GetColumns(this.surfaceX, this.Surface.ActualWidth);
             int visibleRows = rows.VisibleCount(this.Surface.ActualHeight, 0);
             this.visibleRows = visibleRows;
+            int capacity = rows.Capacity(this.Surface.ActualHeight, 0);
+            this.RowScroll.Maximum = Math.Max(0, rows.Count - capacity);
+            this.RowScroll.ViewportSize = capacity;
+            this.RowScroll.LargeChange = Math.Max(1, capacity);
+            this.RowScroll.Value = rows.FirstVisibleIndex;
+            this.RowScroll.Visibility = capacity > 0 && capacity < rows.Count ? Visibility.Visible : Visibility.Collapsed;
             this.gridHeight = visibleRows * rows.Step;
             this.displayColumn = columns.DisplayIndex + this.columnWindow.Slot;
             this.displayRow = rows.DisplayIndex;

@@ -25,6 +25,10 @@ namespace UDK.WinUI.Layout {
 
         public ZoneDirection Direction { get; set; }
 
+        public bool SequentialScroll { get; set; }
+
+        public string Title { get; set; } = string.Empty;
+
         public IList<DependencyObject> Items { get; } = new List<DependencyObject>();
     }
 }

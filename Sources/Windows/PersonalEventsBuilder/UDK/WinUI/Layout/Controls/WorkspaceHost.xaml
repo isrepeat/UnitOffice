@@ -4,6 +4,20 @@
     <UserControl.Content>
         <Border x:Name="ZonePresenter">
             <Border.Resources>
+                <DataTemplate x:Key="ScrollingRows">
+                    <Grid>
+                        <ScrollViewer HorizontalContentAlignment="Stretch"
+                                      HorizontalScrollMode="Disabled"
+                                      VerticalScrollBarVisibility="Auto"
+                                      ZoomMode="Disabled" />
+                        <StackPanel VerticalAlignment="Top" Margin="0,0,16,0" />
+                    </Grid>
+                </DataTemplate>
+                <DataTemplate x:Key="SectionHeader">
+                    <Button HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Visibility="Collapsed" />
+                </DataTemplate>
                 <DataTemplate x:Key="ZoneFrame">
                     <Border />
                 </DataTemplate>

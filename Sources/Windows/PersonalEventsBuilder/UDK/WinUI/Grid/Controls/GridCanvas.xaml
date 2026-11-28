@@ -3,29 +3,36 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              IsTabStop="True"
              UseSystemFocusVisuals="False">
-    <Grid x:Name="Surface"
-          Background="Transparent">
-        <Grid.Resources>
-            <DataTemplate x:Key="ColumnLabelTemplate">
-                <TextBlock Text="{Binding}" />
-            </DataTemplate>
-        </Grid.Resources>
-        <Canvas>
-            <Canvas.Clip>
-                <RectangleGeometry x:Name="ViewportClip" />
-            </Canvas.Clip>
-            <Path x:Name="Lines"
-                  Stroke="{StaticResource GridLineBrush}"
-                  StrokeThickness="1"
-                  IsHitTestVisible="False" />
-            <Canvas x:Name="Targets" />
-            <Border x:Name="Cursor"
-                    BorderBrush="{StaticResource WorkspaceAccentBrush}"
-                    BorderThickness="2"
-                    Visibility="Collapsed"
-                    IsHitTestVisible="False" />
-            <Canvas x:Name="Labels"
-                    IsHitTestVisible="False" />
-        </Canvas>
+    <Grid ColumnDefinitions="*,16">
+        <Grid x:Name="Surface"
+              Background="Transparent">
+            <Grid.Resources>
+                <DataTemplate x:Key="ColumnLabelTemplate">
+                    <TextBlock Text="{Binding}" />
+                </DataTemplate>
+            </Grid.Resources>
+            <Canvas>
+                <Canvas.Clip>
+                    <RectangleGeometry x:Name="ViewportClip" />
+                </Canvas.Clip>
+                <Path x:Name="Lines"
+                      Stroke="{StaticResource GridLineBrush}"
+                      StrokeThickness="1"
+                      IsHitTestVisible="False" />
+                <Canvas x:Name="Targets" />
+                <Border x:Name="Cursor"
+                        BorderBrush="{StaticResource WorkspaceAccentBrush}"
+                        BorderThickness="2"
+                        Visibility="Collapsed"
+                        IsHitTestVisible="False" />
+                <Canvas x:Name="Labels"
+                        IsHitTestVisible="False" />
+            </Canvas>
+        </Grid>
+        <ScrollBar x:Name="RowScroll"
+                   Grid.Column="1"
+                   Orientation="Vertical"
+                   IsTabStop="False"
+                   Scroll="OnRowScroll" />
     </Grid>
 </UserControl>
