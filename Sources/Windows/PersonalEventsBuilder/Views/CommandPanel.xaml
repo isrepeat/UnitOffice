@@ -6,10 +6,8 @@
              IsTabStop="False">
     <Grid Margin="4"
           RowSpacing="3"
-          RowDefinitions="Auto,*"
-          ColumnDefinitions="*,Auto">
+          RowDefinitions="Auto,*">
         <Grid ColumnSpacing="6"
-              Grid.ColumnSpan="2"
               ColumnDefinitions="*,*,*">
             <TextBlock Foreground="{StaticResource WorkspaceTextBrush}"
                        Text="Прибытие" />
@@ -20,9 +18,9 @@
                        Foreground="{StaticResource WorkspaceTextBrush}"
                        Text="Изменение статуса" />
         </Grid>
-        <ScrollViewer x:Name="CommandViewport" Grid.Row="1"
+        <ScrollViewer Grid.Row="1"
                       HorizontalContentAlignment="Stretch"
-                      VerticalScrollMode="Disabled"
+                      VerticalScrollMode="Enabled"
                       HorizontalScrollMode="Disabled"
                       VerticalScrollBarVisibility="Hidden"
                       HorizontalScrollBarVisibility="Disabled">
@@ -93,13 +91,5 @@
                                             PlaceholderLines_LineWidths="33,57" />
             </parts:CommandGrid>
         </ScrollViewer>
-        <ScrollBar Grid.Row="1" Grid.Column="1"
-                   IsTabStop="False"
-                   Orientation="Vertical"
-                   Visibility="{x:Bind ScrollVisibility(CommandViewport.ScrollableHeight), Mode=OneWay}"
-                   Maximum="{Binding ScrollableHeight, ElementName=CommandViewport}"
-                   ViewportSize="{Binding ViewportHeight, ElementName=CommandViewport}"
-                   Value="{Binding VerticalOffset, ElementName=CommandViewport, Mode=OneWay}"
-                   Scroll="OnCommandScroll" />
     </Grid>
 </UserControl>

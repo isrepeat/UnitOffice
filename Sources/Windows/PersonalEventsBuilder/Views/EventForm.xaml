@@ -6,7 +6,7 @@
     <Grid RowDefinitions="Auto,*">
         <TextBlock Foreground="{StaticResource WorkspaceTextBrush}"
                    Text="Форма события" />
-        <udkGridControls:GridCanvas x:Name="Surface" Grid.Row="1"
+        <udkGridControls:GridCanvas Grid.Row="1"
                                     GridLayout="{x:Bind GridLayout, Mode=OneWay}"
                                     GridLinesVisibility="Visible"
                                     ItemsSource="{x:Bind Fields, Mode=OneWay}">

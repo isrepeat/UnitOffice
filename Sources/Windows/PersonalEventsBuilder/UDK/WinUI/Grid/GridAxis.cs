@@ -62,18 +62,19 @@ namespace UDK.WinUI.Grid {
         internal const double MinimumStep = 8;
         internal event Action? Changed;
         private readonly Stopwatch animation = new();
-        private readonly Dictionary<object, (double Start, double End)> viewports = new();
+        private readonly Dictionary<object, (double Start, double End, bool CenterOnStepChange)> viewports = new();
 
-        internal void SetViewport(object owner, double length, double start = 0) {
+        internal void SetViewport(object owner, double length, double start = 0, bool centerOnStepChange = false) {
             if (length <= 0) {
                 if (!this.viewports.Remove(owner)) {
                     return;
                 }
             } else {
-                if (this.viewports.TryGetValue(owner, out var previous) && previous == (start, start + length)) {
+                var viewport = (start, start + length, centerOnStepChange);
+                if (this.viewports.TryGetValue(owner, out var previous) && previous == viewport) {
                     return;
                 }
-                this.viewports[owner] = (start, start + length);
+                this.viewports[owner] = viewport;
             }
             this.UpdateViewport();
         }
@@ -123,7 +124,7 @@ namespace UDK.WinUI.Grid {
             int capacity = this.Capacity(width, 0);
             this.Origin = start + (width - capacity * this.Step) / 2;
             // Сохраняем половину ячейки между соседними шагами перетаскивания.
-            if (stepChanged && this.previousCapacity > 0 && capacity > 0) {
+            if (stepChanged && this.previousCapacity > 0 && capacity > 0 && this.viewports.Values.Any(viewport => viewport.CenterOnStepChange)) {
                 this.scrollPosition += (this.previousCapacity - capacity) / 2.0;
             }
             this.scrollPosition = Math.Clamp(this.scrollPosition, 0, Math.Max(0, this.Count - Math.Max(1, capacity)));

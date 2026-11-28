@@ -301,7 +301,7 @@ namespace UDK.WinUI.Grid.Controls {
         }
 
         private void UpdateViewport() {
-            this.columns?.SetViewport(this.columnViewport, this.Surface.ActualWidth, this.surfaceX);
+            this.columns?.SetViewport(this.columnViewport, this.Surface.ActualWidth, this.surfaceX, centerOnStepChange: true);
             this.rows?.SetViewport(this.rowViewport, this.Surface.ActualHeight);
             this.Draw();
         }

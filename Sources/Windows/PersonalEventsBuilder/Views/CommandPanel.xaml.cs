@@ -7,12 +7,6 @@ namespace PersonalEventsBuilder.Views {
             this.InitializeComponent();
         }
 
-        private Microsoft.UI.Xaml.Visibility ScrollVisibility(double range) =>
-            range > 0 ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
-
-        private void OnCommandScroll(object sender, Microsoft.UI.Xaml.Controls.Primitives.ScrollEventArgs args) =>
-            this.CommandViewport.ChangeView(null, args.NewValue, null, true);
-
         //
         // IKeyboardNavigationArea
         //

@@ -43,7 +43,8 @@
                                     Navigation="{StaticResource EventNavigation}"
                                     NavigationOrder="2">
                     <udkGrid:GridLayout.Rows>
-                        <udkGrid:GridAxis Step="28" Count="30" />
+                        <udkGrid:GridAxis Step="28"
+                                          Count="30" />
                     </udkGrid:GridLayout.Rows>
                 </udkGrid:GridLayout>
                 <Style BasedOn="{StaticResource ZoneSplitterStyle}"
@@ -81,10 +82,6 @@
                             <views:EventForm GridLayout="{StaticResource FormGrid}"
                                              Fields="{x:Bind WorkspacePageViewModel.EventLayout.Fields, Mode=OneWay}" />
                         </udkLayout:Zone>
-                        <!--<udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
-                                        Size="*">
-                            <TextBlock Text="Сводка" />
-                        </udkLayout:Zone>-->
                         <udkLayout:Splitter />
                         <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
                                         Title="Кандидати"
