@@ -31,24 +31,16 @@ namespace PersonalEventsBuilder.Views {
             nameof(Rows), typeof(IReadOnlyList<IReadOnlyList<string>>), typeof(CandidatesTable),
             new PropertyMetadata(null, (sender, _) => ((CandidatesTable)sender).UpdateTable()));
 
-        private readonly CandidatesTableParts.Controls.CandidateGrid region;
+        internal CandidatesTableParts.Controls.CandidateTableItem[] TableItems { get; } = [new()];
 
         public CandidatesTable() {
             this.InitializeComponent();
-            // Один CandidateGrid на весь срок жизни представления: вместе с ним между режимами сохраняется пул ячеек.
-            this.region = (CandidatesTableParts.Controls.CandidateGrid)((DataTemplate)this.Resources["TableTemplate"]).LoadContent();
             this.Surface.ViewportChanged += this.UpdateButtons;
             this.UpdateButtons();
         }
 
         private void UpdateTable() {
-            var region = this.region;
-            if (this.Columns is { Count: > 0 } columns) {
-                region.Configure(columns, this.Rows ?? []);
-                this.Surface.ReplaceRegions(new[] { region });
-            } else {
-                this.Surface.ReplaceRegions<CandidatesTableParts.Controls.CandidateGrid>([]);
-            }
+            this.TableItems[0].Update(this.Columns ?? [], this.Rows ?? []);
         }
 
         private void UpdateButtons() {

@@ -3,11 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:udkGridControls="using:UDK.WinUI.Grid.Controls"
              xmlns:candidatesTableControls="using:PersonalEventsBuilder.Views.CandidatesTableParts.Controls">
-    <UserControl.Resources>
-        <DataTemplate x:Key="TableTemplate">
-            <candidatesTableControls:CandidateGrid />
-        </DataTemplate>
-    </UserControl.Resources>
     <Grid Margin="0,6"
           RowSpacing="4"
           RowDefinitions="Auto,*,Auto">
@@ -18,7 +13,14 @@
         <udkGridControls:GridCanvas x:Name="Surface"
                                     Grid.Row="1"
                                     GridLayout="{x:Bind GridLayout, Mode=OneWay}"
-                                    GridLinesVisibility="Visible" />
+                                    GridLinesVisibility="Visible"
+                                    ItemsSource="{x:Bind TableItems, Mode=OneTime}">
+            <udkGridControls:GridCanvas.ItemTemplate>
+                <DataTemplate x:DataType="candidatesTableControls:CandidateTableItem">
+                    <candidatesTableControls:CandidateGrid TableItem="{x:Bind}" />
+                </DataTemplate>
+            </udkGridControls:GridCanvas.ItemTemplate>
+        </udkGridControls:GridCanvas>
         <StackPanel Grid.Row="2"
                     HorizontalAlignment="Center"
                     Orientation="Horizontal"

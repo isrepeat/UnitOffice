@@ -5,7 +5,36 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Automation;
 
 namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
-    internal sealed partial class CandidateGrid : UserControl, UDK.WinUI.Grid.IGridNavigationTarget, UDK.WinUI.Grid.IGridViewportContent {
+    public sealed class CandidateTableItem {
+        internal event System.EventHandler? Changed;
+        internal IReadOnlyList<EventFormParts.FormColumn> Columns { get; private set; } = [];
+        internal IReadOnlyList<IReadOnlyList<string>> Rows { get; private set; } = [];
+
+        internal void Update(IReadOnlyList<EventFormParts.FormColumn> columns, IReadOnlyList<IReadOnlyList<string>> rows) {
+            this.Columns = columns;
+            this.Rows = rows;
+            this.Changed?.Invoke(this, System.EventArgs.Empty);
+        }
+    }
+
+    internal sealed partial class CandidateGrid : UserControl, UDK.WinUI.Grid.IGridNavigationTarget, UDK.WinUI.Grid.IGridViewportContent, UDK.WinUI.Grid.INotifyGridRegionChanged {
+        public event System.EventHandler? RegionChanged;
+
+        public CandidateTableItem? TableItem {
+            get => (CandidateTableItem?)this.GetValue(TableItemProperty);
+            set => this.SetValue(TableItemProperty, value);
+        }
+        public static readonly DependencyProperty TableItemProperty = DependencyProperty.Register(
+            nameof(TableItem), typeof(CandidateTableItem), typeof(CandidateGrid), new PropertyMetadata(null, (sender, args) => {
+                var grid = (CandidateGrid)sender;
+                if (args.OldValue is CandidateTableItem previous) {
+                    previous.Changed -= grid.OnTableChanged;
+                }
+                if (args.NewValue is CandidateTableItem current) {
+                    current.Changed += grid.OnTableChanged;
+                }
+                grid.OnTableChanged(sender, System.EventArgs.Empty);
+            }));
         //
         // IGridNavigationTarget
         //
@@ -85,12 +114,12 @@ namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
             }
         }
 
-        internal void Configure(IReadOnlyList<EventFormParts.FormColumn> columns, IReadOnlyList<IReadOnlyList<string>> values) {
-            this.values = values;
-            this.columns = columns;
-            int start = this.columns[0].Start;
-            var last = this.columns[^1];
-            this.Bounds = new(start, 0, last.Start + last.Span - start, System.Math.Max(8, this.values.Count));
+        private void OnTableChanged(object? sender, System.EventArgs args) {
+            this.values = this.TableItem?.Rows ?? [];
+            this.columns = this.TableItem?.Columns ?? [];
+            this.Bounds = this.columns.Count == 0 ? default : new(this.columns[0].Start, 0,
+                this.columns[^1].Start + this.columns[^1].Span - this.columns[0].Start, System.Math.Max(8, this.values.Count));
+            this.RegionChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
         private int ColumnIndex(int column) => Enumerable.Range(0, this.columns.Count).First(index => column < this.columns[index].Start + this.columns[index].Span);

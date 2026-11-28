@@ -162,6 +162,9 @@ namespace UDK.WinUI.Grid.Controls {
                 throw new ArgumentException("Grid regions must not overlap.", nameof(region));
             }
             this.regions.Add(region);
+            if (region is INotifyGridRegionChanged notifying) {
+                notifying.RegionChanged += this.OnRegionChanged;
+            }
             this.Targets.Children.Add(region);
             this.UpdateTargets();
         }
@@ -175,6 +178,9 @@ namespace UDK.WinUI.Grid.Controls {
             }
             for (int index = this.Targets.Children.Count - 1; index >= 0; index--) {
                 if (this.Targets.Children[index] is FrameworkElement element && !nextElements.Contains(element)) {
+                    if (element is INotifyGridRegionChanged notifying) {
+                        notifying.RegionChanged -= this.OnRegionChanged;
+                    }
                     this.Targets.Children.RemoveAt(index);
                 }
             }
@@ -182,6 +188,9 @@ namespace UDK.WinUI.Grid.Controls {
             foreach (var region in replacements) {
                 this.regions.Add((IGridNavigationTarget)region);
                 if (!this.Targets.Children.Contains(region)) {
+                    if (region is INotifyGridRegionChanged notifying) {
+                        notifying.RegionChanged += this.OnRegionChanged;
+                    }
                     this.Targets.Children.Add(region);
                 }
             }
@@ -195,6 +204,13 @@ namespace UDK.WinUI.Grid.Controls {
         }
 
         internal GridAddress ResolveAddress(GridAddress hit) => this.Owner(hit)?.FocusAddress(hit) ?? hit;
+
+        private void OnRegionChanged(object? sender, EventArgs args) {
+            this.UpdateTargets();
+            if (this.activeAddress is { } previous) {
+                this.SetActiveAddress(this.ResolveAddress(previous));
+            }
+        }
 
         internal GridArea FocusArea(GridAddress address) => this.Owner(address)?.FocusArea(address) ?? new(address.Column, address.Row, 1, 1);
 
