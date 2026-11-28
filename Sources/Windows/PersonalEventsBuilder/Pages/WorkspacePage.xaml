@@ -25,8 +25,7 @@
                                     Columns="{StaticResource EventColumns}"
                                     Navigation="{StaticResource EventNavigation}">
                     <udkGrid:GridLayout.Rows>
-                        <udkGrid:GridAxis Step="40"
-                                          Count="6" />
+                        <udkGrid:GridAxis Step="40" />
                     </udkGrid:GridLayout.Rows>
                 </udkGrid:GridLayout>
                 <udkGrid:GridLayout x:Key="CandidatesGrid"
@@ -78,20 +77,20 @@
                                     SequentialScroll="True">
                         <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
                                         Title="Форма события"
-                                        Size="340">
+                                        Size="Auto">
                             <views:EventForm GridLayout="{StaticResource FormGrid}"
                                              Fields="{x:Bind WorkspacePageViewModel.EventLayout.Fields, Mode=OneWay}" />
                         </udkLayout:Zone>
-                        <udkLayout:Splitter />
+                        <!--<udkLayout:Splitter />-->
                         <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
                                         Title="Кандидати"
-                                        Size="540">
+                                        Size="Auto">
                             <views:CandidatesTable GridLayout="{StaticResource CandidatesGrid}"
                                                    Columns="{x:Bind WorkspacePageViewModel.EventLayout.MainColumns, Mode=OneWay}" />
                         </udkLayout:Zone>
                         <udkLayout:Zone Style="{StaticResource ZonePanelStyle}"
                                         Title="Тестовая таблица"
-                                        Size="540">
+                                        Size="Auto">
                             <views:CandidatesTable GridLayout="{StaticResource TestCandidatesGrid}"
                                                    Columns="{x:Bind WorkspacePageViewModel.EventLayout.MainColumns, Mode=OneWay}" />
                         </udkLayout:Zone>

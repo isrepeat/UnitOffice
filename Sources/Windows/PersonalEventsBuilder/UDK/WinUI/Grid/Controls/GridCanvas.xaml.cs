@@ -84,6 +84,7 @@ namespace UDK.WinUI.Grid.Controls {
         private double displayRow;
         private double grabOffset;
         private double gridHeight;
+        private double contentHeight;
         private double displayColumn;
         private GridAxis? rows;
         private GridAxis? columns;
@@ -288,16 +289,35 @@ namespace UDK.WinUI.Grid.Controls {
                 this.columns.SetViewport(this.columnViewport, 0);
             }
             if (this.rows is not null) {
-                this.rows.Changed -= this.Draw;
+                this.rows.Changed -= this.OnRowsChanged;
                 this.rows.SetViewport(this.rowViewport, 0);
             }
             this.columns = this.observedLayout?.Columns;
             this.rows = this.observedLayout?.Rows;
             if (this.columns is not null && this.rows is not null) {
                 this.columns.Changed += this.Draw;
-                this.rows.Changed += this.Draw;
+                this.rows.Changed += this.OnRowsChanged;
             }
+            this.UpdateContentHeight();
             this.UpdateViewport();
+        }
+
+        protected override Size MeasureOverride(Size availableSize) {
+            var measured = base.MeasureOverride(availableSize);
+            return new Size(measured.Width, Math.Min(availableSize.Height, this.contentHeight));
+        }
+
+        private void OnRowsChanged() {
+            this.UpdateContentHeight();
+            this.Draw();
+        }
+
+        private void UpdateContentHeight() {
+            double height = this.rows is { } rows ? rows.Count * rows.Step : 0;
+            if (this.contentHeight != height) {
+                this.contentHeight = height;
+                this.InvalidateMeasure();
+            }
         }
 
         private void UpdateViewport() {

@@ -30,10 +30,12 @@ namespace PersonalEventsBuilder.Views {
 
         private void UpdateGridSize() {
             if (this.GridLayout is { } layout) {
+                int rowCount = 1;
                 foreach (var field in this.Fields ?? []) {
-                    layout.Rows.Count = Math.Max(layout.Rows.Count, field.Bounds.Bottom);
+                    rowCount = Math.Max(rowCount, field.Bounds.Bottom);
                     layout.Columns.Count = Math.Max(layout.Columns.Count, field.Bounds.Right);
                 }
+                layout.Rows.Count = rowCount;
             }
         }
     }

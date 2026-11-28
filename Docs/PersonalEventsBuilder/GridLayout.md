@@ -154,18 +154,18 @@
 Grid (шаблон ScrollingRows)
 ├─ ScrollViewer
 │  └─ Grid
-│     ├─ Строка 0 · 340 → Border [ZonePanelStyle] → EventForm
+│     ├─ Строка 0 · Auto → Border [ZonePanelStyle] → EventForm
 │     ├─ Строка 1 ·   5 → Thumb
-│     ├─ Строка 2 · 540 → Border [ZonePanelStyle] → CandidatesTable [CandidatesGrid]
+│     ├─ Строка 2 · Auto → Border [ZonePanelStyle] → CandidatesTable [CandidatesGrid]
 │     ├─ Строка 3 ·   5 → Border [Gap]
-│     └─ Строка 4 · 540 → Border [ZonePanelStyle] → CandidatesTable [TestCandidatesGrid]
+│     └─ Строка 4 · Auto → Border [ZonePanelStyle] → CandidatesTable [TestCandidatesGrid]
 └─ StackPanel
    ├─ Button «Форма события»
    ├─ Button «Кандидати»
    └─ Button «Тестовая таблица»
 ```
 
-Здесь 540 — объявленная высота последней строки. Хост дополнительно задаёт ей минимальную высоту по размеру контейнера в пределах ограничений зоны. Благодаря этому последнюю таблицу можно прокрутить до верхнего края. Кнопки стека изначально скрыты и появляются поверх прокручиваемого содержимого. [Шаблоны WinUI](../../Sources/Windows/PersonalEventsBuilder/UDK/WinUI/Layout/Controls/WorkspaceHost.xaml) · [Построение дерева](../../Sources/Windows/PersonalEventsBuilder/UDK/WinUI/Layout/Controls/WorkspaceHost.xaml.cs)
+При размере Auto сетка запрашивает высоту Rows.Count × Rows.Step. Форма определяет число строк по нижней границе полей текущего режима. Перетаскивание разделителя вручную фиксирует размеры соседних зон. Хост дополнительно задаёт ей минимальную высоту по размеру контейнера в пределах ограничений зоны. Благодаря этому последнюю таблицу можно прокрутить до верхнего края. Кнопки стека изначально скрыты и появляются поверх прокручиваемого содержимого. [Шаблоны WinUI](../../Sources/Windows/PersonalEventsBuilder/UDK/WinUI/Layout/Controls/WorkspaceHost.xaml) · [Построение дерева](../../Sources/Windows/PersonalEventsBuilder/UDK/WinUI/Layout/Controls/WorkspaceHost.xaml.cs)
 
 ### Влияние на видимые ячейки
 
