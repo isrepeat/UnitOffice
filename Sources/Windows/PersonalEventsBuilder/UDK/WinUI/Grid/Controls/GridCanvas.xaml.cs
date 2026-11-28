@@ -231,14 +231,22 @@ namespace UDK.WinUI.Grid.Controls {
             this.UpdateCursor();
         }
 
-        internal void Reveal(GridAddress address) {
+        internal void Reveal(GridAddress address, bool revealInContainer) {
             var area = this.FocusArea(address);
             int left = this.LeftColumn;
             int top = this.rows!.FirstVisibleIndex;
             int firstRow = Math.Max(area.Row, address.Row - this.visibleRows + 1);
             int lastColumn = Math.Min(area.Right, area.Column + this.visibleColumns) - 1;
             this.ScrollColumns(area.Column < left ? area.Column - left : Math.Max(0, lastColumn - (left + this.visibleColumns - 1)));
-            this.ScrollRows(firstRow < top ? firstRow - top : Math.Max(0, address.Row - (top + this.visibleRows - 1)));
+            int lastRow = Math.Min(area.Bottom, firstRow + this.visibleRows) - 1;
+            this.ScrollRows(firstRow < top ? firstRow - top : Math.Max(0, lastRow - (top + this.visibleRows - 1)));
+            if (revealInContainer && this.visibleRows > 0) {
+                double y = (firstRow - this.rows.FirstVisibleIndex) * this.rows.Step;
+                this.Surface.StartBringIntoView(new BringIntoViewOptions {
+                    TargetRect = new Rect(0, y, this.Surface.ActualWidth, (lastRow - firstRow + 1) * this.rows.Step),
+                    AnimationDesired = true
+                });
+            }
         }
 
         private void RebuildRegions(bool reuse = true) {

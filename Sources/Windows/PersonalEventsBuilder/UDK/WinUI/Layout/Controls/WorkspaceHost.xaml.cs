@@ -125,6 +125,23 @@ namespace UDK.WinUI.Layout.Controls {
             }
 
             viewer.ViewChanged += (_, _) => UpdateHeaders();
+            grid.BringIntoViewRequested += (_, args) => {
+                if (!args.AnimationDesired) {
+                    return;
+                }
+                var bounds = args.TargetElement.TransformToVisual(grid).TransformBounds(args.TargetRect);
+                double offset = viewer.VerticalOffset;
+                double covered = headers.ActualHeight;
+                if (bounds.Top < offset + covered || bounds.Height > viewer.ViewportHeight - covered) {
+                    offset = bounds.Top - covered;
+                } else if (bounds.Bottom > offset + viewer.ViewportHeight) {
+                    offset = bounds.Bottom - viewer.ViewportHeight;
+                }
+                args.Handled = true;
+                if (offset != viewer.VerticalOffset) {
+                    viewer.ChangeView(null, Math.Clamp(offset, 0, viewer.ScrollableHeight), null, false);
+                }
+            };
             grid.LayoutUpdated += (_, _) => UpdateHeaders();
             return container;
         }

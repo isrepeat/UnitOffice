@@ -66,7 +66,7 @@ namespace UDK.WinUI.Grid {
             } else if (!restore) {
                 this.coordinator.Remember(address);
             }
-            surface.Reveal(address);
+            surface.Reveal(address, revealInContainer: move.HasValue);
             surface.SetActiveAddress(surface.ResolveAddress(address));
         }
 
