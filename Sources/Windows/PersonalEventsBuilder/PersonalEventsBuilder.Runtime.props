@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(VCToolsInstallDir)' == '' and Exists('$(VsInstallRoot)\VC\Auxiliary\Build\Microsoft.VCToolsVersion.default.txt')">
+    <_DefaultVCToolsVersion>$([System.IO.File]::ReadAllText('$(VsInstallRoot)\VC\Auxiliary\Build\Microsoft.VCToolsVersion.default.txt').Trim())</_DefaultVCToolsVersion>
+    <VCToolsInstallDir Condition="Exists('$(VsInstallRoot)\VC\Tools\MSVC\$(_DefaultVCToolsVersion)\bin\Hostx64\x64\vcmeta.dll')">$(VsInstallRoot)\VC\Tools\MSVC\$(_DefaultVCToolsVersion)\</VCToolsInstallDir>
+  </PropertyGroup>
   <Target Name="IncludeDiagnosticRuntime"
           AfterTargets="__UniversalDevKitResolveNativeRuntime">
     <ItemGroup>

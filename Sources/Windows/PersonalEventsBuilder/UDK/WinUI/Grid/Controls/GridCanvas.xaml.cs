@@ -343,7 +343,7 @@ namespace UDK.WinUI.Grid.Controls {
                 }
                 geometry.Children.Add(new LineGeometry { StartPoint = new Point(x, 0), EndPoint = new Point(x, (bottom - this.displayRow) * rows.Step) });
             }
-            for (int row = top + 1; row <= bottom; row++) {
+            for (int row = top; row <= bottom; row++) {
                 double y = (row - this.displayRow) * rows.Step;
                 geometry.Children.Add(new LineGeometry { StartPoint = new Point(left, y), EndPoint = new Point(right, y) });
             }
