@@ -43,7 +43,7 @@ namespace UDK.WinUI.Grid.Controls {
         }
         public static readonly DependencyProperty ItemTemplateProperty = DependencyProperty.Register(
             nameof(ItemTemplate), typeof(DataTemplate), typeof(GridCanvas),
-            new PropertyMetadata(null, (sender, _) => ((GridCanvas)sender).RebuildRegions()));
+            new PropertyMetadata(null, (sender, _) => ((GridCanvas)sender).RebuildRegions(reuse: false)));
 
         private int LeftColumn => this.columnWindow.First;
 
@@ -168,16 +168,29 @@ namespace UDK.WinUI.Grid.Controls {
 
         internal void ReplaceRegions<T>(IReadOnlyList<T> replacements) where T : FrameworkElement {
             var address = this.activeAddress;
-            this.SetActiveAddress(null);
-            this.Targets.Children.Clear();
+            // Общие для двух раскладок контролы остаются в визуальном дереве вместе со своим состоянием фокуса.
+            var nextElements = new HashSet<FrameworkElement>(replacements);
+            if (this.activeTarget is FrameworkElement activeElement && !nextElements.Contains(activeElement)) {
+                this.SetActiveAddress(null);
+            }
+            for (int index = this.Targets.Children.Count - 1; index >= 0; index--) {
+                if (this.Targets.Children[index] is FrameworkElement element && !nextElements.Contains(element)) {
+                    this.Targets.Children.RemoveAt(index);
+                }
+            }
             this.regions.Clear();
             foreach (var region in replacements) {
                 this.regions.Add((IGridNavigationTarget)region);
-                this.Targets.Children.Add(region);
+                if (!this.Targets.Children.Contains(region)) {
+                    this.Targets.Children.Add(region);
+                }
             }
             this.UpdateTargets();
             if (address is { } previous) {
-                this.SetActiveAddress(this.ResolveAddress(previous));
+                var resolved = this.ResolveAddress(previous);
+                if (this.activeAddress != resolved || this.activeTarget != this.Owner(resolved)) {
+                    this.SetActiveAddress(resolved);
+                }
             }
         }
 
@@ -206,10 +219,18 @@ namespace UDK.WinUI.Grid.Controls {
             this.ScrollRows(firstRow < top ? firstRow - top : Math.Max(0, address.Row - (top + this.visibleRows - 1)));
         }
 
-        private void RebuildRegions() {
+        private void RebuildRegions(bool reuse = true) {
             var elements = new List<FrameworkElement>();
             if (this.ItemTemplate is { } template && this.ItemsSource is { } source) {
+                // Каждый совпавший элемент используем один раз. При смене шаблона всю раскладку создаём из нового шаблона.
+                var previous = reuse ? this.regions.OfType<FrameworkElement>().ToList() : [];
                 foreach (var item in source) {
+                    int index = previous.FindIndex(element => Equals(element.DataContext, item));
+                    if (index >= 0) {
+                        elements.Add(previous[index]);
+                        previous.RemoveAt(index);
+                        continue;
+                    }
                     if (template.LoadContent() is not FrameworkElement element || element is not IGridNavigationTarget) {
                         throw new InvalidOperationException("ItemTemplate must create a FrameworkElement implementing IGridNavigationTarget.");
                     }

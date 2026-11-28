@@ -5,16 +5,6 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Automation;
 
 namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
-    internal sealed class CandidateTableItem {
-        public IReadOnlyList<EventFormParts.FormColumn> Columns { get; }
-        public IReadOnlyList<IReadOnlyList<string>> Values { get; }
-
-        public CandidateTableItem(IReadOnlyList<EventFormParts.FormColumn> columns, IReadOnlyList<IReadOnlyList<string>> values) {
-            this.Columns = columns;
-            this.Values = values;
-        }
-    }
-
     internal sealed partial class CandidateGrid : UserControl, UDK.WinUI.Grid.IGridNavigationTarget, UDK.WinUI.Grid.IGridViewportContent {
         //
         // IGridNavigationTarget
@@ -29,11 +19,6 @@ namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
 
         public CandidateGrid() {
             this.InitializeComponent();
-            this.DataContextChanged += (_, args) => {
-                if (args.NewValue is CandidateTableItem candidateTableItem) {
-                    this.Configure(candidateTableItem);
-                }
-            };
         }
 
         //
@@ -67,7 +52,11 @@ namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
         // IGridViewportContent
         //
         public void ArrangeCells(UDK.WinUI.Grid.GridArea visible, double width, double height) {
-            foreach (var address in this.visibleCells.Keys.Where(address => visible.Intersect(this.FocusArea(address)).IsEmpty).ToArray()) {
+            // Широкая ячейка привязана к началу столбца и остаётся видимой, даже если в окно попадает только его правый край.
+            var visibleStarts = this.columns.Where(column => column.Start < visible.Right && column.Start + column.Span > visible.Column)
+                .Select(column => column.Start).ToHashSet();
+            // Сначала освобождаем исчезнувшие адреса, чтобы их ячейки можно было сразу использовать для новых столбцов.
+            foreach (var address in this.visibleCells.Keys.Where(address => address.Row < visible.Row || address.Row >= visible.Bottom || !visibleStarts.Contains(address.Column)).ToArray()) {
                 var released = this.visibleCells[address];
                 this.visibleCells.Remove(address);
                 this.Cells.Children.Remove(released);
@@ -79,13 +68,14 @@ namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
                     var area = this.FocusArea(new(column, row));
                     var address = new UDK.WinUI.Grid.GridAddress(area.Column, row);
                     if (!this.visibleCells.TryGetValue(address, out var cell)) {
+                        // Загружаем XAML-шаблон только при нехватке готовых ячеек в пуле.
                         cell = this.recycledCells.TryPop(out var recycled) ? recycled
                             : (CandidateCell)((DataTemplate)this.Resources["CandidateCellTemplate"]).LoadContent();
-                        cell.SetContent(this.ValueAt(address), row == this.Bounds.Row, row - this.Bounds.Row < 3);
                         cell.SetSelected(address == this.active);
                         this.visibleCells.Add(address, cell);
                         this.Cells.Children.Add(cell);
                     }
+                    cell.SetContent(this.ValueAt(address), row == this.Bounds.Row, row - this.Bounds.Row < 3);
                     cell.Width = width * area.Width;
                     cell.Height = height;
                     Canvas.SetLeft(cell, (area.Column - this.Bounds.Column) * width);
@@ -95,9 +85,9 @@ namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
             }
         }
 
-        private void Configure(CandidateTableItem candidateTableItem) {
-            this.values = candidateTableItem.Values;
-            this.columns = candidateTableItem.Columns;
+        internal void Configure(IReadOnlyList<EventFormParts.FormColumn> columns, IReadOnlyList<IReadOnlyList<string>> values) {
+            this.values = values;
+            this.columns = columns;
             int start = this.columns[0].Start;
             var last = this.columns[^1];
             this.Bounds = new(start, 0, last.Start + last.Span - start, System.Math.Max(8, this.values.Count));

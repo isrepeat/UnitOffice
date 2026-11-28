@@ -26,30 +26,45 @@
                       LabelKey="Tr_FormExtension"
                       Placement="Left">
         <scheme:FormField Id="L1"
-                          Width="2" />
+                          Width="1" />
+        <scheme:FormField Id="L2"
+                          Width="1" />
     </scheme:FormGroup>
     <scheme:FormGroup Feature="Treatment"
                       LabelKey="Tr_FormExtension"
                       Placement="Right">
         <scheme:FormField Id="R1"
-                          Width="2" />
+                          Width="1" />
+        <scheme:FormField Id="R2"
+                          Width="1" />
     </scheme:FormGroup>
-    <scheme:FormGroup LabelKey="Tr_FormExtension"
+    <scheme:FormGroup Feature="Document"
+                      LabelKey="Tr_FormExtension"
                       Placement="BelowField"
                       AnchorFieldId="A1">
         <scheme:FormField Id="B1"
-                          Width="6" />
+                          Width="3" />
+        <scheme:FormField Id="B2"
+                          Width="3" />
     </scheme:FormGroup>
-    <scheme:FormGroup LabelKey="Tr_FormExtension"
+    <scheme:FormGroup Feature="Treatment"
+                      LabelKey="Tr_FormExtension"
                       Placement="BelowField"
                       AnchorFieldId="A3">
         <scheme:FormField Id="C1"
                           Width="2" />
+        <scheme:FormField Id="C2"
+                          Width="2" />
     </scheme:FormGroup>
-    <scheme:FormGroup LabelKey="Tr_FormExtension"
+    <scheme:FormGroup Feature="Document,Treatment"
+                      LabelKey="Tr_FormExtension"
                       Placement="BelowField"
                       AnchorFieldId="A1">
         <scheme:FormField Id="D1"
-                          Width="6" />
+                          Width="2" />
+        <scheme:FormField Id="D2"
+                          Width="2" />
+        <scheme:FormField Id="D3"
+                          Width="2" />
     </scheme:FormGroup>
 </scheme:FormDefinition>

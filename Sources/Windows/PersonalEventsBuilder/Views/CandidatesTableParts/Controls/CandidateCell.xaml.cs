@@ -21,6 +21,11 @@ namespace PersonalEventsBuilder.Views.CandidatesTableParts.Controls {
         internal void SetSelected(bool isActive) => States.NavigationFocus.SetActive(this.FocusFrame, isActive);
 
         internal void SetContent(string value, bool header, bool showPlaceholder) {
+            // Повторная компоновка часто меняет только размеры ячейки. Сохраняем DataContext, чтобы не запускать привязки заново.
+            if (this.DataContext is CandidateCellContent content && content.Value == value && content.ShowPlaceholder == showPlaceholder &&
+                this.Surface.Background == (Brush)Application.Current.Resources[header ? "CommandBrush" : "PanelBrush"]) {
+                return;
+            }
             this.DataContext = new CandidateCellContent(value, showPlaceholder);
             this.Surface.Background = (Brush)Application.Current.Resources[header ? "CommandBrush" : "PanelBrush"];
         }
